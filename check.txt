@@ -4,10 +4,10 @@
 
 select * from ord_idm_idmsta where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
 
+thay doi dnoi dung 
 
 
-
-select distinct ind_no from ord_idm_idmter where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+select testet distinct ind_no from ord_idm_idmter where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
 
 
 select distinct ind_no from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
@@ -45,5 +45,56 @@ and type='8'
 select * from vhitem.dbo.INV_ACPT
 where acpt_no in (
 select  cr_no from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+and type='8' djdjdj
+) order by acpt_date
+
+
+
+
+
+
+select * from ord_idm_idmsta where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+
+thay doi dnoi dung 
+
+
+select testet distinct ind_no from ord_idm_idmter where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+
+
+select distinct ind_no from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+
+select distinct ind_no from prd_inv_pro_mon where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+
+select *  from prd_inv_pro_mon where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+
+
+
+select  *  from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+and type='8'
+
+
+select * from vhitem.dbo.INV_ACPT
+where acpt_no in (
+select  cr_no from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
 and type='8' 
+) order by acpt_date
+
+
+
+
+
+
+
+---------------
+
+
+
+select  *  from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+and type='8'
+
+
+select * from vhitem.dbo.INV_ACPT
+where acpt_no in (
+select  cr_no from vhitem.dbo.INV_INDS where ind_no in( 'MV605004','MV605012','MV605013','MV605015','MV605111','MV605113','MV605179','MV605243','MV605250','MV606002','MV606029','MV606042','MV606061')
+and type='8' djdjdj
 ) order by acpt_date
