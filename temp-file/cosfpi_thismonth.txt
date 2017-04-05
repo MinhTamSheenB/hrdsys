@@ -1,0 +1,7 @@
+ now fix design table in 7.12
+[flu-erp] 
+and 
+vsb-erp
+
+quantity, 
+style_no
