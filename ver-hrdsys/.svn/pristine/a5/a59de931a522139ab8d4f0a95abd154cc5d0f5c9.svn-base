@@ -1,0 +1,440 @@
+{*************************************************************************
+Name：Dut21
+Author: Leo
+Create date:2005-11-25
+Modify date:2005-11-25
+Commentate:
+*************************************************************************}
+unit UnitDut21;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,
+  TntComCtrls,WSDLIntf, DB, ADODB,TntDialogs,strutils, TntDB,Qt, QuickRpt,
+  DBClient, Provider,DateUtils;
+
+type
+  TFormDut21 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    DataSource1: TDataSource;
+    ADOQuery1: TADOQuery;
+    Panel5: TPanel;
+    PanelGrid: TPanel;
+    TntDBGrid1: TTntDBGrid;
+    TntGroupBox1: TTntGroupBox;
+    RbEmp: TTntRadioButton;
+    EditEmpBegin: TTntEdit;
+    EditEmpEnd: TTntEdit;
+    RbDept: TTntRadioButton;
+    CobDeptBegin: TTntComboBox;
+    CobDeptEnd: TTntComboBox;
+    Btn_Search: TTntBitBtn;
+    Btn_Reset: TTntBitBtn;
+    Btn_Print: TTntBitBtn;
+    ADOQuery2: TADOQuery;
+    ClientDataSet1: TClientDataSet;
+    ClientDataSet1emp_id: TStringField;
+    ClientDataSet1emp_chs: TWideStringField;
+    ClientDataSet1dept_code: TStringField;
+    ClientDataSet1abbr_titl: TWideStringField;
+    ClientDataSet1absent_date: TDateTimeField;
+    ClientDataSet1absent_hours: TStringField;
+    ClientDataSet1seg_code: TStringField;
+    ClientDataSet1s_start: TStringField;
+    ClientDataSet1s_end: TStringField;
+    ADOQuery3: TADOQuery;
+    ADOQuery3wrk_date: TDateTimeField;
+    ADOQuery3emp_id: TStringField;
+    ADOQuery3seg_code: TStringField;
+    ADOQuery3clas_code: TStringField;
+    ADOQuery3s_start: TStringField;
+    ADOQuery3s_end: TStringField;
+    ADOQuery3emp_chs: TWideStringField;
+    ADOQuery3dept_code: TStringField;
+    ADOQuery3name_vim: TWideStringField;
+    ADOQuery3absent_hours: TStringField;
+    ADOQuery3abbr_titl: TWideStringField;
+    ADOQuery3flag: TStringField;
+    TntLabel6: TTntLabel;
+    DTPickBegin: TTntDateTimePicker;
+    DTPickEnd: TTntDateTimePicker;
+    TntLabel1: TTntLabel;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure BtnQueryClick(Sender: TObject);
+    procedure me_monthEnter(Sender: TObject);
+    procedure Btn_ResetClick(Sender: TObject);
+    procedure Btn_PrintClick(Sender: TObject);
+    procedure ClientDataSet1CalcFields(DataSet: TDataSet);
+    procedure ADOQuery3CalcFields(DataSet: TDataSet);
+    procedure CobDeptBeginChange(Sender: TObject);
+   
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormDut21: TFormDut21;
+
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys,UnitPrtSal12;
+var
+  Langstr:TWideStrings;//語言字符串
+  pri_arr:TPrvArr;//權限數組
+  totNum,peoplenum,times:integer;
+  dayNum:double;
+
+{$R *.dfm}
+
+procedure TFormDut21.FormCreate(Sender: TObject);
+begin
+  InitLang;// Init language
+  pri_arr:=GetPrvArr(username,'dut21');
+  InitForm;// Init Form
+end;
+
+procedure TFormDut21.InitLang;
+{*************************************************************************
+TO DO:初始化語言
+*************************************************************************}
+var
+  keys:String;
+begin
+SetComponentLang(self);//set component language text
+keys:='peoplesum,absent_days,absent_times,absent_num,absentwork,current_location,'
+  +'msg_month_error,while_printing,print_finish,just_doing_empid,dut21_titl,dept_range,fld_emp_id';
+LangStr:=GetLangWideStrs(keys);
+//PanelTitle.Caption:=GetLangName(LangStr,'sal10_titl');
+end;
+
+procedure TFormDut21.InitForm;
+{*************************************************************************
+TO DO:初始化Form
+*************************************************************************}
+begin
+  GetDeptRange(CobDeptBegin);
+  GetDeptRange(CobDeptEnd);
+  CobDeptBegin.ItemIndex:=0;
+  CobDeptEnd.ItemIndex:=CobDeptEnd.Items.Count-1;
+  DTPickBegin.Date:=StartOfTheMonth(date-7);
+  DTPickEnd.Date:=EndOfTheMonth(date-7);
+end;
+
+procedure TFormDut21.BtnQueryClick(Sender: TObject);
+var
+  SqlStr,ConStr,empid,empchs,deptcode,abbrtitl:WideString;
+  i,h:integer;
+  ADate,EDate:Tdate;
+  Afield:Tfields;
+  hours,dut_day, flag :string;
+begin
+  if  ( FormatDateTime('yyyy/mm/dd',DTPickBegin.Date) <'2008/08/01' ) and (FormatDateTime('yyyy/mm/dd',DTPickEnd.Date) >='2008/08/01' )  then
+  {if length(trim(me_month.Text))<>6 then}
+  begin
+    wideshowmessage(GetLangName(LangStr,'msg_month_error'));
+    exit;
+  end ;
+  if ( FormatDateTime('yyyy/mm/dd',DTPickEnd.Date) >='2008/08/01' ) and ( FormatDateTime('yyyy/mm/dd',DTPickBegin.Date) >='2008/08/01')  then
+     flag :='1'
+  else
+     flag :='0' ;
+  btn_search.Enabled:=false;
+  btn_print.Enabled:=false;
+  //Ayear:=StrtoInt(leftstr(me_month.text,4));
+  //Amonth:=StrtoInt(rightstr(me_month.text,2));
+  //ADate:=EncodeDate(Ayear,Amonth,1);
+  //EDate:=EndOfTheMonth(ADate);
+  ADate:=DTPickBegin.Date;
+  EDate:=DTPickEnd.Date;
+  if flag ='1'  then
+     sqlstr:='select * from hrd_dut_day A,hrd_dut_seg B,hrd_emp C'
+              +' where A.seg_code=B.seg_code and A.emp_id=C.emp_id'
+              +' and (A.wrk_sts=''06'' or A.clas_code=''06'')'
+              +' and wrk_date>='''+FormatDateTime('yyyy/mm/dd',ADate)+''''
+              +' and wrk_date<='''+FormatDateTime('yyyy/mm/dd',EDate)+''''
+  else
+     sqlstr:='select * from hrd_dut_day_bak A,hrd_dut_seg B,hrd_emp C'
+              +' where A.seg_code=B.seg_code and A.emp_id=C.emp_id'
+              +' and (A.wrk_sts=''06'' or A.clas_code=''06'')'
+              +' and wrk_date>='''+FormatDateTime('yyyy/mm/dd',ADate)+''''
+              +' and wrk_date<='''+FormatDateTime('yyyy/mm/dd',EDate)+'''';
+  if rbEmp.Checked then
+  begin
+    if trim(EditEmpBegin.Text)<>'' then
+      ConStr:=ConStr+' and C.emp_id>='''+EditEmpBegin.Text+''' ';
+    if trim(EditEmpEnd.Text)<>'' then
+      ConStr:=ConStr+' and C.emp_id<='''+EditEmpEnd.text+''' ';
+  end
+  else
+  begin
+    if trim(CobDeptBegin.Text)<>'' then
+      ConStr:=ConStr+' and C.dept_code>='''+leftstr(CobDeptBegin.Text,6)+''' ';
+    if trim(CobDeptEnd.Text)<>'' then
+      ConStr:=ConStr+' and C.dept_code<='''+leftstr(CobDeptEnd.Text,6)+''' ';
+  end;
+  if Checktempuser(username)  = false  then
+     begin
+       sqlstr:=sqlstr + ' and  not exists( select *from hrd_deny_emp where emp_id=c.emp_id ) '
+     end;
+  times:=0;//曠工人次
+  dayNum:=0;//纍計天數
+  peopleNum:=0;//曠工人數
+  TotNum:=0;//總人數
+  with ADOQuery3 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sqlstr+ConStr+' order by A.emp_id,A.wrk_date');
+    open;
+    times:=RecordCount;
+  end;
+  if flag ='1'  then
+  sqlstr:='select count(distinct A.emp_id) from hrd_dut_day A,hrd_dut_seg B,hrd_emp C'
+    +' where A.seg_code=B.seg_code and A.emp_id=C.emp_id'
+    +' and (A.wrk_sts=''06'' or A.clas_code=''06'')'
+    +' and wrk_date>='''+FormatDateTime('yyyy/mm/dd',ADate)+''''
+    +' and wrk_date<='''+FormatDateTime('yyyy/mm/dd',EDate)+''''
+  else
+     sqlstr:='select count(distinct A.emp_id) from hrd_dut_day_bak A,hrd_dut_seg B,hrd_emp C'
+    +' where A.seg_code=B.seg_code and A.emp_id=C.emp_id'
+    +' and (A.wrk_sts=''06'' or A.clas_code=''06'')'
+    +' and wrk_date>='''+FormatDateTime('yyyy/mm/dd',ADate)+''''
+    +' and wrk_date<='''+FormatDateTime('yyyy/mm/dd',EDate)+''''  ;
+  with DMHrdsys.SQLQuery3 do
+  begin
+    close;
+    sql.clear;
+    sql.Add(sqlstr+ConStr);
+    open;
+    peopleNum:=Fields[0].AsInteger;
+    close;
+  end;
+  sqlstr:='select count(*) from hrd_emp C where epindt<='''+FormatDatetime('yyyy/mm/dd',EDate)+''''
+    +' and (epledt is null or epledt>='''+FormatDatetime('yyyy/mm/dd',EDate)+''')';
+  with DMHrdsys.SQLQuery3 do
+  begin
+    close;
+    sql.clear;
+    sql.Add(sqlstr+ConStr);
+    open;
+    totNum:=Fields[0].AsInteger;
+    close;
+  end;
+  {sqlStr:='select * from hrd_dut_mon where dut_mon='''+me_month.text+''' and clas_code=''06'' ';
+  ConStr:='select emp_id from hrd_emp where (epledt is null or epledt>='''+
+        DatetimeToStr(encodedate(Ayear,Amonth,1))+''') ';
+  if rbEmp.Checked then
+  begin
+    if trim(EditEmpBegin.Text)<>'' then
+      ConStr:=ConStr+' and emp_id>='''+EditEmpBegin.Text+''' ';
+    if trim(EditEmpEnd.Text)<>'' then
+      ConStr:=ConStr+' and emp_id<='''+EditEmpEnd.text+''' ';
+  end
+  else
+  begin
+    if trim(CobDeptBegin.Text)<>'' then
+      ConStr:=ConStr+' and dept_code>='''+leftstr(CobDeptBegin.Text,6)+''' ';
+    if trim(CobDeptEnd.Text)<>'' then
+      ConStr:=ConStr+' and dept_code<='''+leftstr(CobDeptEnd.Text,6)+''' ';
+  end;
+  SqlStr:=SqlStr+' and emp_id in('+ConStr+')';
+  with adoquery1 do
+  begin
+    sql.Clear;
+    Sql.Add(ConStr);
+    Open;
+    totNum:=RecordCount;
+    Close;
+    sql.Clear;
+    Sql.Add(SqlStr);
+    Open;
+    peopleNum:=RecordCount;
+    first;
+    SetProcessBar(true,1,recordcount);
+    dayNum:=0.0;
+    times:=0;
+    clientdataset1.Active:=false;
+    clientdataset1.CreateDataSet;
+    clientdataset1.Active:=true;
+    while not eof do
+    begin
+      empid:= FieldByName('emp_id').AsString;
+      SetStatusText(GetLangName(LangStr,'just_doing_empid')+empid+' '+inttostr(recno)+'/'+inttostr(recordcount));
+      SetProcessBar(false,1);
+      for i:=5 to 35 do
+      begin
+        if trim(fields[i].AsString)<>'' then
+        begin
+          inc(times);
+          Afield:=GetEmpInfo(empid);
+          empchs:=Afield.fieldbyname('emp_chs').Value;
+          deptcode:=Afield.fieldbyname('dept_code').AsString;
+          abbrtitl:=Afield.fieldbyname('abbr_titl').Value;
+          h:=fields[i].AsInteger;
+          hours := FloatToStr( (h div 100)+((h mod 100)/60));
+          daynum:=daynum+StrToFloat(hours);
+          clientdataset1.append;
+          clientdataset1.FieldByName('emp_id').AsString:=empid;
+          clientdataset1.FieldByName('emp_chs').Value:=empchs;
+          clientdataset1.FieldByName('dept_code').Value:=deptcode;
+          clientdataset1.FieldByName('abbr_titl').Value:=abbrtitl;
+          clientdataset1.FieldByName('absent_date').AsDateTime:=encodedate(ayear,amonth,i-4);
+          clientdataset1.FieldByName('absent_hours').AsString:=hours;
+//  emp_id:=DataSet.FieldByName('emp_id').AsString;
+          dut_day:=FormatDateTime('yyyy/mm/dd',clientdataset1.FieldByName('absent_date').AsDateTime);
+          sqlstr:='select * from hrd_dut_day A,hrd_dut_seg B where emp_id='''+empid+''''
+            +' and wrk_date='''+dut_day+''' and (A.wrk_sts=''06'' or A.clas_code=''06'')'
+            +' and A.seg_code=B.seg_code';
+          with DMHrdsys.SQLQuery2 do
+          begin
+            close;
+            sql.Clear;
+            sql.Add(sqlstr);
+            open;
+            if not DMHrdsys.SQLQuery2.Eof then
+            begin
+              clientdataset1.FieldByName('seg_code').AsString:=DMHrdsys.SQLQuery2.FieldByName('seg_code').AsString;
+              clientdataset1.FieldByName('s_start').AsString:=DMHrdsys.SQLQuery2.FieldByName('s_start').AsString;
+              clientdataset1.FieldByName('s_end').AsString:=DMHrdsys.SQLQuery2.FieldByName('s_end').AsString;
+            end;
+          end;
+        end;
+      end;
+      next;
+    end;
+    close;
+    daynum:=daynum/8;
+    SetStatusText(GetLangName(LangStr,'peoplesum')+':'+IntToStr(totNum)+' '+
+       GetLangName(LangStr,'absent_num')+':'+IntToStr(peopleNum)+' '+
+       GetLangName(LangStr,'absent_times')+':'+IntToStr(times)+' '+
+       GetLangName(LangStr,'absent_days')+':'+floatToStr(daynum));
+    SetProcessBar;   
+  end;}
+  btn_search.Enabled:=true;
+  btn_print.Enabled:=true;
+  {me_month.Enabled:=false;
+  rbemp.Enabled:=false;
+  rbdept.Enabled:=false;
+  EditEmpBegin.Enabled:=false;
+  EditEmpEnd.Enabled:=false;
+  CobDeptBegin.Enabled:=false;
+  CobDeptEnd.Enabled:=false;}
+end;
+
+procedure TFormDut21.me_monthEnter(Sender: TObject);
+begin
+  {if trim(me_month.Text)='' then
+  begin
+    me_month.text:=formatDatetime('yyyymm',date-6);
+  end;}
+end;
+
+procedure TFormDut21.Btn_ResetClick(Sender: TObject);
+begin
+  adoquery1.Close;
+  clientdataset1.Active:=false;
+  btn_search.Enabled:=true;
+  btn_reset.Enabled:=false;
+  btn_print.Enabled:=false;
+//  me_month.Enabled:=true;
+  rbemp.Enabled:=true;
+  rbdept.Enabled:=true;
+  EditEmpBegin.Enabled:=true;
+  EditEmpEnd.Enabled:=true;
+  CobDeptBegin.Enabled:=true;
+  CobDeptEnd.Enabled:=true;
+end;
+
+procedure TFormDut21.Btn_PrintClick(Sender: TObject);
+var
+  Title:widestring;
+begin
+  SetStatusText(GetLangName(LangStr,'while_printing'));
+  Title :=GetLangName(LangStr,'dut21_titl');
+  if rbemp.Checked then
+  begin
+    Title:=Title+'<br><left>'+GetLangName(LangStr,'fld_emp_id')+':'+EditEmpBegin.text+'~'+EditEmpEnd.text;
+  end
+  else
+  begin
+    Title:=Title+'<br><left>'+GetLangName(LangStr,'dept_range')+':'+CobDeptBegin.Text+'~'+CobDeptEnd.Text;
+  end;
+  Title:=Title+'<br><left>'+GetLangName(LangStr,'peoplesum')+':'+IntToStr(totNum)+' '+
+       GetLangName(LangStr,'absent_num')+':'+IntToStr(peopleNum)+' '+
+       GetLangName(LangStr,'absent_times')+':'+IntToStr(times)+' '+
+       GetLangName(LangStr,'absent_days')+':'+floatToStr(daynum);
+//  ShowPrint(TCustomADODataSet(clientdataset1),Title);
+  ShowPrint(ADOQuery3,Title);
+  SetStatusText(GetLangName(LangStr,'print_finish'));
+end;
+
+procedure TFormDut21.ClientDataSet1CalcFields(DataSet: TDataSet);
+var
+  sqlStr,emp_id,dut_day:string;
+begin
+  {emp_id:=DataSet.FieldByName('emp_id').AsString;
+  dut_day:=FormatDateTime('yyyy/mm/dd',DataSet.FieldByName('absent_date').AsDateTime);
+  sqlstr:='select * from hrd_dut_day where emp_id='''+emp_id+''''
+    +' and wrk_date='''+dut_day+''' and wrk_sts=''06'' or clas_code=''06''';
+  with DMHrdsys.SQLQuery2 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sqlstr);
+    open;
+    if not Eof then
+      DataSet.FieldByName('seg_code').AsString:=FieldByName('seg_code').AsString;
+  end;}
+end;
+
+procedure TFormDut21.ADOQuery3CalcFields(DataSet: TDataSet);
+var
+  sqlstr,key:string;
+  s_time,e_time,t_time:TDateTime;
+begin
+  key:=DataSet.FieldByName('dept_code').AsString;
+  sqlstr:='select * from hrd_dept where dept_code='''+key+'''';
+  DataSet.FieldByName('flag').DefaultExpression:='0';
+//  if DataSet.FieldByName('flag').AsString<>'1' then
+//    DataSet.FieldByName('flag').AsString:='0';
+  with DMHrdsys.SQLQuery2 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sqlstr);
+    open;
+    if not Eof then
+      DataSet.FieldByName('abbr_titl').AsString:=FieldByName('abbr_titl').AsString;
+  end;
+  s_time:=ShortstrToTime(DataSet.FieldByName('s_start').AsString);
+  e_time:=ShortstrToTime(DataSet.FieldByName('s_end').AsString);
+  t_time:=e_time-s_time;
+  if Abs(24*t_time-4)<1.2 then
+    t_time:=4/24;//3,5個小時調整為半天
+  if Abs(24*t_time-8)<1.2 then
+    t_time:=8/24;//7,9個小時調整為一天
+  DataSet.FieldByName('absent_hours').AsInteger:=HourOf(t_time);
+  if DataSet.FieldByName('flag').AsString<>'1' then
+  begin
+    daynum:=daynum+HourOf(t_time)/8;//時段纍計
+    DataSet.FieldByName('flag').AsString:='1';
+  end;
+end;
+
+procedure TFormDut21.CobDeptBeginChange(Sender: TObject);
+begin
+  CobDeptEnd.Text := CobDeptBegin.Text;
+end;
+
+end.

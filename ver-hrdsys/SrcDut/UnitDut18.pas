@@ -1,0 +1,675 @@
+{*************************************************************************
+Namedut18(安戈)
+Author: Leo
+Create date:2005-11-16
+Modify date:2005-11-??
+Commentate:安戈参璸
+*************************************************************************}
+unit UnitDut18;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,DateUtils,
+  TntComCtrls,WSDLIntf,QRPrntr, DB, ADODB,TntDialogs,strutils, TntDB,Qt, QuickRpt,
+  DBClient,QRCtrls,QRExport;
+
+type
+  //絬祘
+  TRunThread = class(TThread)
+  private
+    { Private declarations }
+  protected
+    procedure execute;override;
+
+  public
+    { Public declarations }
+  end;
+  TFormDut18 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    DataSource1: TDataSource;
+    ADOQuery1: TADOQuery;
+    TntGroupBox1: TTntGroupBox;
+    CobDeptBegin: TTntComboBox;
+    CobDeptEnd: TTntComboBox;
+    TntDBGrid1: TTntDBGrid;
+    bb_reset: TTntBitBtn;
+    bb_ok: TTntBitBtn;
+    Btn_Print: TTntBitBtn;
+    PrintDialog1: TPrintDialog;
+    EditEmpBegin: TTntEdit;
+    EditEmpEnd: TTntEdit;
+    TntLabel3: TTntLabel;
+    TntCheckBox1: TTntCheckBox;
+    TntCheckBox2: TTntCheckBox;
+    TntLabel1: TTntLabel;
+    me_year: TMaskEdit;
+    ADOQuery2: TADOQuery;
+    ClientDataSet1: TClientDataSet;
+    ClientDataSet1emp_id: TStringField;
+    ClientDataSet1emp_chs: TWideStringField;
+    ClientDataSet1dept_code: TStringField;
+    ClientDataSet1abbr_titl: TWideStringField;
+    ClientDataSet1epindt: TDateTimeField;
+    ClientDataSet1CanRestYearHoliday: TWideStringField;
+    ClientDataSet1SpringFestivalHoliday: TWideStringField;
+    ClientDataSet1RestYearHoliday: TWideStringField;
+    ClientDataSet1remaindays: TWideStringField;
+    TntGroupBox2: TTntGroupBox;
+    TntLabel2: TTntLabel;
+    TntLabel4: TTntLabel;
+    TntLabel5: TTntLabel;
+    TntLabel6: TTntLabel;
+    TntEdit1: TTntEdit;
+    TntEdit2: TTntEdit;
+    TntEdit3: TTntEdit;
+    TntEdit4: TTntEdit;
+    ADOQuery1emp_id: TStringField;
+    ADOQuery1emp_chs: TWideStringField;
+    ADOQuery1dept_code: TStringField;
+    ADOQuery1abbr_titl: TWideStringField;
+    ADOQuery1epindt: TDateTimeField;
+    qry_pub: TADOQuery;
+    ClientDataSet1SpringFestTime: TFloatField;
+    ClientDataSet1RestYearHoliday_17: TWideStringField;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    procedure GetData;
+    Procedure DealAEmpId(EmpID:string);
+    function GetCanRest(EmpID:string):double;
+    function GetSpFest(EmpID:string):double;
+    function GetRest(EmpID:string):double;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure bb_okClick(Sender: TObject);
+    procedure bb_resetClick(Sender: TObject);
+    procedure CobDeptBeginChange(Sender: TObject);
+    procedure EditEmpBeginDblClick(Sender: TObject);
+    procedure TntCheckBox1Click(Sender: TObject);
+    procedure me_yearClick(Sender: TObject);
+    procedure Btn_PrintClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure EditEmpBeginChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormDut18: TFormDut18;
+  RunThread :TRunThread;
+  AllNum,CanNum:integer;
+  RestDays,RemainDays:Double;
+  DateArr:array[1..3] of TDate;
+  InDate,LvDate:TDate;
+  
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys,UnitPrtDut15;
+var
+  Langstr:TWideStrings;//粂ē才﹃
+  pri_arr:TPrvArr;//舦计舱
+{$R *.dfm}
+
+procedure TFormDut18.InitLang;
+{*************************************************************************
+TO DO:﹍て粂ē
+*************************************************************************}
+var
+  keys:String;
+begin
+  keys:='dut18_error1,dut08_error2,just_doing_empid,dut18_titl';
+  //CanRestYearHoliday    ヰ安
+  //SpringFestivalHoliday 琄竊ヰ安
+  //RestYearHoliday       ヰ安
+  //remaindays            ぱ计
+  LangStr:=GetLangWideStrs(keys);
+  SetComponentLang(self);
+end;                        
+
+procedure TFormDut18.InitForm;
+{*************************************************************************
+TO DO:﹍てForm
+*************************************************************************}
+var
+  sql_str,fld_name:string;
+begin
+  GetDeptRange(CobDeptBegin);
+  GetDeptRange(CobDeptEnd);
+  CobDeptBegin.ItemIndex:=0;
+  CobDeptEnd.ItemIndex:=CobDeptEnd.Items.Count-1;  
+end;
+
+procedure TFormDut18.FormCreate(Sender: TObject);
+begin
+  pri_arr:=GetPrvArr(username,'dut18');
+  InitLang;// Init language
+  InitForm;// Init Form
+end;
+
+
+procedure TFormDut18.bb_okClick(Sender: TObject);
+begin
+  runthread := Trunthread.create(false);
+end;
+
+procedure TFormDut18.bb_resetClick(Sender: TObject);
+begin
+  if (RunThread<>nil) and (not RunThread.Terminated) then
+  begin
+    RunThread.Suspend;
+    if MessageDlg('眤絋﹚璶?',mtConfirmation,[mbYes,mbNo],0)=mrYes then
+    begin
+      RunThread.Resume;
+      RunThread.Terminate;
+      SetStatusText('ノめ氨ゎ巨');
+      clientdataset1.Close;
+      adoquery1.Close;
+      me_year.Enabled:=true;
+
+      TntCheckBox1.Enabled:=true;
+      TntCheckBox2.Enabled:=true;
+
+      TntCheckBox1.Checked:=false;
+      TntCheckBox2.Checked:=false;
+
+      bb_ok.Enabled := true;
+      bb_reset.Enabled := false;
+      btn_print.Enabled := false;
+
+      TntEdit1.Text:='';
+      TntEdit2.Text:='';
+      TntEdit3.Text:='';
+      TntEdit4.Text:='';
+    end
+    else
+      RunThread.Resume;
+  end
+  else
+  begin
+    clientdataset1.Close;
+      adoquery1.Close;
+      me_year.Enabled:=true;
+
+      TntCheckBox1.Enabled:=true;
+      TntCheckBox2.Enabled:=true;
+
+      TntCheckBox1.Checked:=false;
+      TntCheckBox2.Checked:=false;
+
+      bb_ok.Enabled := true;
+      bb_reset.Enabled := false;
+      btn_print.Enabled := false;
+
+      TntEdit1.Text:='';
+      TntEdit2.Text:='';
+      TntEdit3.Text:='';
+      TntEdit4.Text:='';
+  end;
+end;
+
+procedure TFormDut18.CobDeptBeginChange(Sender: TObject);
+begin
+  CobDeptEnd.Text:=CobDeptBegin.Text;
+  {if CobDeptBegin.ItemIndex>CobDeptEnd.ItemIndex then
+  begin
+    CobDeptEnd.ItemIndex:=CobDeptBegin.ItemIndex;
+  end;}
+end;
+
+procedure TFormDut18.EditEmpBeginDblClick(Sender: TObject);
+var
+  empid:string;
+begin
+  empid:=FindEmpId('emp_id');
+  if empid<>'' then
+  begin
+    TEdit(sender).Text:=empid;
+  end;
+end;
+
+procedure TFormDut18.TntCheckBox1Click(Sender: TObject);
+begin
+  if tntCheckBox1.Checked then
+  begin
+    EditEmpBegin.Enabled:=true;
+    EditEmpEnd.Enabled:=true;
+  end
+  else
+  begin
+    EditEmpBegin.Enabled:=false;
+    EditEmpEnd.Enabled:=false;
+  end;
+  if TntCheckbox2.Checked then
+  begin
+    CobDeptBegin.Enabled:=true;
+    CobDeptEnd.Enabled:=true;
+  end
+  else
+  begin
+    CobDeptBegin.Enabled:=false;
+    CobDeptEnd.Enabled:=false;
+  end;
+end;
+
+procedure TFormDut18.me_yearClick(Sender: TObject);
+begin
+  me_year.Text:=formatdatetime('yyyy',GetServerDatetime);
+  me_year.SelStart:=0;
+  me_year.SelLength:=4;
+end;
+
+procedure TFormDut18.GetData;
+begin
+  with adoquery1 do
+  begin
+    Open;
+    AllNum:=RecordCount;
+    CanNum:=0;
+    RestDays:=0.0;
+    RemainDays:=0.0;
+    
+    setProcessBar(true,1,RecordCount);
+    clientdataset1.Active:=false;
+    clientdataset1.CreateDataSet;
+    clientdataset1.Active:=true;
+    
+    while not eof do
+    begin
+      setProcessBar(false,1);
+      SetStatusText(GetLangName(LangStr,'just_doing_empid')+fieldbyname('emp_id').value+' '+IntToStr(RecNo)+'/'+IntToStr(RecordCount));
+      if runthread.Terminated then
+      begin
+        //秈祘挡癶
+        runthread.Terminate;
+        Exit;
+      end;
+      DealAEmpId(fieldbyname('emp_id').value);
+      next;
+    end;
+    setProcessBar(true);
+    TntEdit1.Text:=IntToStr(AllNum);
+    TntEdit2.Text:=IntToStr(CanNum);
+    TntEdit3.Text:=format('%9.1f',[RestDays]);
+    TntEdit4.Text:=format('%9.1f',[RemainDays]);
+  end;
+end;
+
+Procedure TFormDut18.DealAEmpId(EmpID:string);
+var
+  CanRest,SpFest,Rest,Remain:double;
+  ADays:TStrings;
+begin
+  ADays:=GetYearHol(EmpID,me_year.Text);
+  {CanRest:=GetCanRest(EmpID);//ヰ安
+  SpFest:=GetSpFest(EmpID);//琄竊安
+  Rest:=GetRest(EmpID);//ヰ安
+  Remain:=CanRest-SpFest-Rest;//緇ぱ计
+  if Remain>0 then
+    inc(CanNum);
+  RestDays:=RestDays+Rest;
+  RemainDays:=Remain+RemainDays;}  
+  with clientdataset1 do
+  begin
+    Append;
+    fieldbyname('emp_id').AsString:=EmpID;
+    fieldbyname('emp_chs').Value:=Adoquery1.fieldbyname('emp_chs').Value;
+    fieldbyname('dept_code').AsString:=Adoquery1.fieldbyname('dept_code').AsString;
+    fieldbyname('abbr_titl').Value:=Adoquery1.fieldbyname('abbr_titl').Value;
+    fieldbyname('epindt').AsDateTime := Adoquery1.fieldbyname('epindt').AsDateTime;
+    {fieldbyname('CanRestYearHoliday').AsFloat:=CanRest;
+    fieldbyname('SpringFestivalHoliday').AsFloat:=SpFest;
+    fieldbyname('RestYearHoliday').AsFloat:=Rest;
+    fieldbyname('remaindays').AsFloat:=Remain;}
+    //ヰ安
+    fieldbyname('CanRestYearHoliday').AsString:=Adays.Strings[0];
+    //琄竊ヰ安
+    fieldbyname('SpringFestivalHoliday').AsString:=Adays.Strings[2];
+    //ヰ
+    fieldbyname('RestYearHoliday').AsString:=Adays.Strings[1];
+    //逞緇ぱ计
+    fieldbyname('remaindays').AsString:=Adays.Strings[3];
+    //逞緇计
+    //fieldbyname('SpringFestTime').AsString:= FloatToStr(StrToFloat(Adays.Strings[0])*8-StrToFloat(Adays.Strings[2])*8-StrToFloat(Adays.Strings[4]));
+    fieldbyname('SpringFestTime').AsString:= FloatToStr(StrToFloat(Adays.Strings[3])*8);
+    //2015.01.13 sanjin 逼ヰ
+    FieldByName('RestYearHoliday_17').AsString := Adays.Strings[5];
+  end;
+  RestDays:=RestDays+StrToFloat(Adays.Strings[1]);//琄竊ヰ安蹯璸
+  RemainDays:=RemainDays+StrToFloat(Adays.Strings[3]);//琄竊ヰ安蹯璸
+  if StrToFloat(Adays.Strings[3])>0 then
+    inc(CanNum);//叫安计蹯璸
+end;
+
+function TFormDut18.GetCanRest(EmpID:string):double;
+//眔叫安
+begin
+  InDate:=Adoquery1.fieldbyname('epindt').AsDateTime;
+  result:=12.0;
+  if YearOf(InDate)=StrToInt(me_year.Text) then
+  begin
+    result:=12.0-monthof(InDate);
+  end; 
+  if GetEmpInfo(EmpID).fieldbyname('epledt').AsString='' then
+    exit;            
+  LvDate:=GetEmpInfo(EmpID).fieldbyname('epledt').AsDateTime;
+  if YearOf(LvDate)=StrToInt(me_year.Text) then
+  begin
+    result:=result-(12.0-monthof(LvDate));
+  end
+  else if YearOf(LvDate)<StrToInt(me_year.Text) then
+  begin
+    result:=0.0;
+  end;
+end;
+
+function TFormDut18.GetSpFest(EmpID:string):double;//琄竊安碭ぱ
+var
+  CurDate:TDate;  
+  dutmon,fielddate:string;
+  OvrNum,i:integer;
+  flag:boolean;
+begin
+  InDate:=Adoquery1.fieldbyname('epindt').Value;         //秈紅ら戳
+  if GetEmpInfo(EmpID).fieldbyname('epledt').AsString<>'' then 
+    LvDate:=GetEmpInfo(EmpID).fieldbyname('epledt').Value //瞒戮ら戳
+  else
+    LvDate:=0;
+  curDate:=DateOf(GetServerDateTime);
+  if YearOf(CurDate)=StrToInt(me_year.Text) then   //讽
+  begin
+    if DateArr[1]=0 then
+      result:=3.0
+    else
+    begin
+      OvrNum:=0;
+      for i:=1 to 3 do
+      begin
+        if LvDate=0 then
+          flag:=false
+        else 
+          flag:= (DateArr[i]>=LvDate);
+        if (InDate>DateArr[i]) or flag or (DateArr[i]>CurDate) then
+        begin
+          inc(OvrNum);
+          continue;
+        end;
+        dutmon:=formatdatetime('yyyymm',DateArr[i]);
+        fielddate:='day'+formatdatetime('dd',DateArr[i]);
+        with qry_pub do
+        begin
+          sql.Clear;
+          sql.Add('select * from hrd_dut_mon where dut_mon='''+dutmon+''' and clas_code in (''61'',''62'',''63'',''72'')');
+          Open;  
+          while not eof do
+          begin
+            if trim(fieldbyname(fielddate).AsString)<>'' then
+            begin
+              inc(OvrNum);
+              break;
+            end;
+          end;   
+        end;
+      end;
+      result:=3.0-OvrNum;
+    end;
+  end
+  else                      //┕
+  begin
+    if DateArr[1]=0 then
+      result:=3.0
+    else
+    begin
+      OvrNum:=0;
+      for i:=1 to 3 do
+      begin 
+        if LvDate=0 then
+          flag:=false
+        else 
+          flag:= (DateArr[i]>=LvDate);
+        if (DateArr[i]<InDate) or flag then
+        begin
+          inc(OvrNum);
+          continue;
+        end;
+        dutmon:=formatdatetime('yyyymm',DateArr[i]);
+        fielddate:='day'+formatdatetime('dd',DateArr[i]);
+        with qry_pub do
+        begin
+          sql.Clear;
+          sql.Add('select * from hrd_dut_mon where dut_mon='''+dutmon+''' and clas_code in (''61'',''62'',''63'',''72'')');
+          Open;  
+          while not eof do
+          begin
+            if trim(fieldbyname(fielddate).AsString)<>'' then
+            begin
+              inc(OvrNum);
+              break;
+            end;
+          end;   
+        end;
+      end;
+      result:=3.0-OvrNum;
+    end;  
+  end;  
+end;
+
+function TFormDut18.GetRest(EmpID:string):double;
+var
+  h1,m1,h2,m2:string;
+  sDate,eDate,tmpDate:TDate;
+  i:integer;
+begin   
+  result:=0.0;
+  with qry_pub do
+  begin
+    sql.Clear;
+    if me_year.Text = '2010' then
+       sql.Add('select * from hrd_dut_ask where emp_id='''+EmpID+''' and clas_code=''16''  and datepart( year, s_ask_d ) =''2010'' and datepart( month, s_ask_d ) >=''2'' ')
+    else
+       sql.Add('select * from hrd_dut_ask where emp_id='''+EmpID+''' and clas_code=''16'' ');
+    Open;
+    while not eof do
+    begin
+      sDate:=fieldbyname('s_ask_d').Value;
+
+      eDate:=fieldbyname('e_ask_d').Value;
+      if (YearOf(sDate)<=StrToInt(me_year.Text)) and (YearOf(eDate)>=StrToInt(me_year.Text)) then
+      begin
+        h1:=fieldbyname('s_ask_h').AsString;
+        m1:=fieldbyname('s_ask_t').AsString;
+        h2:=fieldbyname('e_ask_h').AsString;
+        m2:=fieldbyname('e_ask_t').AsString;
+        if YearOf(sDate)<StrToInt(me_year.Text) then
+        begin
+          sDate:=EncodeDate(StrToInt(me_year.Text),1,1);
+          h1:='08';
+          m1:='00';
+        end;
+        if YearOf(eDate)>StrToInt(me_year.Text) then
+        begin
+          eDate:=Dateof(EndOfTheYear(sDate));
+          h2:='17';
+          m2:='00';
+        end;
+        if dayofweek(sDate)=1 then
+        begin
+          sDate:=sDate+1;
+          h1:='08';
+          m1:='00';
+        end;
+        if dayofweek(eDate)=1 then
+        begin
+          eDate:=eDate-1;
+          h2:='17';
+          m2:='00';
+        end;
+        if eDate<sDate then
+        begin
+          next;
+          continue;
+        end;
+
+        result:=result+int(eDate-sDate);
+
+        //叫安琌琍戳ら
+        if eDate-1>=sDate then
+        begin
+          for i:=0 to StrToInt(format('%3.0f',[int(eDate-sDate)])) do
+          begin
+            tmpDate:=sDate+i;
+            if dayofweek(tmpDate)=1 then
+              result:=result-1.0;
+          end; 
+        end;
+        
+        if strToint(h2)>strToint(h1) then
+        begin
+          if StrToInt(h2)-StrToInt(h1)+(StrToInt(m2)-StrToInt(m1))/60>4 then
+            result:=result+1.0
+          else
+            result:=result+0.5;
+        end
+        else
+        begin
+          if StrToInt(h2)<8 then
+          begin
+            h2:='08';
+            m2:='00';
+          end;
+          if StrToInt(h1)>=17 then
+          begin
+            h1:='08';
+            m1:='00';
+          end;
+          if 17-StrToInt(h2)+StrToInt(h1)-8+(StrToInt(m1)-StrToInt(m2))/60>4 then
+            result:=result-1.0
+          else
+            result:=result-0.5;
+          if result<0 then
+            result:=0;
+        end;
+      end;
+    
+      next;
+    end;
+  end;
+end;
+
+
+procedure TFormDut18.Btn_PrintClick(Sender: TObject);
+var
+  Title:widestring;
+begin
+  SetStatusText(GetLangName(LangStr,'while_printing'));
+  Title := me_year.Text+GetLangName(LangStr,'dut18_titl');
+  Title := Title+'<br><left>'+tntlabel2.caption+':'+tntedit1.text+'    ' 
+                   +tntlabel4.caption+':'+tntedit2.text+'    ' 
+                   +tntlabel5.caption+':'+tntedit3.text+'    ' 
+                   +tntlabel6.caption+':'+tntedit4.text;
+  ShowPrint(TCustomADODataset(Clientdataset1),Title);
+  SetStatusText(GetLangName(LangStr,'print_finish'));
+end;
+
+procedure TFormDut18.FormDestroy(Sender: TObject);
+begin
+  SetStatustext('');
+  SetProcessBar;
+end;
+
+procedure TRunThread.execute;
+var
+  formdut18:Tformdut18;
+  SqlStr:wideString;
+  i:integer;
+begin
+  FreeOnTerminate := true;
+  formdut18:=Tformdut18(application.FindComponent('formdut18'));
+  with formdut18  do
+  begin
+
+    if (length(trim(me_year.Text))<>4) or (StrToInt(me_year.Text)>yearof(GetServerDateTime)) then
+    begin
+      wideshowmessage(GetLangName(LangStr,'dut18_error1'));
+      exit;
+    end;
+    if TntCheckBox1.Checked and (EditEmpEnd.Text<>'') and (EditEmpBegin.Text>EditEmpEnd.Text) then
+    begin
+      wideshowmessage(GetLangName(LangStr,'dut08_error2'));
+      exit;
+    end;
+    for i:=1 to 3 do
+    DateArr[i]:=0;
+    with qry_pub do
+    begin
+      Sql.Clear;
+      Sql.Add('select * from hrd_spfest where whichyear='+me_year.text+' order by springdate');
+      Open;
+      i:=0;
+      while not eof do
+      begin
+        inc(i);
+        if i<4 then
+          DateArr[i]:=DateOf(fieldbyname('springdate').AsDateTime);
+        next;
+      end;
+      close;
+    end;
+
+    bb_ok.Enabled:=false;
+    bb_reset.Enabled:=true;
+    SqlStr:='select a.emp_id,a.emp_chs,a.dept_code,b.abbr_titl,a.epindt '
+      +'from hrd_emp a,hrd_dept b where  a.dept_code=b.dept_code ';
+      //+' and ((a.epledt>'''+me_year.Text+'/01/01'+''' ) or (a.epledt is null) )';
+
+    if userName<> 'B498077' then
+      SqlStr := SqlStr +' and ( (a.epledt is null) )';
+    if TntCheckBox1.Checked then
+    begin
+      if Trim(EditEmpBegin.Text)<>'' then
+        SqlStr:=SqlStr+' and a.emp_id>='''+Trim(EditEmpBegin.Text)+''' ';
+      if Trim(EditEmpEnd.Text)<>'' then
+        SqlStr:=SqlStr+' and a.emp_id<='''+Trim(EditEmpEnd.Text)+''' ';
+    end;
+    if TntCheckBox2.Checked then
+    begin
+      if Trim(CobDeptBegin.Text)<>'' then
+        SqlStr:=SqlStr+' and a.dept_code>='''+leftstr(CobDeptBegin.Text,6)+''' ';
+      if Trim(CobDeptEnd.Text)<>'' then
+        SqlStr:=SqlStr+' and a.dept_code<='''+leftstr(CobDeptEnd.Text,6)+''' ';
+    end;
+    if TntCheckBox1.Checked then
+      SqlStr:= SqlStr+' order by a.emp_id'
+    else
+      SqlStr:= SqlStr+' order by a.dept_code';
+    adoquery1.SQL.Clear;
+    adoquery1.SQL.Add(sqlstr);
+    synchronize(GetData);
+    //眔闽戈癟
+    me_year.Enabled:=false;
+
+    tntcheckbox1.Enabled:=false;
+    tntcheckbox2.Enabled:=false;
+
+    EditEmpBegin.Enabled:=false;
+    EditEmpEnd.Enabled:=false;
+    CobDeptBegin.Enabled:=false;
+    CobDeptEnd.Enabled:=false;
+
+    //bb_reset.Enabled := true;
+    btn_print.Enabled := true;
+  end;
+  Terminate;
+end;
+procedure TFormDut18.EditEmpBeginChange(Sender: TObject);
+begin
+  EditEmpEnd.Text :=EditEmpBegin.Text ;
+end;
+
+end.

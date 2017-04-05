@@ -1,0 +1,4264 @@
+{*************************************************************************
+Name¡GSal08
+­×§ï³¡ªùsql»y¥y
+update hrd_sal_paymt set dept_code=A.dept_old from hrd_emp_upd A,hrd_sal_paymt B
+where A.id in (select min(id) from hrd_emp_upd
+where up_date>='2006/09/01' and dept_old<>dept_new group by emp_id)
+and A.emp_id=B.emp_id and pay_mon='200608' and B.dept_code<>A.dept_old
+*************************************************************************}
+unit UnitSal08;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, TntExtCtrls, StdCtrls, TntStdCtrls, Buttons,DateUtils,
+  TntButtons, Grids, DBGrids, TntDBGrids, ComCtrls, TntComCtrls, DB, ADODB,
+  Mask, DBCtrls,WSDLIntf,StrUtils, TntDbCtrls,tntdialogs, DBClient, Menus,
+  TntMenus,math,midas;
+const
+  WORK_DAY_MEAL_PAY=800;//¨C¤u§@¤Ñ¥ë­¹¶O
+  LANU_PAY=5000;        //¤½¹Î¶O
+  PERCENT_PICC_SHE=0.08;  //ªÀ«O 5%  // 2010¦~1¤ë°_ªÀ«O­Ó¤H½Õ¾ã¬° 6%    ,2012¦~1¤ë 7% (hyt upd 2012-01-13) 2014-01-07 hyt upd(7->8)
+  PERCENT_PICC_YI =0.015;  //Âå«O 1%
+  PERCENT_PICC_BACK=0.22;//«OÀIªðÁÙ 17% ,2012-02-01 hyt upd(0.19-->0.20) 2014-01-07 hyt upd(20->22)
+  PERCENT_PICC_SHIYE =0.01;  //Âå«O 1%
+  //2014.09.20 ¥Í¤éÂ§ª÷
+  BIRTHDAY_ALLOWANCE= 50000;
+type
+  TSpcGongCurrs= array[0..1] of Currency;
+  TNormalTestDays =array[0..1] of Integer;
+  TDutCurrs=array[0..22] of Currency;//14->17 (¥Ø«e¥u¥Î17)   2013-01-31 hyt upd      2016.02.27 17->22
+  TSalGrad=array[0..6] of Currency;
+  TSpcOver= array[0..3] of double;
+
+  TFormSal08 = class(TForm)
+    TntPanel1: TTntPanel;
+    ADOCommand1: TADOCommand;
+    ADOQuery1: TADOQuery;
+    DataSource1: TDataSource;
+    pc_prv: TTntPageControl;
+    ts_sel: TTntTabSheet;
+    ts_tran: TTntTabSheet;
+    TntPanel7: TTntPanel;
+    TntPanel2: TTntPanel;
+    TntLabel2: TTntLabel;
+    tbb_reset: TTntBitBtn;
+    tbb_ok: TTntBitBtn;
+    sel_month: TMaskEdit;
+    TntPanel3: TTntPanel;
+    TntLabel4: TTntLabel;
+    trb_id: TTntRadioButton;
+    Tid_s: TTntEdit;
+    Tid_e: TTntEdit;
+    cob_DeptBeg1: TTntComboBox;
+    cob_DeptEnd1: TTntComboBox;
+    trb_dept: TTntRadioButton;
+    tbb_search: TTntBitBtn;
+    qry_temp: TADOQuery;
+    TntGroupBox1: TTntGroupBox;
+    cob_DeptBeg2: TTntComboBox;
+    cob_DeptEnd2: TTntComboBox;
+    rb_ByDept2: TTntRadioButton;
+    EditEmpEnd2: TTntEdit;
+    EditEmpBeg2: TTntEdit;
+    rb_ByEmp2: TTntRadioButton;
+    bbtn_Reset2: TTntBitBtn;
+    bbtn_OK2: TTntBitBtn;
+    me_Month2: TMaskEdit;
+    TntLabel3: TTntLabel;
+    sb_EmpBeg2: TTntSpeedButton;
+    sb_EmpEnd2: TTntSpeedButton;
+    TntGroupBox2: TTntGroupBox;
+    TntDBGrid1: TTntDBGrid;
+    sp_Emp2: TADOStoredProc;
+    qry_sal: TADOQuery;
+    ds_sal: TDataSource;
+    qry_Temp2: TADOQuery;
+    TntGroupBox3: TTntGroupBox;
+    re_Message: TTntRichEdit;
+    qry_Grad: TADOQuery;
+    ClientDataSet1: TClientDataSet;
+    qry_salupd_user: TStringField;
+    qry_salupd_date: TDateTimeField;
+    qry_salemp_id: TStringField;
+    qry_salpay_mon: TStringField;
+    qry_salbase_pay: TBCDField;
+    qry_salmgmt_ofr: TBCDField;
+    qry_saltech_ofr: TBCDField;
+    qry_salduty_ofr: TBCDField;
+    qry_salenvr_ofr: TBCDField;
+    qry_salgrad_ofr: TBCDField;
+    qry_salefft_awd: TBCDField;
+    qry_salte_pay: TBCDField;
+    qry_salduo_awd: TBCDField;
+    qry_salfull_awd: TBCDField;
+    qry_salover_work: TBCDField;
+    qry_salsal_night: TBCDField;
+    qry_salgong_pay: TBCDField;
+    qry_salsupp_agai: TBCDField;
+    qry_salpicc_back: TBCDField;
+    qry_salothe_supp: TBCDField;
+    qry_salsick_supp: TBCDField;
+    qry_saldeal_pay: TBCDField;
+    qry_salmeal_pay: TBCDField;
+    qry_salask_pay: TBCDField;
+    qry_salstop_dedu: TBCDField;
+    qry_salpicc_she: TBCDField;
+    qry_salpicc_yi: TBCDField;
+    qry_sallaun_pay: TBCDField;
+    qry_saltax_pay: TBCDField;
+    qry_salsup_dedu: TBCDField;
+    qry_salactu_pay: TBCDField;
+    ClientDataSet1upd_user: TStringField;
+    ClientDataSet1upd_date: TDateTimeField;
+    ClientDataSet1emp_id: TStringField;
+    ClientDataSet1pay_mon: TStringField;
+    ClientDataSet1base_pay: TBCDField;
+    ClientDataSet1mgmt_ofr: TBCDField;
+    ClientDataSet1tech_ofr: TBCDField;
+    ClientDataSet1duty_ofr: TBCDField;
+    ClientDataSet1envr_ofr: TBCDField;
+    ClientDataSet1grad_ofr: TBCDField;
+    ClientDataSet1efft_awd: TBCDField;
+    ClientDataSet1te_pay: TBCDField;
+    ClientDataSet1duo_awd: TBCDField;
+    ClientDataSet1full_awd: TBCDField;
+    ClientDataSet1over_work: TBCDField;
+    ClientDataSet1sal_night: TBCDField;
+    ClientDataSet1gong_pay: TBCDField;
+    ClientDataSet1supp_agai: TBCDField;
+    ClientDataSet1picc_back: TBCDField;
+    ClientDataSet1othe_supp: TBCDField;
+    ClientDataSet1sick_supp: TBCDField;
+    ClientDataSet1deal_pay: TBCDField;
+    ClientDataSet1meal_pay: TBCDField;
+    ClientDataSet1ask_pay: TBCDField;
+    ClientDataSet1stop_dedu: TBCDField;
+    ClientDataSet1picc_she: TBCDField;
+    ClientDataSet1picc_yi: TBCDField;
+    ClientDataSet1laun_pay: TBCDField;
+    ClientDataSet1tax_pay: TBCDField;
+    ClientDataSet1sup_dedu: TBCDField;
+    ClientDataSet1actu_pay: TBCDField;
+    TntPopupMenu1: TTntPopupMenu;
+    N1: TTntMenuItem;
+    QryEmp: TADOQuery;
+    qry_saldept_code: TStringField;
+    ClientDataSet1dept_code: TStringField;
+    qry_salinfo_code: TStringField;
+    qry_salpst_code: TStringField;
+    qry_salsick_back: TBCDField;
+    qry_salother_temp: TBCDField;
+    ClientDataSet1pst_code: TStringField;
+    ClientDataSet1info_code: TStringField;
+    ClientDataSet1other_temp: TBCDField;
+    ClientDataSet1sick_back: TBCDField;
+    ClientDataSet1psal_awd: TBCDField;
+    qry_salyicard_dedu: TCurrencyField;
+    qry_hrd_dut_class_13: TADOQuery;
+    qry_hrd_emp_raise_data: TADOQuery;
+    btn_sal_bao: TTntSpeedButton;
+    qry_cos_data: TADOQuery;
+    flu_conn: TADOConnection;
+    qry_sal_bao: TADOQuery;
+    ClientDataSet1zhuishuo_BHXH: TBCDField;
+    chk_epledt: TTntCheckBox;
+    dtp_epledt_bgn: TTntDateTimePicker;
+    dtp_epledt_end: TTntDateTimePicker;
+    qryLastPaymt: TADOQuery;
+    cbChange: TTntCheckBox;
+    AdoQrySalSpc: TADOQuery;
+    function  GetBase(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDateTime;EduCode:string=''):Currency;
+    function  GetSpcGong(EmpId,PayMon:String;WorkDays:Integer):TSpcGongCurrs;
+    function  GetDutyPay(EmpId,PayMon,PstCode:String;PstPay:Currency;WorkDays:Integer):Currency;
+    function  GetSalTran(EmpId,PayMon,PstCode,EduCode:String;WorkDays:Integer;
+      EmpInDate,EmpLvDate:TDatetime): TSalGrad;
+    function  GetDut(EmpId,PayMon:String;EmpInDate,EmpLvDate:TDateTime;
+      SalBasePay,ABasePay,DutyPay,GongSpcPay:Currency;AWorkDays:integer):TDutCurrs;
+    function  GetGrad(GradStr,PstCode:String;WorkDays:Integer):Currency;
+    function  GetMultPay(EmpId,PayMon:String):Currency;
+    function  GetBuFaKou(EmpId,PayMon,BuType:String):Currency;
+    function  GetLastAddition(EmpId,PayMon:String):Currency;
+    function  GetLanuPay(EmpId,PayMon:String):Currency;
+    function  CheckHasPicc(EmpId,PayMon:String):Boolean;
+    function  IsNewEmp(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDate):Boolean;
+    function  IsNewEmp1(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDate):Boolean;
+    function  GetWrkPay(EmpId,PayMon:String):Currency;
+    function  GetSpcOver(EmpId,PayMon:String):TSpcOver;
+    function  GetSalTax(SalTot:Double; marryid,paymon,EmpId:String):Double;
+    function  GetJiangli(EmpId,PayMon:String):Currency;         
+//    function  GetNormalBase(PstCode,EduCode:String;EmpInDate:TDateTime):Currency;
+    function  GetPsalPay(EmpId,PayMon:String;BasePay:Currency):Currency;
+    function  GetEffPay(EmpId,DeptCode,PayMon:String;EmpInDate,EmpLvDate:TDate):Currency;
+    // 2007.11.05 <<
+    function  getvirus(EmpId,PayMon:String):Currency;
+    // 2007.11.05 >>
+    //sys create
+      //2011-01-14 adam add
+    function GetYearSal(EmpId:String):Currency;
+    function GetSpecSal(EmpId,PayMon:String;EmpInDate,EmpLvDate:TDate):Currency;
+        //2012-03-02 hyt add
+    function FenxiHour(fHours:Extended;PayMon:String):Extended;
+        //2012-03-22 hyt add
+    function GetYiCardPay(EmpId,PayMon:String):Currency;
+        //2013-01-16 hyt add
+    function GetMarryAmt(EmpId,PayMon:String):integer;
+        //2013-01-18 hyt add
+    function GetRaise_num(EmpId:String):integer;
+        //2013-05-30 hyt add
+    function GetOver195(PayMon:String):Currency;
+        //2013-06-24 hyt add
+    function GetFoster_pay(EmpId,PayMon:String):Currency;
+    //¥Í¤éÂ§ª÷ 2014.09.20
+    function GetBirthDay(EmpId, PayMon, PstCode:String; EmpInDate, EmpLvDate, EmpBirthDay : TDate):Currency;
+    //2014.12.03 §PÂ_¬O§_¬°¾ã¤ë½Ð¦©Á~°²
+    function IsAskMonthlong(const PayMon, EmpID: string): Boolean;
+    procedure InitLangInfo;
+    procedure FormInit;
+    procedure FormCreate(Sender: TObject);
+    procedure bbtn_OK2Click(Sender: TObject);
+    procedure bbtn_Reset2Click(Sender: TObject);
+    procedure rb_ByEmp2Click(Sender: TObject);
+    procedure tbb_okClick(Sender: TObject);
+    procedure SetEnableControl(ActNo:Integer;Value:Boolean);
+    procedure tbb_resetClick(Sender: TObject);
+    procedure sb_EmpBeg2Click(Sender: TObject);
+    procedure DelPayMT(EmpId,PayMon:String);
+    procedure DealAEmp(EmpId,PayMon:String);
+    procedure N1Click(Sender: TObject);
+    procedure EditEmpBeg2Change(Sender: TObject);
+    procedure btn_sal_baoClick(Sender: TObject);
+    function getLastWeixiuPrice(iEmpId,iPayMon:string;iEmpInDate,iEmpLvDate:TDateTime):Currency;
+  private
+    //2015.04.25 ­pºâÂ÷Â¾¸É¶K
+    function GetLeaveSubsidy(AMonth, AEmpID: string; AEpIndt, AEpLedt: TDateTime; boChangeFactory: Boolean=False): Currency;
+    //
+    function GetYiFaJinE(const AMonth, AEmpID: string): Double;
+    //±o¨ìÀ³¸É¶Kªº¦~°²¤Ñ¼Æ 2013.09.26 LX ADD
+    function GetButieDays(AEmpID, PayMonth: string): Double;
+    //
+    function GetYXTS_16(AEmpID, AYear: string): Double;
+    //2016.03.19 ±o¨ì§@·~­ûªº¯S§O¼úª÷
+    function GetSpcPayOf60(const AMonth, AEmpID: string): Double;
+    //2016.06.13 Âà¼t
+    function IsChangeFactory(const AMonth, AEmpID: string): Boolean;
+    //2016.08.01
+    function IsYiFa(const AEmpID: string): Boolean;
+    //2016.06.13 ±o¨ì¤W­Ó¤ëªº³Ì«á¤@¤Ñ
+    function GetEndOfLastMonth(PayMon: string): TDateTime;
+    //2016.02.20 ±o¨ì·í¤ëªº¹ê»Ú¤u§@¤Ñ¼Æ
+    function GetWorkDays_Act(const AMonth: string; Date_B, Date_E: TDateTime): Integer;
+    //2016.04.05 ±o¨ì·í¤ëªº¹ê»Ú¤u§@¤Ñ¼Æ
+    function GetWorkDays_Real(const AMonth: string; Date_B, Date_E: TDateTime): Integer;
+    //2016.09.05 ±o¨ì¤U¤@­Ó¤ëªº²Ä¤@¤Ñ
+    function GetNextDay(const AMonth: string): TDate;
+    //2016.09.06
+    function GetWorkDaysEx2(PayMon:String;EmpInDate,EmpLvDate:TDateTime;theEndMonth:TDateTime):Integer;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+  TRunThread = class(TThread)
+  private
+    { Private declarations }
+  protected
+    procedure execute;override;
+  public
+    { Public declarations }
+  end;
+//function GetBase(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDateTime;EduCode:string=''):Currency;
+function GetNormalTestDays(EmpId,PayMon,PstCode_new:String;EmpInDate,EmpLvDate:TDateTime):TNormalTestDays;
+function GetWorkDays(PayMon:String;EmpInDate,EmpLvDate:TDateTime):Integer;
+//2014.12.02 ±o¨ì¥»¤ë¹ê»Ú¤u§@¤Ñ¼Æ
+function GetWorkDaysEx(PayMon:String;EmpInDate,EmpLvDate:TDateTime):Integer;
+function GetSunDayCount(DayBeg,DayEnd:Integer;YearMonth:String):Integer;
+
+var
+  FormSal08: TFormSal08;
+  runThread:TRunThread;
+implementation
+
+Uses
+    UnitDMHrdsys,UnitHrdUtils;
+var
+   prv:TPrvArr;
+   ws_Words:TWideStrings;
+   SalBaseLvl:TStrings;//°ò¥»Á~¸êµ¥¯ÅÃB
+   SalLongWorkLvl:TStrings;//¤[¥ô¼úª÷µ¥¯ÅÃB
+   AEmpId,PayMon:String;
+   MonSDate,MonEDate:TDatetime;
+   g_sHrd_sal_paymt:string;
+   //2016.02.20 ¤ë¹ê»Ú¤u§@¤Ñ¼Æ
+   G_WorkDays: Integer;
+   //2016.04.05 ·í¤ëªº¹ê»Ú¤u§@¤Ñ¼Æ
+   G_RealWorkDays: Integer;
+
+{$R *.dfm}
+{³]¸mª¬ºA ActNo ¬°0 ³]¸m¬d¸ß ActNo ¬°1 ³]¸mÂàÀÉ}
+procedure TFormSal08.SetEnableControl(ActNo:Integer;Value:Boolean);
+begin
+  if ActNo=0 then
+  begin
+    {sel_month.enabled:= true;
+    tbb_ok.Enabled := true;
+    trb_id.Enabled := false;
+    trb_dept.Enabled := false;
+    tid_s.Enabled := false;
+    tid_e.Enabled := false;
+    dept_b.Enabled := false;
+    dept_o.Enabled := false;
+    tbb_search.Enabled := false;}
+  end
+  else if ActNo=1 then
+  begin
+    me_Month2.Enabled:= Value;
+    rb_ByEmp2.Enabled := Value;
+    rb_ByDept2.Enabled := Value;
+    EditEmpBeg2.Enabled := Value;
+    EditEmpEnd2.Enabled := Value;
+    cob_DeptBeg2.Enabled := Value;
+    cob_DeptEnd2.Enabled := Value;
+    bbtn_Ok2.Enabled:= Value;
+    bbtn_Reset2.Enabled:=not Value;
+  end;
+end;
+procedure TFormSal08.InitLangInfo;
+var
+  ThisFormUsedWords:String;
+begin
+  //©w¸q­n¥Î¨ìªº»y¨¥
+ ThisFormUsedWords:='query,ok,reset,find,sal08_titl,fld_emp_id,'+
+   'fld_emp_chs,fld_dept_code,msg_add_error,transferfiles,'+
+   'msg_confirm_save,dbl_clk_slct_emp,month,fld_pay_mon,fld_base_pay,fld_mgmt_ofr,fld_tech_ofr,'+
+   'fld_duty_ofr,fld_envr_ofr,fld_efft_awd,fld_te_pay,fld_duo_awd,fld_full_awd,fld_over_work,fld_gong_pay,fld_supp_agai,'+
+   'fld_picc_back,fld_othe_supp,fld_sick_supp,fld_deal_pay,fld_meal_pay,fld_ask_pay,fld_stop_dedu,fld_picc_she,fld_picc_yi,'+
+   'fld_laun_pay,fld_tax_pay,fld_sup_dedu,fld_actu_pay,msg_month_data_locked';
+ ws_Words:=GetLangWideStrs(ThisFormUsedWords);
+ tntpanel1.Caption := GetLangName(ws_Words,'sal08_titl');
+ SetComponentLang(self);
+end;
+{ªì©l¤Æ«H®§}
+procedure TFormSal08.FormInit;
+var
+  slDate:TStringList;
+begin
+  Prv:=GetPrvArr(UserName,'sal08');
+  if Prv[TRAN] then
+    pc_prv.Pages[1].TabVisible := true
+  else
+    pc_prv.Pages[1].TabVisible := false;
+  //
+  SetComboxList('select dept_code+''-''+abbr_titl from hrd_dept',cob_DeptBeg1);
+  SetComboxList('select dept_code+''-''+abbr_titl from hrd_dept',cob_DeptEnd1);
+  SetComboxList('select dept_code+''-''+abbr_titl from hrd_dept',cob_DeptBeg2);
+  SetComboxList('select dept_code+''-''+abbr_titl from hrd_dept',cob_DeptEnd2);
+  me_Month2.Text := formatdatetime('yyyymm',date-strtoint(formatdatetime('dd',date))-1);
+  slDate := TStringList.Create;
+  try
+    slDate := StrSplit(LockLeaveDate,'/');
+    dtp_epledt_bgn.Date := EncodeDate(StrToInt(slDate[0]),StrToInt(slDate[1]),StrToInt(slDate[2]))+1;
+    dtp_epledt_end.Date := GetServerDateTime;
+  finally
+//    slDate.Free;
+  end;
+end;
+
+procedure TFormSal08.FormCreate(Sender: TObject);
+begin
+  g_sHrd_sal_paymt:='hrd_sal_paymt';  //2010/10/25 hyt add tempdbf.dbo.
+  InitLangInfo;
+  FormInit;
+  SalBaseLvl:=GetAllBaseLvl;//¨ú±o©Ò¦³°ò¥»Á~¸êµ¥¯ÅÃB
+  SalLongWorkLvl:=GetLongWorkLvl;//¨ú±o©Ò¦³¤[¥ô¼úª÷µ¥¯ÅÃB
+end;
+{===============================================================================
+  ­pºâÁ~¸ê½T»{
+===============================================================================}
+procedure TFormSal08.bbtn_OK2Click(Sender: TObject);
+var
+  sql_str:string;
+begin
+  PayMon:=me_Month2.Text;
+  //¸Ó¤ë¸ê®Æ¤w¸gÂê©w
+  if (PayMon<=LockMonth)  then
+  begin
+    WideMessageDlg(GetLangName(ws_Words,'msg_month_data_locked'),mtError,[mbYes],0);
+    exit;
+  end;
+  MonSDate:=StartOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  MonEDate:=EndOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+
+  //2016.02.20 ¤ë¹ê»Ú¤u§@¤Ñ¼Æ
+  G_WorkDays := GetWorkDays_Act(PayMon, MonSDate, MonEDate);
+  //2016.04.05 ·í¤ëªº¹ê»Ú¤u§@¤Ñ¼Æ
+  G_RealWorkDays := GetWorkDays_Real(PayMon, MonSDate, MonEDate);
+
+  sql_str:='select * from hrd_emp where 1=1'
+   +' and epindt<='''+FormatDateTime('yyyy/mm/dd',MonEDate)+''''
+   +' and (epledt>='''+FormatDateTime('yyyy/mm/dd',MonSDate)+''' or epledt is null)';
+  if rb_ByEmp2.Checked then
+  begin
+    if Trim(EditEmpBeg2.Text)<>'' then
+      sql_str:=sql_str+' and emp_id>='''+Trim(EditEmpBeg2.Text)+'''';
+    if Trim(EditEmpEnd2.Text)<>'' then
+      sql_str:=sql_str+' and emp_id<='''+Trim(EditEmpEnd2.Text)+'''';
+
+    sql_str:=sql_str+' and left(dept_code,1)<>''V'' '; //2013-05-04 hyt add
+  end
+  else if rb_ByDept2.Checked then
+  begin
+    if trim(cob_DeptBeg2.Text)<>'' then
+      sql_str:=sql_str+' and dept_code>='''+LeftStr(trim(cob_DeptBeg2.Text),6)+'''';
+    if trim(cob_DeptEnd2.Text)<>'' then
+      sql_str:=sql_str+' and dept_code<='''+LeftStr(trim(cob_DeptEnd2.Text),6)+'''';
+
+    sql_str:=sql_str+' and left(dept_code,1)<>''V'' '; //2013-05-04 hyt add  
+  end;
+
+  //sql_str:=sql_str+' and emp_id in(select emp_id from tempdbf.dbo.aa_00) '; //test 2011-09-21 hyt add
+
+  if cbChange.Checked then
+    sql_str := sql_str + ' and emp_id in (select emp_id from hrd_emp_change where change_month = '+QuotedStr(PayMon)+')'
+  else begin
+    //Â÷Â¾¤é´Á
+    if chk_epledt.Checked then
+    begin
+      sql_str := sql_str+' and epledt >= '''+FormatDateTime('yyyy/mm/dd',dtp_epledt_bgn.Date)+
+            ''' and epledt <='''+FormatDateTime('yyyy/mm/dd',dtp_epledt_end.Date)+'''';
+    end;
+  end;
+  //Âê©wÂ÷Â¾¤é´Á
+  sql_str:=sql_str+' and isnull(epledt,''2050/01/01'')>'''+LockLeaveDate+''' ';
+  //
+  sql_str:=sql_str+' order by emp_id';
+  with QryEmp do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sql_str);
+    open;
+    if not Eof then
+    begin
+      SetEnableControl(1,false);
+      ClientDataSet1.CancelUpdates;
+      runthread := TrunThread.Create(false);
+    end
+    else begin
+      WideShowMessage('¬d´M½d³ò¤ºµL¸ê®Æ¦s¦b');
+      qry_sal.Close;
+    end;
+  end;
+  //***<<<2013-01-18 hyt add ¼¾¾i¸ê®Æ
+  if (PayMon>='201301') then
+  begin
+    with qry_hrd_emp_raise_data do
+    begin
+      close;
+      sql.Clear;
+      sql_str:='SELECT emp_id, raise_num '+
+               'FROM hrd_emp_raise_data ';
+      sql.Add(sql_str);
+      open;
+    end;
+  end;
+  //***>>>
+  //***<<<2013-01-16 hyt add µ²±BÂ§ª÷¸ê®Æ
+  if (PayMon>='201301') then
+  begin
+    with qry_hrd_dut_class_13 do
+    begin
+      close;
+      sql.Clear;
+      sql_str:='SELECT emp_id, dbo.get_YM(MIN(s_ask_d)) AS ask_mon FROM hrd_dut_ask '+
+               'WHERE clas_code=''13'' AND dbo.get_YM(s_ask_d) >= '''+str_PreMonth(PayMon)+''' ' +
+               'GROUP BY  emp_id';
+      sql.Add(sql_str);
+      open;
+    end;
+  end;
+  //***>>>
+end;
+{ÂàÀÉ¤ë¥÷­«¸m}
+procedure TFormSal08.bbtn_Reset2Click(Sender: TObject);
+begin
+  if (RunThread<>nil) and (not RunThread.Terminated) then
+  begin
+    RunThread.Suspend;
+    if MessageDlg('±z½T©w­n¨ú®ø?',mtConfirmation,[mbYes,mbNo],0)=mrYes then
+    begin
+      RunThread.Resume;
+      RunThread.Terminate;
+      re_Message.Lines.Add('¥Î¤á°±¤î¤F¾Þ§@¡I');
+      SetEnableControl(1,true);
+      ClientDataSet1.CancelUpdates;
+    end
+    else
+      RunThread.Resume;
+  end;
+end;
+{¿ï¾Ü¤è¦¡}
+procedure TFormSal08.rb_ByEmp2Click(Sender: TObject);
+begin
+  if rb_ByEmp2.Checked then
+  begin
+    EditEmpBeg2.Enabled := true;
+    EditEmpEnd2.Enabled := true;
+  end
+  else
+  begin
+    EditEmpBeg2.Enabled := false;
+    EditEmpEnd2.Enabled := false;
+  end;
+  if rb_ByDept2.Checked then
+  begin
+    cob_DeptBeg2.Enabled := true;
+    cob_DeptEnd2.Enabled := true;
+  end
+  else
+  begin
+    cob_DeptBeg2.Enabled := false;
+    cob_DeptEnd2.Enabled := false;
+  end;
+end;
+
+{===============================================================================
+  ­pºâÁ~¸êxianµ{
+===============================================================================}
+procedure TRunThread.Execute;
+var
+  FormSal08:Tformsal08;
+  MonthFirstDay:TDateTime; //­pºâ¤ë¥÷ªº²Ä¤@¤Ñ
+begin
+  FreeOnTerminate := true;
+  FormSal08 := TFormSal08(Application.FindComponent('formsal08'));
+  MonthFirstDay:=EncodeDate(StrToInt(LeftStr(FormSal08.me_Month2.Text,4)),StrToInt(MidStr(FormSal08.me_month2.Text,5,2)),1);
+  with FormSal08.QryEmp do
+  begin
+    SetProcessBar(true,1,RecordCount);
+    //DMHrdsys.conn.BeginTrans;
+    while not Eof do
+    begin
+      if Terminated then
+      begin
+        //¶iµ{µ²§ô¡A°h¥X
+        //dmhrdsys.conn.RollbackTrans;
+        FormSal08.SetEnableControl(1,true);
+        ChangeSalDept(payMon);//­×¥¿³¡ªùµ¥«H®§
+        Exit;
+      end;
+      aEmpId:=FieldByName('emp_id').AsString;
+      SetProcessBar(false,1);
+      SetStatusText('·í«e²Ä'+IntToStr(Recno)+'/'+IntToStr(RecordCount)+'µ§');
+      { ³B²z¤@­Ó­û¤uªº¸ê®Æ }
+      //§R°£¸Ó­û¤u¥»¤ëÁ~¸ê
+      if ((FieldByName('epledt').AsString<>'') and
+          (FieldByName('epledt').AsDateTime<MonthFirstDay)) //¥»¤ë«eÂ÷Â¾¤£³B²z 
+          //(FieldByName('epledt').AsDateTime<=MonthFirstDay)) //¥»¤ë«eÂ÷Â¾¤£³B²z
+        or ((FieldByName('epledt').AsString<>'') and
+            (FieldByName('epledt').AsDateTime<=FieldByName('epindt').AsDateTime)) then //Â÷Â¾¤é´Á¤p©ó¶i¼t¤é´Á¤£³B²z
+      begin
+        try
+          FormSal08.DelPayMT(aEmpId,PayMon);
+        except
+          //DMHrdsys.conn.RollbackTrans;
+        end;
+      end
+      else
+        try
+          {­pºâ¸Ó­û¤u¥»¤ëÁ~¸ê}
+          FormSal08.DealAEmp(aEmpId,PayMon);
+        except
+          //DMHrdsys.conn.RollbackTrans;
+        end;
+      Next;
+    end;
+    //DMHrdsys.conn.CommitTrans;
+    ChangeSalDept(payMon);//­×¥¿³¡ªùµ¥«H®§
+    SetProcessBar(true);
+    SetStatusText('ÂàÀÉ§¹²¦¡I');
+    FormSal08.re_Message.Lines.Add('ÂàÀÉ§¹²¦¡I');
+    FormSal08.SetEnableControl(1,true);
+  end;
+end;
+{===============================================================================
+  procedure DelPayMT(EmpId,PayMon:String);
+  §R°£­û¤uÁ~¸ê¥DÀÉ¬ö¿ý
+===============================================================================}
+procedure TFormSal08.DelPayMT(EmpId,PayMon:String);
+begin
+  //
+  with DMHrdsys.ADOCommand1 do
+  begin
+    CommandText:='DELETE FROM '+g_sHrd_sal_paymt+' WHERE emp_id='''+EmpId+''' AND pay_mon='''+PayMon+'''';
+    Execute;
+  end;
+end;
+{===============================================================================
+  DealAEmp(EmpId,PayMon:String);
+  ­pºâ¤@­Ó­û¤uªºÁ~¸ê
+===============================================================================}
+procedure TFormSal08.DealAEmp(EmpId,PayMon:String);
+var
+  EmpInfo:TFields;
+  aSpcGong:TSpcGongCurrs;              //¯S§O¼úª÷ÉO¥\ÁZ¼úª÷
+  aDutCurrs:TDutCurrs;                 //¦Ò¶Ôªð¦^¼Æ²Õ
+  ASalGrads:TSalGrad;                  //½ÕÁ~°O¿ý¤¤¼Æ¾Ú
+  pre_pst_flag:boolean;                //¬O§_­n­«·s¨úÂ¾°È
+  aSQL,
+  DeptCode,                            //³¡ªù
+  InfoCode,                            //¦bÂ¾±¡ªp
+  PstCode,                             //Â¾°È¥N¸¹
+  marryid,                             //Â¾°È¥N¸¹
+  EduCode:String;                      //¾Ç¾ú¥N¸¹
+  CurDateTime,
+  //2014.09.20 ¥X¥Í¤é´Á
+  EmpBirthDay,
+  //
+  EmpInDate,                           //¶i¼t¤é´Á
+  EmpLvDate:TDateTime;                 //Â÷Â¾¤é´Á
+  SalBase,                             //Á~¸êÁ`ÃB ¡A­pºâ³æ»ù¥Î
+  PiccPay:Currency;                    //«OÀI°ò¼Æ
+  WorkDays:Integer;                    //¥»¤ë¤u§@¤Ñ¼Æ
+  F_BasePay,                           //°ò¥»¤u¸ê    have done
+  F_GradPay,                           //Â¾µ¥ª÷ÃB    have done
+  F_MgmtPay,                           //¥DºÞ¥[µ¹    have done
+  F_TechPay,                           //±M·~¥[µ¹    have done
+  F_DutyPay,                           //Â¾°È¬z¶K(¤uºØ¸É¶K)    have done
+  F_EnvrPay,                           //Àô¹Ò¬z¶K    have done(¤w°±)
+  F_OtherPay,                          //¨ä¥L¸É¶K    have done
+  F_OtherTemp,                         //Á{®É¶µ    have done
+  F_EfftPay,                           //®Ä²v¼úª÷  200704¶}©l
+  F_PsalPay,                           //¥ó¸ê¼úª÷  200704¶}©l
+  F_LongWorkPay,                       //¤[¥ô¼úª÷
+  F_SpcPay,                            //¯S§O¬z¶K    have done
+  F_GongPay,                           //¥\ÁZ¼úª÷    have done
+  F_DuoPay,                            //¦h¤u¼úª÷    have done
+  F_NoLeavePay,                        //¥þ¶Ô¼ú      have done
+  F_OverPay,                           //¥[¯Z¶O      have done
+  F_NightPay,                          //©]¯Z¬z¶K    have done
+  F_SuppAgaiPay,                       //¤W¤ë¸Éµo    have done
+  F_LastAddPay,                        //¤W¤ë¾lÃB    have done
+  F_SickPay,                           //¯f°²¸É¶K(«OÀI¤½¥q)    have done
+  F_SickPay2,                           //¯f°²¸É¶K(¤½¥q)    have done
+  F_PiccBackPay,                       //«OÀIªðÁÙ    have done
+  F_DealPay,                           //À³µoÁ~¸ê    have done
+  F_MealCost,                          //¥ë­¹¶O      have done
+  F_AskCost,                           //½Ð°²¦©´Ú    have done
+  F_StopCost,                          //°±¤u¦©´Ú    have done
+  F_PiccSheCost,                       //ªÀ·|«OÀI    have done
+  F_PiccYiCost,                        //ÂåÀø«OÀI    have done
+  F_YiCardCost,                        //Âå«O¥d¦©´Ú    have done
+  F_LaunCost,                          //¤u¹Î¶O      have done
+  F_TaxCost,                           //­Ó¤H©Ò±oµ|  have done
+  F_SupDeduCost,                       //¤W¤ë¸É¦©    have done
+  //
+  F_ZhuiShou,                          //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+  //
+  F_PiccShiyeCost,                     //2009.02.10
+//  F_VirusPay ,                       //¬r®`¬z¶K    have done   2007.11.03 <<
+  F_Over195pay,
+  F_Foster_pay,                        //2013-06-24 hyt add ¨|¨à¬z¶K ¨C­Ó¤H¤p«Ä 60000vnd¡A³Ì¦h¤£¥i¥H¶W¹L120000
+  lciItem1, F_DealPay1,F_RealPay1,F_OverPay1,
+  //¦h¥ð¦~°²¦©´Ú
+  F_DuoxiuKoukuan,
+  //
+  F_LeavPay,                           //2015.05.04 Â÷Â¾¸É¶K
+  F_RealPay, F_Mealsal,F_YuzhiPay, F_YiFa:Currency;                  //¹êµoÁ~¸ê    have done
+
+  F_NightHour,                         //©]¯Z®É¼Æ 2013-01-31 hyt add
+
+  F_HourPrice,                         //¤p®É³æ»ù
+  F_Over15Hour,                        //¥[¯Z®É*1.5
+  F_Over20Hour,                        //¥[¯Z®É*2.0
+  F_Over30Hour,                        //¥[¯Z®É*3.0
+  F_Over195Hour,
+  HourPrice,            //¤p®É³æ»ù
+  HourPrice1:double ;           //¤p®É³æ»ù
+  sTemp:string;
+  //
+  boChange: Boolean;
+begin
+//  EmpInfo:=GetEmpInfo(EmpId,PayMon);
+  CurDateTime:=GetServerDateTime;
+  with QryEmp do
+  begin
+    DeptCode:=FieldByName('dept_code').AsString;  //³¡ªù¥N¸¹
+    PstCode:=FieldByName('pst_code').AsString;    //Â¾ºÙ¥N¸¹
+    EduCode:=FieldByName('edu_code').AsString;    //¾Ç¾ú¥N¸¹
+    EmpInDate:=FieldByName('epindt').AsDateTime;  //¶i¼t¤é´Á
+    EmpLvDate:=FieldByName('epledt').AsDateTime;  //Â÷Â¾¤é´Á
+    InfoCode:=FieldByName('info_code').AsString;  //¦bÂ¾ª¬ºA
+    marryid:=FieldByName('ifmarry').AsString;  //¦bÂ¾ª¬ºA
+    //2014.09.01 ¥X¥Í¤é´Á
+    EmpBirthDay := FieldByName('epbirth').AsDateTime;
+  end;
+  //¦bÂ¾ª¬ºA³B²z
+  if (InfoCode='1') or (InfoCode='2') or (InfoCode='7') then
+    InfoCode:='2'
+  else if (InfoCode='3') or (InfoCode='4') or (InfoCode='5') or (InfoCode='6') then
+    InfoCode:='6'
+  else
+    InfoCode:='0';
+  if EmpLvDate>DateOf(MonEDate) then
+    InfoCode:='0';
+  //
+  if (EmpLvDate=MonSDate) then
+    WorkDays := 0
+  else begin
+    if PayMon >= '201608' then
+      WorkDays:= GetWorkDaysEx2(PayMon,EmpInDate,EmpLvDate,MonEDate)    //¥»¤ë¤u§@¤Ñ¼Æ
+    else
+      WorkDays:=GetWorkDays(PayMon,EmpInDate,EmpLvDate);    //¥»¤ë¤u§@¤Ñ¼Æ
+  end;
+
+  //
+  if empid ='060024'  then
+       InfoCode:='0';
+  {¶}©l­pºâ ¥HF_¶}ÀYªºÅÜ¶q¬°¼Æ¾Ú®wÁ~¸êÀÉ¤¤ªºÄæ¦ì}
+
+  //¬d§ä½ÕÁ~¬ö¿ý(hrd_sal_grade)
+  aSQL:='select * from hrd_saltran where emp_id='''+EmpId+''' order by valid_date desc ';
+  with qry_Grad do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(aSQL);
+    Open;
+    if not Eof then
+    begin
+      first;
+      pre_pst_flag:=false;
+      while not Eof do
+      begin
+        if DateOf(FieldByName('valid_date').AsDateTime)>DateOf(MonEDate) then
+        begin//·í¤ë¤§«á¦³½ÕÂ¾¬ö¿ý
+          Next;
+          pre_pst_flag:=true;
+        end
+        else
+          Break;
+      end;
+      {if (pre_pst_flag) and (not Eof) then//­«·s¨ú±o½ÕÂ¾«eªºÂ¾ºÙ
+        PstCode:=FieldByName('pst_code').AsString;}
+      if (pre_pst_flag) then//­«·s¨ú±o½ÕÂ¾«eªºÂ¾ºÙ(·í¤ë¦Z¦³½ÕÂ¾)
+      begin
+        if (not Eof) then//¤§«e¦³½ÕÂ¾
+          PstCode:=FieldByName('pst_code').AsString
+        else//¤§«e¥¼½ÕÂ¾
+          PstCode:='60';
+      end;
+    end;
+      ASalGrads:=GetSalTran(EmpId,PayMon,PstCode,EduCode,WorkDays,EmpInDate,EmpLvDate);
+      F_MgmtPay:=ASalGrads[1];                 //2,¥DºÞ¥[µ¹
+      F_TechPay:=ASalGrads[2];                 //3,±M·~¥[µ¹
+      F_DutyPay:=ASalGrads[3];                 //4,Â¾°È¬z¶K(¤uºØ¸É¶K)
+      //GetDutyPay(EmpId,PayMon,PstCode,FieldByName('pst_pay').AsCurrency,WorkDays);
+
+    //  F_EnvrPay:=ASalGrads[4];                 //5,Àô¹Ò¬z¶K(§R)
+      //F_GradPay:=GetGrad(FieldByName('sal_grade').AsString,PstCode,WorkDays);
+      F_GradPay:=ASalGrads[5];                 //6,Â¾°Èµ¥¯ÅÃB
+      F_OtherPay:=0;//ASalGrads[6];                //5,¨ä¥L¸É¶K(§R)
+      F_SpcPay:=ASalGrads[6];                                //7-¯S§O¼úª÷
+      //***<<<2011-11-26 hyt add ºÖ¸S-¦L¨ê¼t-§@·~­ûªº¤ë¥÷¯S§O¼úª÷-¯S§O³B²z
+      if (PstCode='60') and (leftStr(DeptCode,2)='FE') and (PayMon>='201111') then
+      begin
+        F_SpcPay:=GetSpecSal(EmpId,PayMon,EmpInDate,EmpLvDate);
+      end;
+      //***>>>
+
+      //***<<<2011-04-25 hyt add
+      if ( PstCode='60' ) or ( PstCode='61' ) or ( PstCode='62' )  or ( PstCode='63' ) then
+      begin
+        //³B²z·s¶i§@·~­û¡]¤uºØ¬z¶K¡^²Î¤@«ö20000¶V¹ô®Ö¸ê¨Æ©y
+        if copy( deptcode, 1, 1) = 'S' then
+        begin
+          if (F_DutyPay<=0) and (PayMon>='201104') and (formatDatetime('yyyymm',EmpInDate)=PayMon) then //¥u¹ï¥»¤ë·s¶i¦³®Ä¡A¦¸¤ë¤£¤ÀªR
+          begin
+            F_DutyPay:=20000*WorkDays/G_WorkDays
+          end;
+        end;
+      end;
+      //***>>>
+    Close;
+  end;
+  F_BasePay := GetBase(EmpId,PayMon,PstCode,EmpInDate,EmpLvDate,EduCode); //1,°ò¥»¤u¸ê
+  if paymon <='200809'  then
+     F_LongWorkPay:=GetLongWorkPay( EmpInDate,empid,PstCode,PayMon)  //¤[¥ô¼úª÷
+  else
+      F_LongWorkPay:= 0 ;
+ // else
+   //  F_BasePay := F_BasePay  + F_LongWorkPay ;
+
+   if ( empid='064618') or ( empid='064619') then
+       F_BasePay  :=1032000 ;
+  //°òÁ~Á`ÃB¡]ºâ³æ»ù®É¥Î¡^
+  if PstCode='60' then
+    //§@·~­û¡A°òÁ~Á`ÃB¬°°ò¥»¤u¸ê+¤uºØ¸É¶K
+    SalBase:=F_BasePay+F_DutyPay
+  else
+    //«D§@·~­û¡A°òÁ~Á`ÃB¬° °ò¥»¤u¸ê+¥DºÞ¥[µ¹+Â¾°È¬z¶K+±M·~¬z¶K+Â¾°Èµ¥¯ÅÃB+¯S§O¼úª÷(2016.03.16)  
+    SalBase:=F_BasePay+F_MgmtPay+F_DutyPay+F_TechPay+F_GradPay + F_SpcPay;
+
+  //
+  aSpcGong:=GetSpcGong(EmpId,PayMon,WorkDays);          //­pºâ¥\ÁZ¼úª÷¡B¯S§O¼úª÷
+  //F_SpcPay:=aSpcGong[0];                                //7-¯S§O¼úª÷
+  F_GongPay:=aSpcGong[1];                               //8-¥\ÁZ¼úª÷
+
+  F_DuoPay:=GetMultPay(EmpId,PayMon);                   //9-¦h¤u¼úª÷
+  aDutCurrs:=GetDut(EmpId,PayMon,EmpInDate,EmpLvDate,SalBase,F_BasePay,F_DutyPay,F_SpcPay+F_GongPay,WorkDays);
+
+  //¥[¥|ªÙ¤­¤J 2013-06-07 hyt add
+  aDutCurrs[4]:=strToInt(formatFloat('0',aDutCurrs[4]));
+  
+  //2010/07/12
+  if WorkDays<> 0 then
+    HourPrice:=SalBase/WorkDays/8;            //¤p®É³æ»ù
+    F_Over15Hour:=aDutCurrs[9];                            //16-¥[¯Z®É*1.5
+    F_Over20Hour:=aDutCurrs[10];                            //16-¥[¯Z®É*2
+    F_Over30Hour:=aDutCurrs[11];                           //16-¥[¯Z®É*3
+    F_Over195Hour :=aDutCurrs[13] ;                        //16-¥[¯Z®É*1.95
+    F_HourPrice:=aDutCurrs[14];                            //16-¤p®É³æ»ù
+    F_Over195pay := 0;
+    F_Over195pay :=F_Over195Hour*F_HourPrice*GetOver195(PayMon) ;//aDutCurrs[18];                         //1.95
+    F_Over195pay:=strToInt(formatFloat('0',F_Over195pay)); //2013-06-07 hyt add 
+
+    if PayMon<'201305' then
+      F_OverPay :=Int(F_Over15Hour*F_HourPrice*1.5)+ Int(F_Over20Hour*F_HourPrice*2.0) + Int(F_Over30Hour*F_HourPrice*2.0)
+    else  //2013-05-31 hyt add  201305 300%
+      F_OverPay :=Int(F_Over15Hour*F_HourPrice*1.5)+ Int(F_Over20Hour*F_HourPrice*2.0) + Int(F_Over30Hour*F_HourPrice*3.0);
+
+    F_OverPay := F_OverPay + F_Over195pay ;
+
+    F_OverPay1 :=0;
+    //³o¸Ì³]©w¥þ³¡ ¥[¯Zªº ¦©µ|ª÷ÃB ºâ1­¿
+    if PayMon>='201307' then //2013-07-30 ¦©µ|¤¤ ¥u¦³¥[¯Z1.5©M©]¯Z¥[¯Z1.95 2ºØ±¡ªp¤ÀªR
+      F_OverPay1 :=Int(F_Over15Hour*F_HourPrice*1)+ Int(F_Over195Hour*F_HourPrice*1) + Int(F_Over20Hour*F_HourPrice*1) + Int(F_Over30Hour*F_HourPrice*1)
+    else
+      F_OverPay1 :=Int(F_Over15Hour*F_HourPrice*1)+ Int(F_Over20Hour*F_HourPrice*1) + Int(F_Over30Hour*F_HourPrice*1) + Int(F_Over195Hour*F_HourPrice*1);
+  //2010/07/12
+  F_MealCost:=aDutCurrs[0];                             //10-¥ë­¹¶O
+  F_NoLeavePay:=aDutCurrs[1];                           //11-¥þ¶Ô¼ú
+
+  //***<<<2013-01-31 hyt add ¯S®í³B²z Adidas ªº19­Ó§@·~­û
+  if PayMon='201301' then
+  begin
+    if (EmpId>='200309') and (EmpId<='200327') then
+    begin
+      if (EmpId>='200309') and (EmpId<='200310') then
+        F_NoLeavePay:=100000
+      else if (EmpId='200311') then
+        F_NoLeavePay:=200000
+      else if (EmpId>='200312') and (EmpId<='200314') then
+        F_NoLeavePay:=150000
+      else if (EmpId='200315') then
+        F_NoLeavePay:=75000
+      else if (EmpId='200316') then
+        F_NoLeavePay:=100000
+      else if (EmpId='200317') then
+        F_NoLeavePay:=175000
+      else if (EmpId>='200318') and (EmpId<='200323') then
+        F_NoLeavePay:=200000
+      else if (EmpId='200324') then
+        F_NoLeavePay:=0
+      else
+        F_NoLeavePay:=200000;
+    end;
+  end;
+  //***>>>
+
+  //2016.01.29
+  if (PayMon= '201601') or (PayMon= '201602') then
+  begin
+    F_YiFa := GetYiFaJinE(PayMon, EmpId);
+  end;
+  //
+  if (PayMon= '201602') and (F_YiFa > 0) then
+    F_SuppAgaiPay:=GetBuFaKou(EmpId,PayMon,'1') + F_YiFa 
+  else
+    F_SuppAgaiPay:=GetBuFaKou(EmpId,PayMon,'1');          //17-¸Éµoª÷ÃB
+  // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+ //   if paymon = '200801'  then
+   //    begin
+   // 2008.05.07 <<
+  if paymon >='200804'  then
+     F_MealCost:=0;                             //10-¥ë­¹¶O
+     //  F_NoLeavePay:=0;                           //11-¥þ¶Ô¼ú
+     //  F_SuppAgaiPay:=0;                          //17-¸Éµoª÷ÃB
+   //  end;
+   // 2008.01.24  >> 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+  //2010/07/12 del <<
+ // F_OverPay:=aDutCurrs[2];                              //12-¥[¯Z¶O
+ // F_OverPay1:= aDutCurrs[8];
+ // 2010/07/12  >>
+
+  F_NightPay:=aDutCurrs[3];                             //13-©]¯Z¬z¶K
+  F_AskCost:=aDutCurrs[4];                              //14-½Ð°²¦©´Ú
+  F_SickPay:=GetSalBaoBu(EmpId,PayMon);                  //15-¯f°²¸É¶K(«OÀI¤½¥q)
+  F_SickPay2:=aDutCurrs[5];                              //15-¯f°²¸É¶K(¤½¥q)
+  F_StopCost:=aDutCurrs[6];                              //16-°±¤u¦©´Ú
+
+  //if PayMon>='201305' then //¶}©l¤£³B²z¤W­Ó¤ëªº§À¼Æ 2013-05-25 hyt add
+  //  F_LastAddPay:=0
+  //else
+
+  //21 - ¦h¥ð¦©´Ú
+  F_DuoxiuKoukuan := aDutCurrs[21];
+
+    F_LastAddPay:=GetLastAddition(EmpId,PayMon);              //17-¤W¤ë¾lÃB
+
+  if IsNewEmp(EmpId,PayMon,PstCode,EmpInDate,EmpLvDate) or (EmpId= '079920') then      //§PÂ_¸Ó­û¤u¬O§_¬°·s¶i­û¤u
+  begin
+    if PstCode >= '60' then
+      F_PiccBackPay := F_BasePay*PERCENT_PICC_BACK          //18-«OÀIªðÁÙ(·s¶i­û¤u¦³)
+    else
+    //Â¾­û©Î·F³¡¬°°ò¥»¤u¸ê+¥DºÞ¥[µ¹+Â¾°È¬z¶K+±M·~¥[µ¹+Â¾µ¥ª÷ÃB+¯S§O¼úª÷
+      F_PiccBackPay := (F_BasePay+F_MgmtPay+F_DutyPay+F_TechPay+F_GradPay + F_SpcPay)*PERCENT_PICC_BACK;
+  end
+  else
+  begin
+    F_PiccBackPay:=0;
+  end;
+  {if CheckRecordExist('SELECT * FROM hrd_picc WHERE emp_id='''+EmpId+''' AND picc_mon<='''+PayMon+'''') then
+    PiccPay:=GetNormalBase(PstCode,EduCode,EmpInDate,SalBaseLvl,false)//F_BasePay
+  else                                                  //«OÀI°ò¼Æ
+    PiccPay:=0;//CheckHasPicc(EmpId,PayMon,PstCode);}
+  if CheckHasPicc(EmpId,PayMon) then
+  begin
+    // if  payMon <'200801'  then
+    //     PiccPay:=GetBase1(PayMon,PstCode,EmpInDate,EmpLvDate,EduCode)
+       //  PiccPay:=F_BasePay
+    // else
+      PiccPay:=GetNormalBase(EmpId,PayMon,PstCode,EduCode,EmpInDate,SalBaseLvl,false);  //F_BasePay
+
+      //2016.01.19 Â¾­û©Î¨ä¥L»Ý¥[¤WÂ¾µ¥ª÷ÃB¡BÂ¾°È¬z¶K¡B±M·~¥[µ¹¡B¯S§O¼úª÷¡B¥DºÞ¥[µ¹
+      //2016.01.23 §@·~­û¥uºâ°ò¥»¤u¸ê¡A¤£ºâ¤uºØ¸É¶K
+      if PstCode < '60' then
+        PiccPay := PiccPay + GetPiccBase(PayMon, EmpId)
+      else
+        PiccPay := PiccPay + GetSpcPayOf60(PayMon, EmpId);  
+
+      if ( empid='064618') or ( empid='064619') then
+       PiccPay:=1032000
+  end
+  else                                                  //«OÀI°ò¼Æ
+    PiccPay:=0;//CheckHasPicc(EmpId,PayMon,PstCode);
+  {2016.04.04
+  F_PiccSheCost:=PiccPay*PERCENT_PICC_SHE;              //19-ªÀ·|«OÀI
+  F_PiccYiCost:=PiccPay*PERCENT_PICC_YI;                //20-ÂåÀø«OÀI
+  // 2009.02.10 <<
+
+    //­Ó¤HÃº¯Çªº³Ì¦h23000000
+  if PiccPay > 23000000 then
+    F_PiccShiYeCost := 23000000*PERCENT_PICC_SHIYE
+  else
+    F_PiccShiYeCost:=PiccPay*PERCENT_PICC_SHIYE;              //23-2009¦~1¤ë°_¦©°£ 1%ªºªÀ«O¥¢·~ª÷
+  }
+  //2016.04.04 ªÀ«O©MÂå«O³Ì¦h«ö23000000Ãº¯Ç¡A¥¢·~«OÀI«ö¹ê»ÚÃº¯Ç
+  if PiccPay > 23000000 then
+  begin
+    F_PiccSheCost:= 23000000*PERCENT_PICC_SHE;              //19-ªÀ·|«OÀI
+    F_PiccYiCost:= 23000000*PERCENT_PICC_YI;                //20-ÂåÀø«OÀI
+  end
+  else begin
+    F_PiccSheCost:=PiccPay*PERCENT_PICC_SHE;              //19-ªÀ·|«OÀI
+    F_PiccYiCost:=PiccPay*PERCENT_PICC_YI;                //20-ÂåÀø«OÀI
+  end;
+  //¥¢·~
+  F_PiccShiYeCost:=PiccPay*PERCENT_PICC_SHIYE;              //23-2009¦~1¤ë°_¦©°£ 1%ªºªÀ«O¥¢·~ª÷
+
+  // 2009.02.10  >>
+   // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+ // if paymon ='200801'  then
+ //    begin
+ //      F_PiccSheCost:=0;              //19-ªÀ·|«OÀI
+ //      F_PiccYiCost:=0;                //20-ÂåÀø«OÀI
+ //    end;
+     // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+  if  PayMon >='200704'  then
+    begin
+      F_PsalPay:=GetPsalPay(EmpId,PayMon,F_DutyPay);           //21-¥ó¸ê¼úª÷
+      F_EfftPay:= 0 ; //GetEffPay(EmpId,DeptCode,PayMon,EmpInDate,EmpLvDate);//21-®Ä²v¼úª÷
+
+    end
+  else
+    begin
+       F_PsalPay:=0 ;
+       F_EfftPay:= 0 ;
+
+    end;
+   // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+ // if paymon='200801'  then
+ //    begin
+ //      F_PsalPay:=0 ;
+ //      F_EfftPay:= 0 ;
+ //    end;
+  //if paymon='200712'  then
+  //   F_SupDeduCost:=  5000  // 200712¤ë¨C­Ó­û¤u¯S§O¦©°£°òª÷®½´Ú 5000
+  //else
+  F_SupDeduCost:= GetBuFaKou(EmpId,PayMon,'2');          //22-¤W¤ë¸É¦©
+  //
+  if (PayMon= '201601') or (F_YiFa < 0) then
+    F_SupDeduCost := F_SupDeduCost + Abs(F_YiFa);
+  //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+  F_ZhuiShou   := GetBuFaKou(EmpId,PayMon,'3');          //°l¦¬¯f«O¶W¥I´Ú
+
+  
+  F_Mealsal := 0 ;  //»~À\¶O
+  F_Mealsal:=aDutCurrs[12] ; //- getnomeal( empid, paymon );
+  F_OtherPay:=0;
+
+  F_NightHour:=aDutCurrs[17];                            //16-©]¯Z®É¼Æ 2013-01-31 hyt add
+                                        //23-¨ä¥L¸É¶K(§R)
+  // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+  //2015.09.04 ·í¤ë¦³¤W¯Z¤~¦©¤u¹Î¶O
+  if WorkDays> 0 then
+    F_LaunCost:=GetLanuPay(EmpId,PayMon);                 //24-¤u¹Î¶O
+ // if paymon='200801'  then
+ //    F_LaunCost:= 0 ;
+   F_YiCardCost:=GetYiCardPay(EmpId,PayMon); //2012-03-22 hyt add 
+  F_OtherTemp:=0;                                       //23-Á{®Éª÷ÃB
+  // 2010.09.18 <<
+ // if (RightStr(PayMon,2)='09') and (InfoCode='0') then                         //(¤¤¬îÂ§ª÷)
+   if (payMon='201309') and (InfoCode='0') then                         //(¤¤¬îÂ§ª÷) 201108==>201209 2012-09-25 hyt upd
+  begin
+    //aSQL:='select * from hrd_picc where insu_cod=''9'' and emp_id='''+EmpId+'''';
+    //if not CheckRecordExist(aSQL) then
+      F_OtherTemp := 50000;  //F_OtherTemp  //+20000; 2013-10-04 hyt upd 30000->50000
+  end;
+  // 2010.09.18 >>
+
+  //2014.09.20 ¤¤¬îÂ§ª÷
+  if PayMon= '201409' then
+  begin
+    //¤¤¬î¸`§Y2014/09/08«e(¤£§t)¶i¼t¡A¥B·í¤ë¦bÂ¾ªº­û¤u¤~¦³¤¤¬îÂ§ª÷
+    if (FormatDateTime('YYYY/MM/DD', EmpInDate)<= '2014/09/07') and
+       ((EmpLvDate= 0) or (FormatDateTime('YYYYMM', EmpLvDate)> PayMon)) then
+      F_OtherTemp := F_OtherTemp + 50000;
+  end;
+
+  //2015.10.05 ¤¤¬îÂ§ª÷
+  if PayMon= '201509' then
+  begin
+    //¤¤¬î¸`§Y2015/09/27«e(¤£§t)¶i¼t¡A¥B·í¤ë¦bÂ¾ªº­û¤u¤~¦³¤¤¬îÂ§ª÷
+    if (FormatDateTime('YYYY/MM/DD', EmpInDate)<= '2015/09/10') and
+       ((EmpLvDate= 0) or (FormatDateTime('YYYYMM', EmpLvDate)> PayMon)) then
+      F_OtherTemp := F_OtherTemp + 50000;
+  end;
+
+  //2016.09.29 ¤¤¬îÂ§ª÷
+  if PayMon= '201609' then
+  begin
+    //¤¤¬î¸`§Y2015/09/27«e(¤£§t)¶i¼t¡A¥B·í¤ë¦bÂ¾ªº­û¤u¤~¦³¤¤¬îÂ§ª÷
+    if (FormatDateTime('YYYY/MM/DD', EmpInDate)<= '2016/09/10') and
+       ((EmpLvDate= 0) or (FormatDateTime('YYYYMM', EmpLvDate)> PayMon)) then
+      F_OtherTemp := F_OtherTemp + 50000;
+  end;
+
+  //2014¦~09¤ë20¤é 2014¦~09¤ë°_¡A¸Õ¥Î´Á«áº¡¤@¦~¡A¥Í¤é·í¤ëµo©ñ50000¥Í¤éÂ§ª÷
+  if PayMon>= '201409' then
+    F_OtherTemp := F_OtherTemp + GetBirthDay(EmpId, PayMon, PstCode, EmpInDate, EmpLvDate, EmpBirthDay);
+
+  //***<<2010-11-30 hyt
+  if (payMon>='201011') then
+    F_OtherTemp:=F_OtherTemp+GetJiangli(EmpId,PayMon);
+  //***>>
+
+  F_OtherTemp:=F_OtherTemp+GetMarryAmt(EmpId,paymon); //2013-01-16 hyt add  µ²±BÂ§ª÷ 201301¶}©l 
+
+  //2013-06-24 hyt add ¨|¨à¬z¶K
+  F_Foster_pay:=0;
+  if (paymon >='201306') and (InfoCode='0')  then
+    F_Foster_pay:=GetFoster_pay(EmpId,PayMon);
+  //2015.08.27 Â÷Â¾¸É¶K
+  F_LeavPay := 0;
+  //2015.05.04 Â÷Â¾¸É¶K
+
+  //
+  boChange := False;
+  //
+  if cbChange.Checked then 
+    boChange := IsChangeFactory(PayMon, EmpId);
+
+  //2015.05.22 ¥¿±`Â÷Â¾ªÌ¤~¦³Â÷Â¾¸É¶K 2016.06.13 ºÖ¸SÅÜ¶¶ªN¸É¶K
+  if (PayMon >= '201508') and ((InfoCode= '2') or boChange)then
+    F_LeavPay := GetLeaveSubsidy(PayMon, EmpId, EmpInDate, EmpLvDate);
+
+  //2016.08.01 ¬O§_¤w¸gµo©ñ
+  if IsYiFa(EmpId) and (PayMon <= '201607') then
+    F_LeavPay := 0;
+
+  //***<<<2013-05-04 hyt add       2016.05.07 5¤ë1¤éÂ÷Â¾ªº¤£¨É¦³50000
+  if (paymon >='201305') and (rightStr(paymon,2)='05') and (FormatDateTime('MMDD', EmpLvDate)<> '0501') then
+  begin
+    F_OtherTemp:=F_OtherTemp+50000 ; //©T©w¨C¦~ 5.1 ³£­n¥[Â§ª÷ 5¸U
+  end;
+    //***>>>
+
+  //
+  if (PayMon= '201511') and ((EmpId= '074244') or (EmpId= '810030') or (EmpId= '062123') or (EmpId= '065417') or
+                             (EmpId= '061012') or (EmpId= '072242') or (EmpId= '074848') or (EmpId= '078974') or
+                             (EmpId= '810028') or (EmpId= '067202') or (EmpId= '064056') or (EmpId= '810029') or
+                             (EmpId= '069079') or (EmpId= '069080') or (EmpId= '062959') or (EmpId= '066235')) then
+    F_OtherTemp := F_OtherTemp + 180000;
+
+
+ // if ( pstcode= '60' ) and ( Int(F_PsalPay) >= 0 )  then
+ //     F_DutyPay  := 0 ;
+  //2007.11.03-¬r®`¬z¶K <<
+  if paymon <='200809'  then
+     F_EnvrPay:=GetVirus(EmpId,PayMon)          //2007.11.03-¬r®`¬z¶K
+  else
+     F_EnvrPay :=0 ;
+ //2007.11.03-¬r®`¬z¶K  >>
+  // 2008.05.07 <<
+  if paymon >= '200804'  then
+  begin
+   // if IsNewEmp1(EmpId,PayMon,PstCode,EmpInDate,EmpLvDate) then      //§PÂ_¸Ó­û¤u¬O§_¬°·s¶i­û¤u
+   // else
+   //   begin
+    if paymon < '200807' then
+      F_GongPay := int((WorkDays/G_WorkDays)*100000 ) //1,¥t¥~¸É¶K
+    else
+    begin
+      if paymon ='200807'  then
+        F_GongPay := int((WorkDays/G_WorkDays)*135000)  //1,¥t¥~¸É¶K
+      else
+      begin
+        if paymon <'201103'  then
+          F_GongPay := int((WorkDays/G_WorkDays)*200000 ) //1,¥t¥~¸É¶K
+        else
+          F_GongPay := int((WorkDays/G_WorkDays)*400000 ); //1,¥t¥~¸É¶K   2011¦~3¤ë
+      end;
+    end;
+    //  end;
+  end;
+  // 2008.05.07 >>
+
+  F_BasePay:=strToInt(formatFloat('0',F_BasePay));//¥[¥|ªÙ¤­¤J 2013-06-07 hyt add
+  F_GradPay:=strToInt(formatFloat('0',F_GradPay));
+  F_DutyPay:=strToInt(formatFloat('0',F_DutyPay));
+  F_TechPay:=strToInt(formatFloat('0',F_TechPay));
+  F_MgmtPay:=strToInt(formatFloat('0',F_MgmtPay));
+  F_EnvrPay:=strToInt(formatFloat('0',F_EnvrPay));
+  F_EfftPay:=strToInt(formatFloat('0',F_EfftPay));
+  F_SpcPay:=strToInt(formatFloat('0',F_SpcPay));
+  F_DuoPay:=strToInt(formatFloat('0',F_DuoPay));
+  F_NoLeavePay:=strToInt(formatFloat('0',F_NoLeavePay));
+  F_OverPay:=strToInt(formatFloat('0',F_OverPay));
+  F_NightPay:=strToInt(formatFloat('0',F_NightPay));
+  F_GongPay:=strToInt(formatFloat('0',F_GongPay));
+  F_SuppAgaiPay:=strToInt(formatFloat('0',F_SuppAgaiPay));
+  F_PiccBackPay:=strToInt(formatFloat('0',F_PiccBackPay));
+  F_SickPay:=strToInt(formatFloat('0',F_SickPay));
+  F_SickPay2:=strToInt(formatFloat('0',F_SickPay2));
+  F_OtherPay:=strToInt(formatFloat('0',F_OtherPay));
+  F_OtherTemp:=strToInt(formatFloat('0',F_OtherTemp));
+  F_LastAddPay:=strToInt(formatFloat('0',F_LastAddPay));
+  //F_SalHolPay:=strToInt(formatFloat('0',F_SalHolPay));
+  //F_IPsal:=strToInt(formatFloat('0',F_IPsal));
+  F_Mealsal:=strToInt(formatFloat('0',F_Mealsal));
+  //F_xiaoyeban:=strToInt(formatFloat('0',F_xiaoyeban));
+  //F_dayeban:=strToInt(formatFloat('0',F_dayeban));
+  F_MealCost:=strToInt(formatFloat('0',F_MealCost));
+  F_AskCost:=strToInt(formatFloat('0',F_AskCost));
+  F_StopCost:=strToInt(formatFloat('0',F_StopCost));
+  F_PiccSheCost:=strToInt(formatFloat('0',F_PiccSheCost));
+  F_PiccYiCost:=strToInt(formatFloat('0',F_PiccYiCost));
+  F_LaunCost:=strToInt(formatFloat('0',F_LaunCost));
+  F_SupDeduCost:=strToInt(formatFloat('0',F_SupDeduCost));
+  //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+  F_ZhuiShou   := StrToInt(FormatFloat('0', F_ZhuiShou));
+
+  F_YiCardCost:=strToInt(formatFloat('0',F_YiCardCost));
+  F_PiccShiyeCost:=strToInt(formatFloat('0',F_PiccShiyeCost));
+  //F_LeavPay:=strToInt(formatFloat('0',F_LeavPay));
+  //F_SalHolDec:=strToInt(formatFloat('0',F_SalHolDec));
+  lciItem1:=round(F_BasePay+F_GradPay+F_DutyPay+F_TechPay+F_MgmtPay);
+                                                        //26-À³µoÁ~¸ê
+  F_DealPay:=F_BasePay+F_MgmtPay+F_TechPay+F_DutyPay+F_GradPay
+    +F_PsalPay+F_EfftPay+F_LongWorkPay+F_SpcPay+F_DuoPay+F_NoLeavePay+F_OverPay+F_NightPay+F_GongPay
+    +F_SuppAgaiPay+F_PiccBackPay+F_SickPay+F_SickPay2+F_OtherPay+F_OtherTemp+F_LastAddPay +F_EnvrPay +F_Mealsal
+    +F_Foster_pay  //2013-06-24 hyt add ¨|¨à¬z¶K
+    +F_LeavPay;    //2015.08.27 lx add Â÷Â¾¬z¶K                                  
+  F_RealPay:=F_DealPay-F_MealCost-F_AskCost-F_StopCost-F_PiccSheCost-F_PiccYiCost-
+      F_LaunCost-F_SupDeduCost-F_PiccShiyeCost-F_YiCardCost - F_ZhuiShou - Int(F_DuoxiuKoukuan); //°l¦¬¯f«O¶W¥I´Ú //¦h¥ð¦©´Ú
+   //2009.11.24<<
+  F_DealPay1:=0;
+ //// F_OverPay1 := 0;
+ // F_DealPay1:= lciItem1 //F_BasePay+F_MgmtPay+F_TechPay+F_DutyPay+F_EnvrPay+F_GradPay
+ //   +F_EfftPay+F_SpcPay+F_DuoPay+F_NoLeavePay+F_OverPay1+F_GongPay
+ //   +F_SuppAgaiPay+F_OtherTemp  +F_Mealsal  ; //+F_PiccBackPay+F_SickPay+F_SickPay2;
+
+ // F_RealPay1:=0;
+ // F_RealPay1:=F_DealPay1-F_MealCost-F_AskCost-F_StopCost-F_PiccSheCost-F_PiccYiCost
+  //    -F_LaunCost-F_SupDeduCost-F_PiccShiyeCost;
+  F_DealPay1:= lciItem1 //F_BasePay+F_MgmtPay+F_TechPay+F_DutyPay+F_EnvrPay+F_GradPay
+    + F_EfftPay+F_SpcPay+F_DuoPay+F_NoLeavePay+F_OverPay1+F_GongPay
+    + F_SuppAgaiPay+F_OtherTemp    //+F_PiccBackPay+F_SickPay+F_SickPay2;
+    + F_PiccBackPay  //2011-09-21 hyt add «OÀIªðÁÙ
+    + F_Foster_pay ; //2013-06-24 hyt add ¨|¨à¬z¶K
+                                            //2012-02-20 hyt add F_NightPay ©]¯Z¬z¶K (the same chingluh)
+   //+F_LastAddPay+F_NightPay 2012-07-31 hyt add °]°È­n¨D ±q2012-07¶}©l ¤£­n¦Ò¼{ ©]¯Z¸É¶K¡A¸É¥¼µo
+
+  F_RealPay1:=0;
+  F_RealPay1:=F_DealPay1-F_MealCost-F_AskCost-F_StopCost-F_PiccSheCost-F_PiccYiCost
+      -F_SupDeduCost-F_PiccShiyeCost - F_ZhuiShou -
+      //¦h¥ð¦~°²¦©´Ú
+      Int(F_DuoxiuKoukuan); //°l¦¬¯f«O¶W¥I´Ú
+ //2009.11.24 >>
+  F_TaxCost:= 0;
+  // 2011.01.14  add  <<
+  if paymon ='201101'  then
+     F_RealPay1 := F_RealPay1 + getyearsal( empid) ;
+  // 2011.01.14  add   >>   
+  F_TaxCost:=GetSalTax(F_RealPay1,marryid,paymon,empid);
+  F_TaxCost:=strToInt(formatFloat('0',F_TaxCost));//¥[¥|ªÙ¤­¤J 2013-06-07 hyt add    
+ // F_TaxCost:=GetSalTax(F_RealPay);                     //25-­Ó¤H©Ò±oµ|
+  // 2008.01.24  << 2008 ¦~¤@¤ë¥÷¤W¥b¤ë¤£¦©¶O¥Î
+//  if paymon ='200801'  then
+ //    F_TaxCost:= 0 ;   
+  F_RealPay:=F_RealPay-F_TaxCost;                      //27-¹êµoÁ~¸ê
+ //  if paymon ='200801'  then
+ //    begin
+//        F_RealPay:= int( F_RealPay / 50000 )*50000;
+ //    end; 
+  //***<<<2014-01-07 hyt add
+  F_YuzhiPay:=0;
+  if  paymon='201401' then
+  begin
+    //sTemp:=DB_GetSRecord('select advance_amt from hrd_year_end_bonus where r_year=''2013'' and emp_id='''+EmpId+''' ');// ¤W¥b¤ëÁ~¸ê
+    sTemp:=DB_GetSRecord('select last_salary from hrd_sal_currency201401 where pay_mon=''201401'' and emp_id='''+EmpId+''' ');// ¤W¥b¤ëÁ~¸ê
+    if sTemp<>'' then
+    begin
+      F_RealPay  :=F_RealPay - strToFloat(sTemp);
+      F_YuzhiPay := strToFloat(sTemp);
+    end;
+  end;
+  //***>>>
+
+  //
+  F_YiFa := 0;
+  //2017.01.07 ¸É¦©1¤ë¥÷¹w¤äªº³¡¤À¡C³o³¡¤À»Ý­pµ|¡A©Ò¥H¦b³o¸Ì¦©°£
+  if PayMon= '201701' then
+  begin
+    F_YiFa := GetYiFaJinE(PayMon, EmpId);
+    //
+    if F_YiFa > 0 then
+    begin
+      F_RealPay := F_RealPay - F_YiFa;
+      //
+      F_SupDeduCost := F_SupDeduCost + F_YiFa;
+    end;
+  end;
+  //
+  if F_RealPay<0 then
+  begin
+    F_RealPay:=0;
+    re_Message.Lines.Add('­û¤u'+EmpId+' ªº¹êµoÁ~¸ê¤p¤_¹s¡I½Ð­«·s­pºâ¡I');
+  end;
+  with qry_temp2 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM '+g_sHrd_sal_paymt+' WHERE emp_id='''+EmpId+''' AND pay_mon='''+PayMon+'''');
+    Open;
+    if Eof then
+    begin
+      Append;
+      FieldByName('upd_user').AsString:=UserName;
+      FieldByName('upd_date').AsDateTime:=CurDateTime;
+      FieldByName('dept_code').AsString:=DeptCode;
+      FieldByName('info_code').AsString:=InfoCode;
+      FieldByName('pst_code').AsString:=PstCode;
+      FieldByName('emp_id').AsString:=EmpId;
+      FieldByName('pay_mon').AsString:=PayMon;
+      FieldByName('base_pay').AsCurrency:=Int(F_BasePay);
+      FieldByName('mgmt_ofr').AsCurrency:=Int(F_MgmtPay);
+      FieldByName('tech_ofr').AsCurrency:=Int(F_TechPay);
+    //  if ( pstcode= '60' ) and ( Int(F_PsalPay) >= 0 )  then
+    //     FieldByName('duty_ofr').AsCurrency:= 0    //Int(F_DutyPay);
+    //  else
+      FieldByName('duty_ofr').AsCurrency:=Int(F_DutyPay);
+   //   FieldByName('envr_ofr').AsCurrency:=Int(F_EnvrPay);
+      FieldByName('grad_ofr').AsCurrency:=Int(F_GradPay);
+      if PayMon >='200704'   then
+         begin
+          FieldByName('efft_awd').AsCurrency:=Int(F_EfftPay);
+          if ( pstcode= '60' ) and ( Int(F_PsalPay) >= 0 )  then
+             FieldByName('psal_awd').AsCurrency:=Int(F_PsalPay) ;
+         end;
+      FieldByName('longwork_pay').AsCurrency:= 0 ; //Int(F_LongWorkPay);
+      FieldByName('te_pay').AsCurrency:=Int(F_SpcPay);
+      FieldByName('duo_awd').AsCurrency:=Int(F_DuoPay);
+      FieldByName('full_awd').AsCurrency:=Int(F_NoLeavePay);
+      FieldByName('over_work').AsCurrency:=Int(F_OverPay);
+      FieldByName('sal_night').AsCurrency:=Int(F_NightPay);
+      FieldByName('gong_pay').AsCurrency:=Int(F_GongPay);
+      FieldByName('supp_agai').AsCurrency:=Int(F_SuppAgaiPay);
+      FieldByName('picc_back').AsCurrency:=Int(F_PiccBackPay);
+      FieldByName('othe_supp').AsCurrency:=Int(F_OtherPay);
+      FieldByName('other_Temp').AsCurrency:=Int(F_OtherTemp);
+      FieldByName('last_addition').AsCurrency:=Int(F_LastAddPay);
+      FieldByName('sick_supp').AsCurrency:=Int(F_SickPay);
+      FieldByName('sick_back').AsCurrency:=Int(F_SickPay2);
+      FieldByName('deal_pay').AsCurrency:=Int(F_DealPay);
+      FieldByName('meal_pay').AsCurrency:=Int(F_MealCost);
+      FieldByName('ask_pay').AsCurrency:=Int(F_AskCost);
+      FieldByName('stop_dedu').AsCurrency:=Int(F_StopCost);
+      FieldByName('picc_she').AsCurrency:=Int(F_PiccSheCost);
+      FieldByName('picc_yi').AsCurrency:=Int(F_PiccYiCost);
+      FieldByName('yicard_dedu').AsCurrency:=Int(F_YiCardCost); //ÂåÀø¥d¦©´Ú
+      FieldByName('laun_pay').AsCurrency:=Int(F_LaunCost);
+      FieldByName('tax_pay').AsCurrency:=Int(F_TaxCost);
+
+      if (paymon ='201401')  then
+        FieldByName('sup_dedu').AsCurrency:=Int(F_SupDeduCost) + Int(F_YuzhiPay )
+      else
+        FieldByName('sup_dedu').AsCurrency:=Int(F_SupDeduCost) ; //¤W¤ë¸É¦©
+      //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+      FieldByName('zhuishuo_BHXH').AsCurrency := Int(F_ZhuiShou);
+      //¦h¥ð¦~°²¦©´Ú 2016.02.27
+      FieldByName('duoxiu_koukuan').AsFloat:= Int(F_DuoxiuKoukuan);
+
+      FieldByName('actu_pay').AsCurrency:=Int(F_RealPay);
+      FieldByName('envr_ofr').AsCurrency:= 0 ; //Int(F_EnvrPay);    // 2007/11/03 <<
+      FieldByName('picc_shiye').AsCurrency:=Int( F_PiccShiyeCost) ; //Int(F_EnvrPay);    // 2009/02/10 <<
+   //   FieldByName('OT_hour15').AsFloat := aDutCurrs[9];
+   //   FieldByName('OT_hour20').AsFloat := aDutCurrs[10];
+    //  FieldByName('OT_hour30').AsFloat := aDutCurrs[11];
+    //  FieldByName('OT_hour195').AsFloat := aDutCurrs[13];
+    //2010/07/12 <<
+      FieldByName('over_time').AsFloat:=F_Over15Hour + F_Over20Hour + F_Over30Hour; // ¥[¯Z®É¼Æ
+      FieldByName('over15_hour').AsFloat:=F_Over15Hour; //   ¥[¯Z®É¼Æ1.5
+      FieldByName('over15_price').AsCurrency:=Int(F_HourPrice*1.5); // ¥[¯ZÁ~¸ê1.5­¿
+      FieldByName('over15_sal').AsCurrency:=Int(F_Over15Hour*F_HourPrice*1.5); //¥[¯Z¶O1.5
+      FieldByName('over20_hour').AsFloat:=F_Over20Hour; //   ¥[¯Z®É¼Æ2.0
+      FieldByName('over20_price').AsCurrency:=Int(F_HourPrice*2);// ¥[¯Z®ÉÁ~2.0­¿
+      FieldByName('over20_sal').AsCurrency:=Int(F_Over20Hour*F_HourPrice*2.0);  // ¥[¯ZÁ~¸ê2.0­¿
+      FieldByName('over30_hour').AsFloat:=F_Over30Hour;  //  ¥[¯Z®É¼Æ3.0
+
+      if PayMon<'201305' then
+      begin
+        FieldByName('over30_price').AsCurrency:=Int(F_HourPrice*2);  //¥[¯Z®ÉÁ~3.0­¿
+        FieldByName('over30_sal').AsCurrency:=Int(F_Over30Hour*F_HourPrice*2.0) //// ¥[¯ZÁ~¸ê3.0­¿
+      end
+      else
+      begin
+        FieldByName('over30_price').AsCurrency:=Int(F_HourPrice*3);  //¥[¯Z®ÉÁ~3.0­¿
+        FieldByName('over30_sal').AsCurrency:=Int(F_Over30Hour*F_HourPrice*3.0); //// ¥[¯ZÁ~¸ê3.0­¿    2013-05-31 hyt upd
+      end;
+      FieldByName('over195_hour').AsFloat:=F_Over195Hour;  //  ¥[¯Z®É¼Æ195
+      FieldByName('over195_price').AsCurrency:=Int(F_HourPrice*GetOver195(PayMon));  //¥[¯Z®ÉÁ~195­¿1.95
+      FieldByName('over195_sal').AsCurrency:=Int(F_Over195pay); //// ¥[¯ZÁ~¸ê195­¿
+      //2010/07/12  >>
+
+      FieldByName('meal_sal').AsFloat:=F_Mealsal; //À\¶O¸É¶K
+
+      FieldByName('night_time').AsFloat:=F_NightHour; // ©]¯Z®É¼Æ 2013-01-31 hyt add
+      FieldByName('foster_pay').AsFloat:=F_Foster_pay; //¨|¨à¬z¶K 2013-06-24 hyt add
+      //2015.08.27 Â÷Â¾¸É¶K
+      FieldByName('leav_pay').AsFloat := F_LeavPay;
+      Post;
+    end
+    else begin
+      Edit;
+      FieldByName('upd_user').AsString:=UserName;
+      FieldByName('upd_date').AsDateTime:=CurDateTime;
+      FieldByName('dept_code').AsString:=DeptCode;
+      FieldByName('info_code').AsString:=InfoCode;
+      FieldByName('pst_code').AsString:=PstCode;
+      FieldByName('base_pay').AsCurrency:=Int(F_BasePay);
+      FieldByName('mgmt_ofr').AsCurrency:=Int(F_MgmtPay);
+      FieldByName('tech_ofr').AsCurrency:=Int(F_TechPay);
+     // if ( pstcode= '60' ) and ( Int(F_PsalPay) > 0 )  then
+    //     FieldByName('duty_ofr').AsCurrency:= 0    //Int(F_DutyPay);
+     // else
+      FieldByName('duty_ofr').AsCurrency:=Int(F_DutyPay);
+   //   FieldByName('duty_ofr').AsCurrency:=Int(F_DutyPay);
+  //    FieldByName('envr_ofr').AsCurrency:=Int(F_EnvrPay);
+      FieldByName('grad_ofr').AsCurrency:=Int(F_GradPay);
+
+      if  PayMon >='200704' then
+      begin
+        FieldByName('efft_awd').AsCurrency:=Int(F_EfftPay);
+        if ( pstcode= '60' ) and ( Int(F_PsalPay) >= 0 )  then
+           FieldByName('psal_awd').AsCurrency:=Int(F_PsalPay) ;
+      end;
+      FieldByName('longwork_pay').AsCurrency:= 0 ; //Int(F_LongWorkPay);
+      FieldByName('te_pay').AsCurrency:=Int(F_SpcPay);
+      FieldByName('duo_awd').AsCurrency:=Int(F_DuoPay);
+      FieldByName('full_awd').AsCurrency:=Int(F_NoLeavePay);
+      FieldByName('over_work').AsCurrency:=Int(F_OverPay);
+      FieldByName('sal_night').AsCurrency:=Int(F_NightPay);
+      FieldByName('gong_pay').AsCurrency:=Int(F_GongPay);
+      FieldByName('supp_agai').AsCurrency:=Int(F_SuppAgaiPay);
+      FieldByName('picc_back').AsCurrency:=Int(F_PiccBackPay);
+      FieldByName('othe_supp').AsCurrency:=Int(F_OtherPay);
+      FieldByName('other_Temp').AsCurrency:=Int(F_OtherTemp);
+      FieldByName('last_addition').AsCurrency:=Int(F_LastAddPay);
+      FieldByName('sick_supp').AsCurrency:=Int(F_SickPay);
+      FieldByName('sick_back').AsCurrency:=Int(F_SickPay2);
+      FieldByName('deal_pay').AsCurrency:=Int(F_DealPay);
+      FieldByName('meal_pay').AsCurrency:=Int(F_MealCost);
+      FieldByName('ask_pay').AsCurrency:=Int(F_AskCost);
+      FieldByName('stop_dedu').AsCurrency:=Int(F_StopCost);
+      FieldByName('picc_she').AsCurrency:=Int(F_PiccSheCost);
+      FieldByName('picc_yi').AsCurrency:=Int(F_PiccYiCost);
+      FieldByName('yicard_dedu').AsCurrency:=Int(F_YiCardCost); //ÂåÀø¥d¦©´Ú
+      FieldByName('laun_pay').AsCurrency:=Int(F_LaunCost);
+      FieldByName('tax_pay').AsCurrency:=Int(F_TaxCost);
+
+      if (paymon ='201401')  then      //2014-01-22 hyt add
+        FieldByName('sup_dedu').AsCurrency:=Int(F_SupDeduCost) + Int(F_YuzhiPay )
+      else
+        FieldByName('sup_dedu').AsCurrency:=Int(F_SupDeduCost);
+
+      //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+      FieldByName('zhuishuo_BHXH').AsCurrency := Int(F_ZhuiShou);
+      //¦h¥ð¦~°²¦©´Ú 2016.02.27
+      FieldByName('duoxiu_koukuan').AsFloat:= Int(F_DuoxiuKoukuan); 
+
+      FieldByName('actu_pay').AsCurrency:=Int(F_RealPay);
+      FieldByName('envr_ofr').AsCurrency:=Int(F_EnvrPay);   // 2007.11.03
+      FieldByName('picc_shiye').AsCurrency:=Int( F_PiccShiyeCost) ; //Int(F_EnvrPay);    // 2009/02/10 <<
+       //2010/07/12 <<
+      FieldByName('over_time').AsFloat:=F_Over15Hour + F_Over20Hour + F_Over30Hour; // ¥[¯Z®É¼Æ
+      FieldByName('over15_hour').AsFloat:=F_Over15Hour; //   ¥[¯Z®É¼Æ1.5
+      FieldByName('over15_price').AsCurrency:=Int(F_HourPrice*1.5); // ¥[¯ZÁ~¸ê1.5­¿
+      FieldByName('over15_sal').AsCurrency:=Int(F_Over15Hour*F_HourPrice*1.5); //¥[¯Z¶O1.5
+      FieldByName('over20_hour').AsFloat:=F_Over20Hour; //   ¥[¯Z®É¼Æ2.0
+      FieldByName('over20_price').AsCurrency:=Int(F_HourPrice*2);// ¥[¯Z®ÉÁ~2.0­¿
+      FieldByName('over20_sal').AsCurrency:=Int(F_Over20Hour*F_HourPrice*2.0);  // ¥[¯ZÁ~¸ê2.0­¿
+
+      FieldByName('over30_hour').AsFloat:=F_Over30Hour;  //  ¥[¯Z®É¼Æ3.0
+      if PayMon<'201305' then
+      begin
+        FieldByName('over30_price').AsCurrency:=Int(F_HourPrice*2);  //¥[¯Z®ÉÁ~3.0­¿
+        FieldByName('over30_sal').AsCurrency:=Int(F_Over30Hour*F_HourPrice*2); //// ¥[¯ZÁ~¸ê3.0­¿
+      end
+      else  //2013-05-31 hyt add
+      begin
+        FieldByName('over30_price').AsCurrency:=Int(F_HourPrice*3);  //¥[¯Z®ÉÁ~3.0­¿
+        FieldByName('over30_sal').AsCurrency:=Int(F_Over30Hour*F_HourPrice*3); //// ¥[¯ZÁ~¸ê3.0­¿
+      end;
+      FieldByName('over195_hour').AsFloat:=F_Over195Hour;  //  ¥[¯Z®É¼Æ195
+      FieldByName('over195_price').AsCurrency:=Int(F_HourPrice*GetOver195(PayMon));  //¥[¯Z®ÉÁ~195­¿1.95
+      FieldByName('over195_sal').AsCurrency:=Int(F_Over195pay); //// ¥[¯ZÁ~¸ê195­¿
+      //2010/07/12  >>
+      FieldByName('meal_sal').AsFloat:=F_Mealsal; //À\¶O¸É¶K
+
+      FieldByName('night_time').AsFloat:=F_NightHour; // ©]¯Z®É¼Æ 2013-01-31 hyt add
+      FieldByName('foster_pay').AsFloat:=F_Foster_pay; //¨|¨à¬z¶K 2013-06-24 hyt add
+      //2015.08.27 Â÷Â¾¸É¶K
+      FieldByName('leav_pay').AsFloat := F_LeavPay;
+      Post;
+    end;
+  end;
+  with ClientDataSet1 do
+  begin
+    Append;
+    FieldByName('dept_code').AsString:=DeptCode;
+    FieldByName('info_code').AsString:=InfoCode;
+    FieldByName('pst_code').AsString:=PstCode;
+    FieldByName('emp_id').AsString:=EmpId;
+    FieldByName('pay_mon').AsString:=PayMon;
+    FieldByName('base_pay').AsCurrency:=Int(F_BasePay);
+    FieldByName('mgmt_ofr').AsCurrency:=Int(F_MgmtPay);
+    FieldByName('tech_ofr').AsCurrency:=Int(F_TechPay);
+    FieldByName('duty_ofr').AsCurrency:=Int(F_DutyPay);
+  //  FieldByName('envr_ofr').AsCurrency:=Int(F_EnvrPay);
+    FieldByName('grad_ofr').AsCurrency:=Int(F_GradPay);
+
+    if  PayMon >='200704' then
+    begin
+      FieldByName('efft_awd').AsCurrency:=Int(F_EfftPay);
+      FieldByName('psal_awd').AsCurrency:=Int(F_PsalPay);
+    end;
+    FieldByName('te_pay').AsCurrency:=Int(F_SpcPay);
+    FieldByName('duo_awd').AsCurrency:=Int(F_DuoPay);
+    FieldByName('full_awd').AsCurrency:=Int(F_NoLeavePay);
+    FieldByName('over_work').AsCurrency:=Int(F_OverPay);
+    FieldByName('sal_night').AsCurrency:=Int(F_NightPay);
+    FieldByName('gong_pay').AsCurrency:=Int(F_GongPay);
+    FieldByName('supp_agai').AsCurrency:=Int(F_SuppAgaiPay);
+    FieldByName('picc_back').AsCurrency:=Int(F_PiccBackPay);
+    FieldByName('othe_supp').AsCurrency:=Int(F_OtherPay);
+    FieldByName('other_Temp').AsCurrency:=Int(F_OtherTemp);
+    FieldByName('sick_supp').AsCurrency:=Int(F_SickPay);
+    FieldByName('sick_back').AsCurrency:=Int(F_SickPay2);
+    FieldByName('deal_pay').AsCurrency:=Int(F_DealPay);
+    FieldByName('meal_pay').AsCurrency:=Int(F_MealCost);
+    FieldByName('ask_pay').AsCurrency:=Int(F_AskCost);
+    FieldByName('stop_dedu').AsCurrency:=Int(F_StopCost);
+    FieldByName('picc_she').AsCurrency:=Int(F_PiccSheCost);
+    FieldByName('picc_yi').AsCurrency:=Int(F_PiccYiCost);
+    FieldByName('laun_pay').AsCurrency:=Int(F_LaunCost);
+    FieldByName('tax_pay').AsCurrency:=Int(F_TaxCost);
+    FieldByName('sup_dedu').AsCurrency:=Int(F_SupDeduCost);
+    FieldByName('actu_pay').AsCurrency:=Int(F_RealPay);
+    FieldByName('envr_ofr').AsCurrency:= 0 ; //Int(F_EnvrPay); // 2007.11.03
+    //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+    FieldByName('zhuishuo_BHXH').AsCurrency := Int(F_ZhuiShou);
+    Post;
+  end;
+end;
+{===============================================================================
+  ¨ç¼Æ¦WºÙ:GetBase  -- ­pºâ­û¤u°ò¥»¤u¸ê
+  °Ñ¼Æ:    EmpId -- ­û¤u¤u¸¹  PayMon  -- ¤u¸ê¤ë¥÷ PstCode -- Â¾ºÙ
+           EmpInDate -- ¶i¼t¤é´Á  EmpLvDate -- Â÷Â¾¤é´Á
+===============================================================================}
+function TFormSal08.GetBase(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDateTime;EduCode:string=''):Currency;
+var
+  PayNormal,PayTest:Currency;
+  NormalTestDays:TNormalTestDays;
+  NormalDays,TestDays:Integer;
+begin
+  PayNormal:=GetNormalBase(Empid, paymon, PstCode,EduCode,EmpInDate,SalBaseLvl,false); //¥¿¦¡°ò¥»Á~¸ê
+   if paymon >='200801'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 90000    // 2008.01°_¸Õ¥Î´ÁÁ~¸ê¤W¯B90000
+   else
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) ;
+
+   if paymon >='200810'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 ;    // 2008.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B150000
+
+   if paymon >='200901'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000;    // 2008.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B150000
+   if paymon >='201001'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000;    // 2008.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B150000
+   if paymon >='201101'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000 + 430000 ;    // 2008.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B150000
+   if paymon >='201107'  then
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000 + 430000 + 200000 ;    // 2008.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B150000
+   if paymon >='201110'  then //2011-11-01 hyt add
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000 + 430000 + 200000+60000 ;    // 2011.10°_¸Õ¥Î´ÁÁ~¸ê¤W¯B60000
+   if paymon >='201301'  then //2013-01-09 hyt add
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000 + 430000 + 200000+60000+320000 ;    // 2013.01°_¸Õ¥Î´ÁÁ~¸ê¤W¯B320000
+   if paymon >='201401'  then //2014-01-07 hyt add
+      PayTest:=StrToFloat(SalBaseLvl.Strings[1]) + 150000 + 150000+110000 + 430000 + 200000+60000+320000+300000;    // 2013.01°_¸Õ¥Î´ÁÁ~¸ê¤W¯B3000000
+
+   //2015.01.07 ¸Õ¥Î´Á°ò¥»Á~¸ê+400000
+   if PayMon>= '201501' then
+     PayTest:= 2830000;
+   //2016.01.06 ¸Õ¥Î´ÁÁ~¸êº¦¦Ü3230000
+   if PayMon>= '201601' then
+     PayTest:= 3230000;
+
+   //2017.01.06 ¸Õ¥Î´ÁÁ~¸êº¦¦Ü3480000  
+   if PayMon >= '201701' then
+     PayTest := 3480000;  
+
+  NormalTestDays:=GetNormalTestDays(EmpId,PayMon,PstCode,EmpInDate,EmpLvDate);
+  NormalDays:=NormalTestDays[0];
+  TestDays:=NormalTestDays[1];
+  //
+  Result:=(NormalDays/G_WorkDays)*PayNormal+(TestDays/G_WorkDays)*PayTest;
+  //¤ÀªR¬O§_¦³¯S®í¤H­û ­è¶i¼t´N¤£¥Î ¸Õ¥Î´Áªº±¡ªp    2013-01-10 hyt add
+  if TestDays>0 then
+  begin
+    if DB_SeekRecord('SELECT * FROM hrd_emp_spc_set where emp_id='''+EmpId+''' and if_test=0')=true then
+       Result:=((NormalDays+TestDays)/G_WorkDays)*PayNormal;
+  end;
+end;
+
+{===============================================================================
+  GetSpcGong(EmpId:String;Id:Integer)  ­pºâ¥\ÁZ¼úª÷ÉO¯S§O¼úª÷
+  input :EmpId ­û¤u¤u¸¹  PayMon Á~¸ê¤ë¥÷ EmpInDate ¶i¼t¤é´Á EmpLvDate Â÷Â¾¤é´Á
+  output:RetArr 0-¯S§O¼úª÷ 1-¥\ÁZ¼úª÷
+===============================================================================}
+function TFormSal08.GetSpcGong(EmpId,PayMon:String;WorkDays:Integer):TSpcGongCurrs;
+var
+  ValidDate:TDateTime;
+  RetArr:TSpcGongCurrs;
+begin
+  with qry_temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_sal_spec WHERE emp_id='''+EmpId+'''');
+    Open;
+    if Eof then
+    begin
+      RetArr[0]:=0;
+      RetArr[1]:=0;
+    end
+    else begin
+      ValidDate:=FieldByName('valid_date').AsDateTime;
+      //§PÂ_Á~¸ê¤ë¥÷¬O§_¥Í®Ä¤F
+      if StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-YearOf(ValidDate))*12-
+        MonthOf(ValidDate)<0 then
+      begin
+        RetArr[0]:=0;
+        RetArr[1]:=0;
+      end
+      else begin
+        RetArr[0]:=Int((WorkDays/G_WorkDays)*FieldByName('sal_spec').AsCurrency);
+        RetArr[1]:=Int((WorkDays/G_WorkDays)*FieldByName('sal_achi').AsCurrency);
+      end;//if
+    end;//if
+  end;//with
+  Result:=RetArr;
+end;
+{===============================================================================
+  ±o¨ì«OÀI°ò¼Æ
+===============================================================================}
+function  TFormSal08.CheckHasPicc(EmpId,PayMon:String):Boolean;
+var
+  sqlstr:string;
+  ADate:TDatetime;
+  SDate :string ;
+begin
+  ADate:=EncodeDate(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)),1);
+  ADate:=EndOfTheMonth(ADate);
+   SDate := LeftStr(PayMon,4) +'/'+ RightStr(PayMon,2)+'/14' ;   //2011.07.29 upd
+  //·í¤ëÂ÷Â¾¤£¥æ«OÀI
+  //PayNormal:=StrToFloat(SalBaseLvl.Strings[SalBaseLvl.IndexOf(PstCode)+1]);
+  sqlstr:='SELECT * FROM hrd_picc A,hrd_emp B WHERE A.emp_id=B.emp_id'
+    +' and A.emp_id='''+EmpId+''' AND A.picc_mon<='''+PayMon+''' and insu_cod=''1'''
+    +' and (B.epledt is null or B.epledt>'''+ SDate+''')' ;//+FormatDateTime('yyyy/mm/dd',ADate)+''')';
+  if CheckRecordExist(sqlstr) then
+    Result:=true
+  else
+    Result:=false;
+end;
+{===============================================================================
+  Name:GetLanuPay(EmpId,PayMon:String):Currency;
+  ±o¨ì¤½¹Î¶O
+===============================================================================}
+function TFormSal08.GetLanuPay(EmpId,PayMon:String):Currency;
+begin
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_lanu WHERE emp_id='''+EmpId+''' AND lanu_date<='''+PayMon+'''');
+    Open;
+    if not Eof then
+    begin
+      //2015.02.02 2015¦~1¤ë°_¦@¹Î¶Oº¦¦Ü20000
+      if PayMon >= '201501' then
+         Result:= 20000
+      else if paymon>='201102'  then
+         Result:=10000
+      else
+         Result:=LANU_PAY   ;
+    end
+    else
+      Result:=0;
+    Close;
+  end;
+end;
+{===============================================================================
+  Name:GetMultPay(EmpId,PayMon:String):Currency;
+  ±o¨ì¦h¤u¼úª÷
+===============================================================================}
+function TFormSal08.GetMultPay(EmpId,PayMon:String):Currency;
+begin
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_sal_mult WHERE emp_id='''+EmpId+'''');
+    Open;
+    if not Eof then
+    begin
+      if (FieldByName('valid_date').Value <> null) and (FormatDateTime('yyyymm',FieldByName('valid_date').AsDateTime)<=PayMon) then
+        Result:=FieldByName('wrk_pay').AsCurrency
+      else
+        Result:=0;
+    end
+    else
+      Result:=0;
+    Close;
+  end;
+end;
+{===============================================================================
+  GetSupDedu(EmpId,PayMon:String):Currency;
+  ±o¨ì¤W¤ë¸Éµo¸É¦©
+===============================================================================}
+function TFormSal08.GetBuFaKou(EmpId,PayMon,BuType:String):Currency;
+var
+  RetCur:Currency;
+  aSQL,LastMon:String;
+  ADate:TDatetime;
+begin
+  RetCur:=0;
+  ADate:=EnCodeDate(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)),1)-1;
+  LastMon:=FormatDateTime('yyyymm',ADate);
+  aSQL:='SELECT * FROM hrd_sal_allowance WHERE emp_id='''+EmpId+''' AND al_mon='''+LastMon+'''';
+  if BuType='1' then //¸Éµo
+    aSQL:=aSQL+' AND al_type=''1'''
+  else if BuType='2' then  //¦©´Ú
+    aSQL:=aSQL+' AND al_type=''2'''
+  //°l¦¬¯f«O¶W¥I´Ú 2015.07.27
+  else if BuType= '3' then
+    aSQL:=aSQL+' AND al_type=''3'''
+  else
+    aSQL:=aSQL+' AND 1=2';
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(aSQL);
+    Open;
+    if not Eof then
+    begin
+      while not Eof do
+      begin
+      //  if FieldByName('al_type').AsString='1' then//¸Éµo
+           RetCur:=RetCur+FieldByName('al_money').AsCurrency;
+       // if FieldByName('al_type').AsString='2' then//¸É¦©
+       //   RetCur:=RetCur-FieldByName('al_money').AsCurrency;
+        Next;
+      end;
+    end
+    else
+      RetCur:=0;
+    Close;
+  end;
+  Result:=RetCur;
+end;
+{===============================================================================
+  GetLastAddition(EmpId,PayMon:String):Currency;
+  ±o¨ì¤W¤ë¾lÃB
+  anil add 2007/2/5
+===============================================================================}
+function TFormSal08.GetLastAddition(EmpId,PayMon:String):Currency;
+var
+  RetCur:Currency;
+  aSQL,LastMon:String;
+  ADate:TDatetime;
+begin
+  RetCur:=0;
+  ADate:=EnCodeDate(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)),1)-1;
+  LastMon:=FormatDateTime('yyyymm',ADate);
+  //anil modify 2007/2/5 «Ê¸Ë³Ì¤pºI¦Ü2000,§À¼Æõì­p¨ì¤U¤ë
+  if (PayMon>='200702') then
+  begin
+     if paymon ='200802'  then
+       aSQL:='SELECT a.salary-a.full_sal-b.full_sal FROM hrd_sal_currency as a, hrd_med_sal as b  WHERE  a.emp_id=b.emp_id and '
+         +' a.emp_id='''+EmpId+''' AND a.pay_mon='''+LastMon+''''
+    else
+
+     aSQL:='SELECT salary-full_sal FROM hrd_sal_currency WHERE '
+      +' emp_id='''+EmpId+''' AND pay_mon='''+LastMon+''''; 
+ //   aSQL:='SELECT salary-full_sal FROM hrd_sal_currency WHERE '
+  //    +' emp_id='''+EmpId+''' AND pay_mon='''+LastMon+'''';
+    with qry_Temp do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(aSQL);
+      Open;
+      if not Eof then
+        RetCur:=RetCur+Fields[0].AsCurrency;
+    end;
+  end;
+  Result:=RetCur;
+end;
+{===============================================================================
+  GetDutyPay():Currency -- ±o¨ìÂ¾°È¬z¶K
+===============================================================================}
+function TFormSal08.GetDutyPay(EmpId,PayMon,PstCode:String;PstPay:Currency;WorkDays:Integer):Currency;
+var
+  WorkSal,              //¤uºØ¸É¶K
+  OfrPay,OfrPay1:Currency;
+  aSQL:String;
+  EDay,SDay,DayCount,DayLeft:Integer;
+begin
+  OfrPay:=0;
+  if PstCode='60' then //1,§@·~­û
+  begin
+    with qry_temp do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM hrd_wrkpay WHERE emp_id='''+EmpId+''' AND wrk_mon='''+PayMon+'''');
+      Open;
+      if (not Eof) and (FieldByName('valid_date').AsDateTime<>0) then
+      begin
+        WorkSal:=FieldByName('wrk_sal').AsCurrency;
+        OfrPay:=Int((WorkDays/G_WorkDays)*WorkSal);
+      end
+      else
+        OfrPay:=0;
+      Close;
+    end;
+  end
+  //2
+  else if (PstCode='28') or (PstCode='33') or (PstCode='41') or (PstCode='42') or (PstCode='46') or (PstCode='50') then
+  begin
+//    aSQL:='SELECT pst_pay FROM hrd_saltran WHERE emp_id='''+EmpId+
+//      ''' AND valid_date=(SELECT MAX(valid_date) FROM hrd_saltran WHERE valid_date<'''+
+//      FormatDateTime('yyyy/mm/dd',MonSDate)+''' AND emp_id='''+EmpId+''' order BY valid_date desc)';
+    aSQL:='SELECT * FROM hrd_saltran WHERE emp_id='''+EmpId+
+      ''' AND valid_date<='''+FormatDateTime('yyyy/mm/dd',MonEDate)+''' order BY valid_date desc';
+    with qry_temp do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(aSQL);
+      Open;
+      EDay:=DayOf(MonEDate);
+      DayLeft:=WorkDays;//³Ñ¤U¥i¥Î¤Ñ¼Æ³Ì¦h¬°¤u§@¤Ñ¼Æ(¦p26)
+      OfrPay:=0;
+      while not eof do
+      begin
+        if DateOf(FieldByName('valid_date').AsDateTime)>DateOf(MonEDate) then
+          Next;//¸õ¹L·í¤ë¤§«á½ÕÂ¾ªº¬ö¿ý
+        SDay:=DayOf(FieldByName('valid_date').AsDateTime);
+        if DateOf(FieldByName('valid_date').AsDateTime)<DateOf(MonSDate) then
+          SDay:=1;//¤W¤ë½ÕÂ¾ªº¬ö¿ý³]¸m°_©l¤é´Á¬°1
+        DayCount:=EDay-SDay+1-GetSunDayCount(SDay,EDay,PayMon);
+        DayCount:=min(DayCount,DayLeft);
+        OfrPay1:=FieldByName('pst_pay').AsFloat;
+        OfrPay:=OfrPay+int(OfrPay1*DayCount/G_WorkDays);
+        DayLeft:=DayLeft-DayCount;
+        EDay:=SDay;
+        if EDay=1 then
+          break;
+        Next;
+      end;
+      Close;
+    end;
+    aSQL:='SELECT pst_pay,valid_date FROM hrd_saltran WHERE emp_id='''+EmpId+''''+
+      ' AND Year(valid_date)='+LeftStr(PayMon,4)+' AND Month(valid_date)='+IntToStr(StrToInt(RightStr(PayMon,2)))
+      +'  order by valid_date desc';
+  end
+  //3
+  else begin
+    OfrPay:=Int((WorkDays/G_WorkDays)*PstPay);
+  end;
+  Result:=OfrPay;
+end;
+
+{===============================================================================
+  ¨ç¼Æ¦WºÙ:GetGrad(GradStr:String):Currency -- ±o¨ì Â¾°Èµ¥¯ÅÃB
+  ¿é¤J°Ñ¼Æ:GradStr -- eg. 0102 0504
+===============================================================================}
+function TFormSal08.GetGrad(GradStr,PstCode:String;WorkDays:Integer):Currency;
+var
+  GradClas,GradLevel:Integer;
+  aSQL:String;
+  GradPay:Currency;
+begin
+  if Length(GradStr)=4 then
+  begin
+    GradClas:=StrToInt(LeftStr(GradStr,2));
+    GradLevel:=StrToInt(RightStr(GradStr,2));
+  end
+  else begin
+    GradClas:=0;
+    GradLevel:=0;
+  end;
+  if GradLevel=0 then
+  begin
+    if PstCode='50'  then
+      GradPay:=20000
+    else
+      GradPay:=0;
+  end;
+  if GradClas>9 then
+    GradPay:=0;
+  if GradLevel<>0 then
+  begin
+    aSQL:='SELECT grad_'+IntToStr(GradLevel)+' FROM hrd_sal_lvl WHERE grad_clas='''+IntToStr(GradClas)+'''';
+    with DMHrdsys.SQLQuery4 do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(aSQL);
+      try
+        Open;
+        GradPay:=FieldByName('grad_'+IntToStr(GradLevel)).AsCurrency;
+      except
+        GradPay:=0;
+        Exit;
+      end;
+      Close;
+    end;
+  end;
+  if (PstCode='28') or (PstCode='33') or (PstCode='41') or (PstCode='42') or (PstCode='46') or (PstCode='50') then
+  begin
+    GradPay:=(WorkDays/G_WorkDays)*GradPay;
+  end;
+  Result:=GradPay;
+end;
+{===============================================================================
+  ¨ç¼Æ¦WºÙ:GetSunDayCount -- ±o¨ì¿é¤J½d³ò¤ºªº¬P´Á¤Ñ¼Æ
+  °Ñ¼Æ:    DayBeg -- ¶}©l¤é´Á DayEnd -- µ²§ô¤é´Á YearMonth -- ¦~¤ë
+===============================================================================}
+function GetSunDayCount(DayBeg,DayEnd:Integer;YearMonth:String):Integer;
+var
+  Count:Integer;
+  SDate,EDate:TDateTime;
+begin
+  TryEnCodeDate(StrToInt(LeftStr(YearMonth,4)),StrToInt(RightStr(YearMonth,2)),DayBeg,SDate);
+  TryEnCodeDate(StrToInt(LeftStr(YearMonth,4)),StrToInt(RightStr(YearMonth,2)),DayEnd,EDate);
+  Count:=GetRestDayCount(SDate,EDate);
+  Result:=Count;
+end;
+{===============================================================================
+  ­pºâ·í¤ë¤u§@¤Ñ¼Æ
+===============================================================================}
+function GetWorkDays(PayMon:String;EmpInDate,EmpLvDate:TDateTime):Integer;
+var
+  WorkDays,TheInDay,TheLvDay,HaveInMonths,SunDays:Integer;
+  MonEnd:TDateTime;
+begin
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:=StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-
+                YearOf(EmpInDate))*12-MonthOf(EmpInDate);
+  //­û¤u¶i¼t¤é
+  TheInDay:=DayOf(EmpInDate);
+  //­û¤uÂ÷Â¾¤é
+  if (EmpLvDate<>0) then
+    TheLvDay:=DayOf(EmpLvDate)-1;
+  //¸Ó¤ë³Ì«á¤@¤Ñ
+  MonEnd:=EndOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  if HaveInMonths=0 then  //·s¶i­û¤u
+  begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEnd) then
+    begin
+      SunDays:=GetSunDayCount(1,TheInDay,PayMon);
+      WorkDays:=26-(TheInDay-SunDays)+1; //2010-10-04 hyt add ¥[1¤Ñ,¦]³W©w¤@¶i¼t´N­nºâÁ~¸ê  exp:810740
+    end
+    else begin
+      SunDays:=GetSunDayCount(TheInDay,TheLvDay,PayMon);
+      WorkDays:=TheLvDay-TheInDay-Sundays;
+    end;
+  end
+  else begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEnd) then
+    begin
+      WorkDays:= 26;
+    end
+    else begin
+      SunDays:=GetSunDayCount(1,TheLvDay,PayMon);
+      WorkDays:=TheLvDay-SunDays;
+    end;
+  end;
+  WorkDays:=max(WorkDays,0);
+
+  Result:=WorkDays;
+end;
+
+//2014.12.02 ±o¨ì¥»¤ë¹ê»Ú¤u§@¤Ñ¼Æ
+function GetWorkDaysEx(PayMon:String;EmpInDate,EmpLvDate:TDateTime):Integer;
+var
+  WorkDays,
+  TheInDay,
+  TheLvDay,
+  HaveInMonths,
+  SunDays,
+  //2014.12.02 ¸Ó¤ëªº³Ì¤j¤Ñ¼Æ
+  iMaxDay : Integer;
+  //
+  MonEnd:TDateTime;
+begin
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:=StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-
+                YearOf(EmpInDate))*12-MonthOf(EmpInDate);
+  //­û¤u¶i¼t¤é
+  TheInDay:=DayOf(EmpInDate);
+  //­û¤uÂ÷Â¾¤é
+  if (EmpLvDate<>0) then
+    TheLvDay:=DayOf(EmpLvDate)-1;
+  //¸Ó¤ë³Ì«á¤@¤Ñ
+  MonEnd:=EndOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  if HaveInMonths=0 then  //·s¶i­û¤u
+  begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEnd) then
+    begin
+      SunDays:=GetSunDayCount(1,TheInDay,PayMon);
+      WorkDays:=G_WorkDays-(TheInDay-SunDays)+1; //2010-10-04 hyt add ¥[1¤Ñ,¦]³W©w¤@¶i¼t´N­nºâÁ~¸ê  exp:810740
+    end
+    else begin
+      SunDays:=GetSunDayCount(TheInDay,TheLvDay,PayMon);
+      WorkDays:=TheLvDay-TheInDay-Sundays;
+    end;
+  end
+  else begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEnd) then
+    begin
+      //
+      iMaxDay := DayOf(MonEnd);
+      //
+      SunDays := GetSunDayCount(1, iMaxDay, PayMon);
+      //
+      WorkDays := iMaxDay - SunDays;
+      //³Ì¦h26¤Ñ
+      if WorkDays> G_WorkDays then
+        WorkDays:= G_WorkDays;
+    end
+    else begin
+      SunDays:=GetSunDayCount(1,TheLvDay,PayMon);
+      WorkDays:=TheLvDay-SunDays;
+    end;
+  end;
+  WorkDays:=max(WorkDays,0);
+  //
+  Result:=WorkDays;
+end;
+
+{===============================================================================
+  ­pºâ·í¤ë¸Õ¥Î´ÁÉO¥¿¦¡¤u¸ê¤Ñ¼Æ
+===============================================================================}
+function GetNormalTestDays(EmpId,PayMon,PstCode_new:String;EmpInDate,EmpLvDate:TDateTime):TNormalTestDays;
+var
+  NormalTestDays:TNormalTestDays;
+  HaveInMonths,                 //­pºâÁ~¸êªº·í¤ë­û¤u¤w¶i¼t¤ë¼Æ
+  TheInDay,                     //­û¤u¶i¼t¤é
+  TheLvDay,                     //­û¤uÂ÷Â¾¤é
+  TestDays,                     //¸Õ¥Î´Á¤u§@¤Ñ¼Æ
+  NormalDays,                   //¸Õ¥Î´Áº¡¤u§@¤Ñ¼Æ
+  SunDayCount,                  //¬P´Á¤Ñ¼Æ
+  TheMaxDay:Integer;            //Á~¸ê­pºâ·í¤ë¤Ñ¼Æ
+  PstCode:string; //2013-07-04 hyt upd Âà´« Â¾°È
+  sTmpMonth:string;
+begin
+  PstCode:=PstCode_new;
+  //***<<<2013-07-04 hyt add
+  sTmpMonth:=formatDatetime('yyyymm',EmpInDate);
+  sTmpMonth:=str_NextMonth(sTmpMonth);
+  sTmpMonth:=str_NextMonth(sTmpMonth);
+  sTmpMonth:=str_NextMonth(sTmpMonth);
+
+  if PayMon<=sTmpMonth then
+  begin
+    sTmpMonth:=formatDatetime('yyyymm',EmpInDate);
+    PstCode:=DB_GetSRecord('select pst_code from hrd_sal_paymt where pay_mon='''+sTmpMonth+''' and emp_id='''+EmpId+'''');
+  end;
+  //***>>>
+
+  //¨úªA°È¾¹·í«e®É¶¡
+  //CurServerDateTime:=GetServerDateTime;
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:=StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-
+                YearOf(EmpInDate))*12-MonthOf(EmpInDate);
+  //¨C¤ë³Ì¤j¤@¤Ñ
+  TheMaxDay:=DaysInAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  //­û¤u¶i¼t¤é
+  TheInDay:=DayOf(EmpInDate);
+  {¥»¤ë¶i¼t}
+  if HaveInMonths=0 then  //pst_code "60" ¤Î ¨ä¥L¦@¥Î
+  begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEDate) then   //«DÂ÷Â¾,§Y¦bÂ¾
+    begin
+      //
+      if PayMon>= '201608' then
+      begin
+        SundayCount:=GetSundayCount(TheInDay, TheMaxDay, PayMon);
+        TestDays:= TheMaxDay - TheInDay + 1 -SundayCount;
+      end
+      else begin
+        SundayCount:=GetSundayCount(1,TheInDay,PayMon);
+        TestDays:=G_WorkDays-(TheInDay-SundayCount)+1; //2010-10-04 hyt add ¥[1¤Ñ,¦]³W©w¤@¶i¼t´N­nºâÁ~¸ê  exp:810740
+      end;
+
+      NormalDays:=0;
+    end
+    else begin//·í¤ë§YÂ÷Â¾
+      TheLvDay:=DayOf(EmpLvDate)-1;
+      SundayCount:=GetSundayCount(TheInDay+1,TheLvDay,PayMon);
+      TestDays:=TheLvDay-TheInDay + 1 -SundayCount;
+      NormalDays:=0;
+    end;
+  end
+  {¶i¼t¤@­Ó¤ë}
+  else if HaveInMonths=1 then
+  begin
+    if PstCode='60' then   //§@·~­û
+    begin
+      if (EmpLvDate=0) or (EmpLvDate>MonEDate) then  //«DÂ÷Â¾,§Y¦bÂ¾
+      begin
+        TestDays:=TheInDay;
+        if TestDays>=TheMaxDay then
+          TestDays:=TheMaxDay;
+        SunDayCount:=GetSundayCount(1,TestDays,PayMon);
+        TestDays:=TestDays-SunDayCount;
+        NormalDays:=G_WorkDays-TestDays;
+      end
+      else begin          //Â÷Â¾¤é´Á¤£ªÅ¡A¥»¤ëÖÃÂ¾
+        TheLvDay:=DayOf(EmpLvDate)-1;
+        if TheLvDay > TheInDay then     //º¡¤@­Ó¤ë¤F,Á~¸ê¤À¸Õ¥Î´Á³¡¤ÀÉO¥¿±`³¡¤À
+        begin
+          TestDays:=TheInDay;
+          SunDayCount:=GetSundayCount(1,TheInDay,PayMon);
+          TestDays:=TestDays-SunDayCount;
+          NormalDays:=TheLvDay-TheInDay;
+          SunDayCount:=GetSundayCount(TheInDay+1,TheLvDay,PayMon);
+          NormalDays:=NormalDays-SunDayCount;
+        end
+        else begin                     //¥¼º¡¤@­Ó¤ë¡AÁ~¸ê¸Õ¥Î´Á
+          TestDays:=TheLvDay;
+          SunDayCount:=GetSundayCount(1,TestDays,PayMon);
+          TestDays:=TestDays-SunDayCount;
+          NormalDays:=0;
+        end;
+      end;
+    end
+    else begin             //«D§@·~­û
+      if (EmpLvDate=0) or (EmpLvDate>MonEDate) then //¦bÂ¾
+      begin
+        TestDays:=G_WorkDays;
+        NormalDays:=0;
+      end
+      else begin                  //Â÷Â¾
+        TheLvDay:=DayOf(EmpLvDate)-1;
+        TestDays:=TheLvDay;
+        SundayCount:=GetSundayCount(1,TheLvDay,PayMon);
+        TestDays:=TestDays-SundayCount;
+        NormalDays:=0;
+      end;
+    end;
+  end
+  {¶i¼t¨â­Ó¤ë}
+  else if (HaveInMonths=2) and (PstCode<>'60')  then
+  begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEDate) then //¦bÂ¾
+    begin
+      TestDays:=TheInDay;
+      if TestDays>TheMaxDay then
+        TestDays:=TheMaxDay;
+      SundayCount:=GetSundayCount(1,TheInDay,PayMon);
+      TestDays:=TestDays-SundayCount;
+      NormalDays:=G_WorkDays-TestDays;
+    end
+    else begin   //Â÷Â¾
+      TheLvDay:=DayOf(EmpLvDate)-1;
+      if TheLvDay>TheInDay then //º¡¸Õ¥Î´Á¡A¤À¸Õ¥Î´ÁÁ~¸êÉOº¡¸Õ¥Î´ÁÁ~¸ê
+      begin
+        TestDays:=TheInDay;
+        SundayCount:=GetSundayCount(1,TheInDay,PayMon);
+        TestDays:=TestDays-SundayCount;
+        NormalDays:=TheLvDay-TheInDay;
+        SundayCount:=GetSundayCount(TheInDay+1,TheLvDay,PayMon);
+        NormalDays:=NormalDays-SundayCount;
+      end
+      else begin               //¥¼º¡¸Õ¥Î´Á¡A¥þ³¡¬°¸Õ¥Î´ÁÁ~¸ê
+        TestDays:=TheLvDay;
+        SundayCount:=GetSundayCount(1,TheLvDay,PayMon);
+        TestDays:=TestDays-SundayCount;
+        NormalDays:=0;
+      end;
+    end;
+  end
+  {¶i¼t¨â­Ó¤ë¥H¤W}
+  else begin
+    if (EmpLvDate=0) or (EmpLvDate>MonEDate) then   //«DÂ÷Â¾,§Y¦bÂ¾
+    begin
+      TestDays:=0;
+      NormalDays:=G_WorkDays;
+    end
+    else begin
+      TheLvDay:=DayOf(EmpLvDate)-1;
+      TestDays:=0;
+      TheLvDay:=DayOf(EmpLvDate)-1;
+      SundayCount:=GetSundayCount(1,TheLvDay,PayMon);
+      NormalDays:=TheLvDay-SundayCount;
+    end;
+  end;
+  if NormalDays>G_WorkDays then NormalDays:=G_WorkDays;
+  if NormalDays<0 then NormalDays:=0;
+  if TestDays<0 then TestDays:=0;
+  if TestDays>G_WorkDays then TestDays:=G_WorkDays;
+  NormalTestDays[0]:=NormalDays;
+  NormalTestDays[1]:=TestDays;
+  Result:=NormalTestDays;
+end;
+
+{===============================================================================
+  function IsNewEmp(EmpId,PayMon,PstCode:String;EmpInDate:TDate):Boolean;
+  §PÂ_­û¤u¬O§_¬°·s¶i­û¤u(­pºâ«OÀIªðÁÙ¥Î)
+===============================================================================}
+function TFormSal08.IsNewEmp(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDate):Boolean;
+var
+  HaveInMonths:Integer;
+  sSql:string;
+begin
+  if ( PayMon=FormatDateTime('yyyymm',EmpLvDate) )  then
+  begin//(·í¤ëÂ÷Â¾µL«OÀIªðÁÙ)
+    Result:=false;
+    exit;
+  end;
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:=StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-YearOf(EmpInDate))*12-MonthOf(EmpInDate);
+  if PstCode='60' then   //§@·~­û
+  begin
+    if (HaveInMonths=0) or ( (HaveInMonths=1) and (DayOf(EmpInDate)>14) ) then
+      Result:=true
+    else
+      Result:=false;
+  end
+  else begin             //¨ä¥L
+    if (HaveInMonths<2) or ( (HaveInMonths=2) and (DayOf(EmpInDate)>14) ) then
+      Result:=true
+    else
+      Result:=false;
+  end;
+
+  //2013-01-30 hyt add
+  if Result then
+  begin  //°²¦p¬O·s¶i¡A¦A¤ÀªR¬Ý¬Ý ¬O§_¦³¯S®í³]©w¤@¶i¼t´N¬O¥¿¦¡­û¤uªº±¡ªp
+    sSql:='SELECT * FROM hrd_emp_spc_set where emp_id='''+EmpId+''' and if_test=''0'' and set_month<='''+PayMon+'''';
+    if DB_SeekRecord(sSql) then
+      Result:=false;
+  end;
+end;
+ {===============================================================================
+  function IsNewEmp(EmpId,PayMon,PstCode:String;EmpInDate:TDate):Boolean;
+  §PÂ_­û¤u¬O§_¬°·s¶i­û¤u(­pºâ«OÀIªðÁÙ¥Î)
+===============================================================================}
+function TFormSal08.IsNewEmp1(EmpId,PayMon,PstCode:String;EmpInDate,EmpLvDate:TDate):Boolean;
+var
+  HaveInMonths:Integer;
+begin
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:=StrToInt(RightStr(PayMon,2))+(StrToInt(LeftStr(PayMon,4))-YearOf(EmpInDate))*12-MonthOf(EmpInDate);
+  if PstCode='60' then   //§@·~­û
+  begin
+    if (HaveInMonths=0) or ( (HaveInMonths=1) and (DayOf(EmpInDate)>10) ) then
+      Result:=true
+    else
+      Result:=false;
+  end
+  else begin             //¨ä¥L
+    if (HaveInMonths<2) or ( (HaveInMonths=2) and (DayOf(EmpInDate)>10) ) then
+      Result:=true
+    else
+      Result:=false;
+  end;
+end;
+
+{===============================================================================
+  GetDut
+  ªð¦^­È: TSalGrad 0-°ò¥»¤u¸ê 1-¥DºÞ¥[µ¹ 2-±M·~¥[µ¹  3-Â¾°È¬z¶K(¤uºØ¸É¶K)
+                   4-Àô¹Ò¬z¶K 5-Â¾µ¥ª÷ÃB 6-¨ä¥L¥[µ¹
+===============================================================================}
+function TFormSal08.GetSalTran(EmpId,PayMon,PstCode,EduCode:String;WorkDays:Integer;
+  EmpInDate,EmpLvDate:TDatetime):TSalGrad;
+var
+  sal_base,sal_mgmt,sal_tech,pst_pay,envir_pay,grade_pay,other_pay,sal_spec:Currency;
+  aSQL,Pst_Code:String;
+  EDay,SDay,DayCount,DayLeft:Integer;
+begin
+  sal_base:=0;
+  sal_mgmt:=0;
+  sal_tech:=0;
+  pst_pay:=0;
+  envir_pay:=0;
+  grade_pay:=0;
+  other_pay:=0;
+  sal_spec:=0;
+  aSQL:='SELECT * FROM hrd_saltran WHERE emp_id='''+EmpId+
+    ''' AND valid_date<='''+FormatDateTime('yyyy/mm/dd',MonEDate)+''' order BY valid_date desc';
+  with qry_temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(aSQL);
+    Open;
+    EDay:=DayOf(MonEDate);
+    if (EDay=28) or (EDay=29) then
+      EDay:=30;//¤G¤ë½Õ¾ã¤Ñ¼Æ
+    DayLeft:=WorkDays;//³Ñ¤U¥i¥Î¤Ñ¼Æ³Ì¦h¬°¤u§@¤Ñ¼Æ(¦p26)
+    //OfrPay:=0;
+    if Eof then//¦pªG¨S¦³½ÕÁ~¬ö¿ý
+    begin
+      //sal_base := GetBase(EmpId,PayMon,PstCode,EmpInDate,EmpLvDate,EduCode);
+      DayLeft:=0;
+      if pstCode='60' then
+        pst_pay:=pst_pay+int(GetWrkPay(EmpId,PayMon)*WorkDays/G_WorkDays);
+      if pstCode='50' then//Â¾­ûÀq»{Â¾µ¥ÃB20000
+        grade_pay:=grade_pay+20000*WorkDays/G_WorkDays;
+    end;
+    while not eof do
+    begin
+      if DateOf(FieldByName('valid_date').AsDateTime)>DateOf(MonEDate) then
+        Next;//¸õ¹L·í¤ë¤§«á½ÕÂ¾ªº¬ö¿ý
+      Pst_Code:=FieldByName('pst_code').AsString;
+      SDay:=DayOf(FieldByName('valid_date').AsDateTime);
+      if DateOf(FieldByName('valid_date').AsDateTime)<DateOf(MonSDate) then
+        SDay:=1;//¤W¤ë½ÕÂ¾ªº¬ö¿ý³]¸m°_©l¤é´Á¬°1
+      if GetSunDayCount(SDay,EDay,PayMon) = 5 then
+         Eday := 31;
+      DayCount:=EDay-SDay+1-GetSunDayCount(SDay,EDay,PayMon);
+      DayCount:=min(DayCount,DayLeft);
+      if Pst_Code='60' then
+      begin
+        pst_pay:=pst_pay+int(GetWrkPay(EmpId,PayMon)*DayCount/G_WorkDays);
+        sal_spec:=sal_spec+int(FieldByName('sal_spec').AsFloat*DayCount/G_WorkDays);
+      end
+      else
+      begin
+        sal_mgmt:=sal_mgmt+int(FieldByName('sal_mgmt').AsFloat*DayCount/G_WorkDays);
+        sal_tech:=sal_tech+int(FieldByName('sal_tech').AsFloat*DayCount/G_WorkDays);
+        pst_pay:=pst_pay+int(FieldByName('pst_pay').AsFloat*DayCount/G_WorkDays);
+        envir_pay:=envir_pay+int(FieldByName('envir_pay').AsFloat*DayCount/G_WorkDays);
+        grade_pay:=grade_pay+int(FieldByName('grade_pay').AsFloat*DayCount/G_WorkDays);
+        other_pay:=other_pay+int(FieldByName('other_pay').AsFloat*DayCount/G_WorkDays);
+        //2014.09.19  sal_spec:=other_pay+int(FieldByName('sal_spec').AsFloat*DayCount/26);
+        sal_spec:=sal_spec+int(FieldByName('sal_spec').AsFloat*DayCount/G_WorkDays);
+      end;
+      DayLeft:=DayLeft-DayCount;
+      EDay:=SDay;
+      if EDay=1 then//µL¥»¤ë½ÕÂ¾°O¿ý,°h¥X
+        break;
+      Next;
+    end;
+  end;
+  if DayLeft>0 then
+  begin//°_©l½ÕÁ~¦b¤ë¤¤
+    if Pst_Code='60' then
+      pst_pay:=pst_pay+int(GetWrkPay(EmpId,PayMon)*DayLeft/G_WorkDays);
+    if Pst_Code='50' then
+      grade_pay:=grade_pay+20000*DayLeft/G_WorkDays;
+  end;
+  //***<<<2013-01-31 hyt add
+  if PayMon='201301' then
+  begin
+    if (EmpId>='200309') and (EmpId<='200311') then
+      pst_pay:=220000
+    else if (EmpId>='200319') and (EmpId<='200326') then
+      pst_pay:=220000   ;
+    {else if (EmpId>='200323') and (EmpId<='200324') then
+      pst_pay:=220000
+    else if (EmpId='200326')  then
+      pst_pay:=220000 ;}
+  end;
+  //***>>>
+
+  result[0]:=sal_base;
+  result[1]:=sal_mgmt;
+  result[2]:=sal_tech;
+  result[3]:=pst_pay;
+  result[4]:=0;//envir_pay;(Àô¹Ò¬z¶K©¿²¤)
+  result[5]:=grade_pay;
+  result[6]:=sal_spec;//¯S§O¼úª÷//other_pay;(¨ä¥L¬z¶K©¿²¤)
+//  result[7]:=pst_code;
+end;
+
+function TFormSal08.GetWrkPay(EmpId,PayMon:String):Currency;
+//§@·~­û¨ú¤uºØ¸É¶K
+var
+  ASQL:string;
+begin
+  aSQL:='SELECT * FROM hrd_wrkpay A,hrd_wrkpart B,hrd_wrkpay_grad C'
+      +' WHERE A.part_code=B.part_code and B.part_grad=C.grad_code'
+      +' and emp_id='''+EmpId+''' AND wrk_mon='''+PayMon+''''
+      +' and valid_date is not null';
+  with DMhrdsys.SQLQuery3 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(aSQL);
+    Open;
+    if (not Eof) then
+    begin
+      result:=FieldByName('grad_money').AsCurrency;
+        //Int((WorkDays/26)*WorkSal);
+    end
+    else
+      result:=0;
+    Close;
+  end;
+end;
+
+{===============================================================================
+  GetDut
+  ªð¦^­È: TRetCurrs 0-¥ë­¹¶O 1-¥þ¶Ô¼ú 2-¥[¯Z¶O  3-©]¯Z¬z¶K 4-½Ð°²¦©´Ú 5-¯f°²¸É¶K
+                    6-°±¤u¦©´Ú
+===============================================================================}
+function TFormSal08.GetDut(EmpId,PayMon:String;EmpInDate,EmpLvDate:TDateTime;
+  SalBasePay,ABasePay,DutyPay,GongSpcPay:Currency;AWorkDays:integer):TDutCurrs;
+var
+  MonthMaxDay,StartDay,EndDay,TheInDay,TheLvDay,Value1,i:Integer;
+  ASpcOver:TspcOver;
+  ClasHours,            //¯Z§O®É¼Æ
+  NightDays,            //©]¯Z¤Ñ¼Æ
+  WorkDays,             //¤W¯Z¤Ñ¼Æ
+  Hours_1,              //±`ºA¤u®É
+  Hours_2,              //©]¯Z¤u®É
+  Hours_3,              //¥­±`¥[¯Z
+  Hours_4,              //©P¥½¥[¯Z
+  Hours_5,              //¸`°²¤é¥[¯Z
+  Hours_6,              //¤@¯ë¯f°²
+  Hours_7,              //¦³Á~°²
+  Hours_8,              //¦³Á~¤½¶Ë°²
+  Hours_9,              //¨ê¥d²§±`
+  Hours_10,             //¥¿±`°±¤u
+  Hours_11,             //°±¤u¥þ¦©
+  Hours_12,             //°±¤u¦©¥b
+  Hours_17,             //©]³s¯Z1.95
+  Hours_14,             //©]³s¯Z1.95
+  Hours_13_kou,         //2013-07-04 hyt add
+  Hours_27,             //µLÁ~°²¡]¤£¦©¦~²×¼ú¡^ //2016.03.17 
+  Hours_CQJ,            //2016.03.17 ²£«e°²¤£µ¹Á~¸ê¡A¦ý¤£¦©¥þ¶Ô
+  Hours_KQ,             //2016.08.31 ¦©¿úªº°²´Á®É¼Æ
+  Hours_13:Extended;    //Ãm¤u,½Ð¨Æ°², ¸É¶K¯f°², µLÁ~¤½¶Ë°², ¥Í¨|°²
+  Hours_22,             //¥ð¾i»P«ì´_°·±d°²(¤£¨É¦³¥ð°²´Á¶¡¤§Á~¤ô¡A¦ý¨É¦³¥þ¶Ô¼ú¤Î¥Í¬¡¬z¶K)  2015.03.09 LX
+  MonthFirstDate,aDate:TDateTime;
+  ClasCode, Asql:String;
+  Value2, MealDay, MealDays:Extended;
+  StaffNatuPrice,       //¥­±`¥[¯Z³æ»ù
+  StaffPeriPrice,       //©P¥½¥[¯Z³æ»ù
+  StaffHoliPrice,       //¸`°²¥[¯Z³æ»ù
+  StaffNighPrice,       //©]¯Z¬z¶K³æ»ù
+  StaffSickPrice,       //¯f°²¸É¶K³æ»ù
+  AskLeavPrice:Currency;//½Ð°²¦©´Ú³æ»ù
+  RetArr:TDutCurrs;     //ªð¦^­È
+  psalkou:double;
+  //2014.12.02 ­pºâ¦©´Ú®Éªº¹ê»Ú¤u§@¤Ñ¼Æ
+  iWorkDays: Integer;
+  fDays : Double;
+  lastMonthPrice:Currency;
+  //
+  sSQL, sSalSpc: string;
+begin
+  //
+  fDays := 0;  
+  //
+  if AWorkDays = 0 then
+  begin
+    //
+    fDays:= GetButieDays(EmpId, PayMon);
+    //¤u§@¤Ñ¼Æ¬°0¡A¶È­pºâ¥¼¥ð¦~°²¸Éµo
+    lastMonthPrice := getLastWeixiuPrice(EmpId,PayMon,EmpInDate,EmpLvDate);
+    //¥¼¥ð¸Éµo
+    if fDays>= 0 then
+      RetArr[20]:= fDays*8*lastMonthPrice
+    //¦h¥ð¦©´Ú
+    else if PayMon>= '201401' then
+    begin
+      //2014.02.08 ¨ú®ø¦h¥ð¦©´Ú
+      RetArr[21]:= Abs(fDays)*8*lastMonthPrice;
+    end;  
+    Result := RetArr;
+    Exit;
+  end;
+  //­pºâÁ~¸ê¤ë²Ä¤@¤Ñ
+  MonthFirstDate:=EnCodeDate(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)),1);
+  //­pºâÁ~¸ê¤ë¤Ñ¼Æ
+  MonthMaxDay:=DaysInAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  //­û¤u¶i¼t¤é
+  TheInDay:=DayOf(EmpInDate);
+  //­û¤uÂ÷Â¾¤é
+  if EmpLvDate<>0 then
+    TheLvDay:=DayOf(EmpLvDate);
+  //¦Ò¶Ô²Î­p¶}©l¤é´Á
+  if MonthFirstDate>=EmpInDate then
+    StartDay:=1
+  else
+    StartDay:=DayOf(EmpInDate);
+  //¦Ò¶Ô²Î­pµ²§ô¤é´Á
+  if (EmpLvDate<>0) and (EmpLvDate<=MonEDate) then//·í¤ëÂ÷Â¾
+    EndDay:=DayOf(EmpLvDate)-1
+  else
+    EndDay:=MonthMaxDay;
+  NightDays:=0;
+  Hours_1:=0;
+  Hours_2:=0;
+  Hours_3:=0;
+  Hours_4:=0;
+  Hours_5:=0;
+  Hours_6:=0;
+  Hours_7:=0;
+  Hours_8:=0;
+  Hours_9:=0;
+  Hours_10:=0;
+  Hours_11:=0;
+  Hours_12:=0;
+  Hours_13:=0;
+  //2015.03.09 ¥ð¾i»P«ì´_°·±d°²
+  Hours_22:= 0;
+  //
+  Hours_27 := 0;
+  Hours_CQJ:= 0;
+  //2016.08.31 ¦©¿úªº°²´Á®É¼Æ
+  Hours_KQ := 0;
+  //
+  Hours_13_kou:=0;
+  RetArr[0]:=0;                  //¥ë­¹¶O
+  RetArr[1]:=0;                  //¥þ¶Ô¼ú
+  RetArr[2]:=0;                  //¥[¯Z¶O
+  RetArr[3]:=0;                  //©]¯Z¬z¶K
+  RetArr[4]:=0;                  //½Ð°²¦©´Ú
+  RetArr[5]:=0;                  //¯f°²¸É¶K
+  RetArr[6]:=0;                  //°±¤u¦©´Ú
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_dut_mon WHERE emp_id='''+EmpId+''' AND dut_mon='''+PayMon+'''');
+    Open;
+    while not Eof do
+    begin
+      Value1:=0;          //¨C¤Ñ¤u®É ¡]¦p0800¡^
+      Value2:=0;          //¨C¤Ñ¤p®É¼Æ¡]¦p8¡^
+      ClasCode:=FieldByName('clas_code').AsString;  //¯Z§O
+      ClasHours:=0;       //¸ÓÃþ§O¤u§@®É¼Æ
+      WorkDays:=0;        //¸Ó¯Z§O¤u§@¤Ñ¼Æ
+      for i:=StartDay to EndDay do
+      begin
+        //¨ú±o¸Ó¤Ñ¤é´Á
+        aDate:=EnCodeDate(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)),1);
+        try
+          if FieldByName('day'+Format('%.2d',[i])).AsString<>'' then
+            Value1:=StrToInt(FieldByName('day'+Format('%.2d',[i])).AsString)
+          else
+            Value1:=0;
+        except
+          Value1:=0;
+        end;
+        if Value1<0 then
+        begin
+          re_Message.Lines.Append('¤u¸¹:'+EmpId+' ¯Z§O:'+FieldByName('clas_code').AsString+'¥X²{­t¼Æ!');
+          exit;
+        end;
+        Value2:=Value1;
+        //¦pªG¤j©óµ¥©ó30¡AÀ³¸Ó¤£¬O¿ð¨ì©Î¦­°h¡A±N¥¦§éºâ¦¨¤p®É¼Æ
+        if ClasCode>='06' then
+        begin
+          if Value1>=30 then
+            Value2:=(Value1 div 100)+(Value1 mod 100)/60
+          else
+            Value2:=0;
+        end;
+        //06-Ãm¤u 08-¤½°² 09-¦í°|°² 10-¤@¯ë¯f°² 12-¨Æ°² 13-±B°² 14-³à®a 15-¦³Á~¤½¶Ë°² 16-¦~°² ©P¥½¤£­p¤J
+        if ((ClasCode='06') or (ClasCode='08') or (ClasCode='09') or (ClasCode='10') or (ClasCode='12') or
+           (ClasCode='13') or (ClasCode='14') or (ClasCode='15') or (ClasCode='16') or (ClasCode='23')) and
+           (DayOf(aDate)<>1) then //³oÃä¦³°ÝÃD¡A­n§ï¡A°²´Á¤£¤@©w´N¬°¬P´Á¤Ñ¡Aªk©w°²¤é¤]­nºâ¤W 2010-10-27 hyt add 23-¿ð¨ì/¦­°h
+          ClasHours:=ClasHours
+        else if (Value2=9) and (ClasCode='63') then
+        begin
+          NightDays:=NightDays+1;
+          ClasHours:=ClasHours+8;
+        end
+        else if (Value2=5) and (ClasCode='63') then
+        begin
+          NightDays:=NightDays+1;
+          ClasHours:=ClasHours+4;
+        end
+        else  if (( clasCode='70' )  or ( clascode='67' )   or ( clascode='76' ))  and ( value2 > 0 ) then //2014-03-25 hyt add 76
+        begin                    //2010.05.07 ²K¥[
+          mealday := mealday + 1 ;
+          ClasHours:=ClasHours+Value2;
+        end                                                                       //±ß¯Z¸ó®É¬q¡A­n¸É¶KÀ\¶O
+        else  if (( clasCode='73' ) or ( clascode='74' ) or ( clascode='75' ) or ( clascode='6C' ))  and ( value2 > 0 ) then
+        begin                    //2010.08.09 ²K¥[
+          mealdays := mealdays + 1 ;
+          ClasHours:=ClasHours+Value2;
+        end
+        else begin
+          ClasHours:=ClasHours+Value2;
+          if Value2>0 then
+            WorkDays:=WorkDays+1;
+        end;
+      end;//for
+                                               //6D ¸ó±ß¯Z©M¦­¯Z®É¬q¡A¤£µ¹©]¯Z¸É¶K 2015.09.10
+      if (ClasCode='61') or (ClasCode='62') or (ClasCode='6D') then   //±`ºA¤u®É
+      begin
+        Hours_1:=Hours_1+ClasHours;
+        RetArr[0]:=RetArr[0]+WORK_DAY_MEAL_PAY*WorkDays; //¥ë­¹¶O
+      end
+      else if  (ClasCode='63') or (ClasCode='73') or (ClasCode='6C')  then  //2010.08.09                  //©]¯Z¤u®É
+      begin
+        Hours_1:=Hours_1+ClasHours;
+        Hours_2:=Hours_2+ClasHours;
+      end
+     //  else if   ( ClasCode='74' )  then  //2010.08.09                  //©]¯Z¤u®É
+    //  begin     //( ClasCode='74' ) or
+    //    Hours_2:=Hours_2+ClasHours;
+    //  end
+      else if  ( ClasCode='75' ) then
+      begin
+        Hours_2:=Hours_2+ClasHours;
+        Hours_5:=Hours_5+ClasHours
+
+      end
+      else if (ClasCode='65') or (ClasCode='66') or (ClasCode='67') or(ClasCode='68') or(ClasCode='80') or (ClasCode='90') then
+        Hours_3:=Hours_3+ClasHours            //¥­±`¥[¯Z
+      else if (ClasCode='69') or (ClasCode='82') or (ClasCode='92') or (ClasCode='74') or (ClasCode='76')   then //2010-10-27 hyt add 74 2014-03-25 hyt add 76
+         begin
+            if   ( ClasCode='74' )  then  //2010.08.09                  //©]¯Z¤u®É
+                 Hours_2:=Hours_2+ClasHours;
+            Hours_4:=Hours_4+ClasHours            //©P¥½¥[¯Z
+         end
+      else if (ClasCode='72') or (ClasCode='85') or (ClasCode='95') or (ClasCode= '7C') then
+      begin
+
+        Hours_5:=Hours_5+ClasHours;            //¸`°²¤é¥[¯Z
+        //2015.12.29
+        if ClasCode= '7C' then
+        begin
+          Hours_2 := Hours_2 + ClasHours;
+          NightDays := NightDays + 1;
+        end;
+      end
+      else if  (ClasCode='09') or (ClasCode='10') then
+        Hours_6:=Hours_6+ClasHours            //¤@¯ë¯f°²
+      else if (ClasCode='07') or (ClasCode='08') or (ClasCode='13') or (ClasCode='14') or (ClasCode='16') or (ClasCode='17') then //2014.12.29 17:¦w±Æ¦~¥ð
+        Hours_7:=Hours_7+ClasHours            //¦³Á~°²
+      //11-²£«e°²  
+      else if ClasCode='11' then
+      begin
+        if PayMon <= '201602' then
+          Hours_1:=Hours_1+ClasHours            //²£°²
+        else
+          Hours_CQJ := Hours_CQJ + ClasHours;
+      end
+      else if ClasCode='15' then
+        Hours_8:=Hours_8+ClasHours            //¦³Á~¤½¶Ë°²
+      else if ClasCode='02' then
+        Hours_9:=Hours_9+ClasHours*5          //¨ê¥d²§±`
+      else if (ClasCode='04') or (ClasCode='05') then
+        Hours_9:=Hours_9+ClasHours            //¿ð¨ì¦­°h
+      else if ClasCode='64' then              //¥¿±`°±¤u
+      begin
+        Hours_10:=Hours_10+ClasHours;
+        Hours_1:=Hours_1+ClasHours;
+      end
+      else if ClasCode='54' then              //°±¤u¥þ¦©
+        Hours_11:=Hours_11+ClasHours
+      else if ClasCode='44' then              //°±¤u¦©¥b
+      begin
+        Hours_12:=Hours_12+ClasHours;
+        Hours_1:=Hours_1+(ClasHours/2);
+      end
+      else if (ClasCode='70') or (ClasCode='71')  then
+        Hours_17:=Hours_17+ClasHours
+      //¥ð¾i»P«ì´_°·±d°²(¤£¨É¦³¥ð°²´Á¶¡¤§Á~¤ô¡A¦ý¨É¦³¥þ¶Ô¼ú¤Î¥Í¬¡¬z¶K)  2015.03.09 LX
+      else if ClasCode= '22' then
+        Hours_22:= Hours_22 + ClasHours
+      else if (ClasCode='06')or(ClasCode='12')or(ClasCode='20')or(ClasCode='21')or(ClasCode='25') or (ClasCode='23') or
+         //2015.05.07 °ü¤k¯f°²¡Aµ¥¦P©ó20-¸É¶K¯f°²
+         (ClasCode='24') or
+         //³­²£°²
+         (ClasCode= '27') then
+      begin
+        Hours_13:=Hours_13+ClasHours;        //Ãm¤u,½Ð¨Æ°², ¸É¶K¯f°², µLÁ~¤½¶Ë°², ¥Í¨|°² 2010-10-27 hyt add 23-¿ð¨ì/¦­°h
+        {2016.03.17 µLÁ~°²¡A»Ý¦©¥þ¶Ô¼ú
+        if ClasCode='25' then
+          Hours_13_kou :=Hours_13_kou +ClasHours;
+        }
+        //³­²£°²¡A¤£¦©¥þ¶Ô¼ú 2016.03.17
+        if ClasCode= '27' then
+          Hours_13_kou := Hours_13_kou + ClasHours;
+      end;
+
+      //2016.08.31 ·í¤ë¦©¿úªº°²´Á®É¼Æ
+      if (ClasCode= '06') or (ClasCode= '09') or (ClasCode= '10') or (ClasCode= '11') or (ClasCode= '12') or
+         (ClasCode= '19') or (ClasCode= '20') or (ClasCode= '21') or (ClasCode= '22') or (ClasCode= '23') or (ClasCode= '24') or
+         (ClasCode= '25') or (ClasCode= '27') or (ClasCode= '54') then
+      begin
+        Hours_KQ := Hours_KQ + ClasHours;
+      end;
+
+
+      Next;
+    end;//while
+  end;//with
+
+  //2016.04.05 ·í¤ë¨Æ°²¤u§@¤Ñ¼Æ¤j©ó26¤Ñ ****************************************
+  if G_RealWorkDays > 26 then
+  begin
+    //·í¤ë½Ð°²¤Ñ¼Æ¦b14¤Ñ¤Î¥H¤W¡A§Y¡G·í¤ë®É¶¡¤W¯Z¤Ñ¼Æ<=13¤Ñ
+    if Hours_KQ >= 112 then
+    begin
+      //Hours_13 -> 6.12.19.20.21.25
+      if Hours_13 >= 8 then
+      begin
+        Hours_13 := Hours_13 - 8;
+        sSalSpc := 'Hours_13';
+      end
+      //Hours_6 -> 9.10
+      else if Hours_6 >= 8 then
+      begin
+        Hours_6 := Hours_6 - 8;
+        sSalSpc := 'Hours_6';
+      end
+      //Hours_11 -> 54
+      else if Hours_11 >= 8 then
+      begin
+        Hours_11 := Hours_11 - 8;
+        sSalSpc := 'Hours_11';
+      end
+      //Hours_CQJ -> 11
+      else if Hours_CQJ >= 8 then
+      begin
+        Hours_CQJ := Hours_CQJ - 8;
+        sSalSpc := 'Hours_CQJ';
+      end;  
+      //
+      sSQL:= 'select * from hrd_sal_spc where sal_month= '+QuotedStr(PayMon)
+           + ' and emp_id = '+QuotedStr(EmpId);
+      with AdoQrySalSpc do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(sSQL);
+        Open;
+        if not IsEmpty then
+        begin
+          Edit;
+          FieldByName('sal_month').AsString := PayMon;
+          FieldByName('emp_id').AsString := EmpId;
+          FieldByName('remarks').AsString := sSalSpc;
+          Post;
+        end
+        else begin
+          Append;
+          FieldByName('sal_month').AsString := PayMon;
+          FieldByName('emp_id').AsString := EmpId;
+          FieldByName('remarks').AsString := sSalSpc;
+          Post;
+        end;
+        Close;        
+      end;
+    end;
+  end;    
+  // ·s¶i,Â÷Â¾­û¤uµL¥þ¶Ô¼ú
+  if (EmpInDate>MonthFirstDate) or ((EmpLvDate<>0) and (EmpLvDate<=MonEDate)) then
+    RetArr[1]:=0
+  else begin
+    if paymon <='200809'  then
+      RetArr[1]:=100000
+    else begin
+      if paymon >='200901' then
+        RetArr[1]:=200000
+      else
+        RetArr[1]:=160000;
+    end;
+  end;
+
+  if Hours_9<11 then
+  begin
+    RetArr[1]:=RetArr[1]-Hours_9*25000; //20000; //*12500;
+    RetArr[1]:=RetArr[1]-(Hours_13-Hours_13_kou)*25000; //20000 ; //*12500;        2013-07-04 hyt upd
+    RetArr[1]:=RetArr[1]-Hours_6*25000 ;// 20000; //12500;
+    if RetArr[1]<0 then RetArr[1]:=0;
+  end
+  else
+    RetArr[1]:=0;
+  //¥ð¾i»P«ì´_°·±d°²(¤£¨É¦³¥ð°²´Á¶¡¤§Á~¤ô¡A¦ý¨É¦³¥þ¶Ô¼ú¤Î¥Í¬¡¬z¶K)  2015.03.09 Sanjin
+  Hours_13 := Hours_13 + Hours_22;
+
+  //µLÁ~°²¡]¤£¦©¥þ¶Ô¼ú¡^ 2016.03.17 lx
+  Hours_13 := Hours_13 + Hours_27;
+  //2016.03.17 ²£«e°²¨S¦³Á~¸ê¡A¦ý¤£¦©¥þ¶Ô¼ú
+  Hours_13 := Hours_13 + Hours_CQJ;
+  //2015.09.04 1¸¹Â÷Â¾¡A¦ý¦³Â÷Â¾¸É¶K
+  if AWorkDays<> 0 then
+  begin
+    StaffNatuPrice:=(SalBasePay/AWorkDays/8)*1.5; //¥­±`¥[¯Z³æ»ù
+    StaffPeriPrice:=(SalBasePay/AWorkDays/8)*2.0; //©P¥½¥[¯Z³æ»ù
+    StaffHoliPrice:=(SalBasePay/AWorkDays/8)*2.0; //¸`°²¥[¯Z³æ»ù
+    StaffNighPrice:=(SalBasePay/AWorkDays/8)*0.3; //©]¯Z¬z¶K³æ»ù
+    StaffSickPrice:=(ABasePay/AWorkDays/8)*0.5;   //¯f°²¸É¶K³æ»ù
+  end
+  else begin
+    StaffNatuPrice:= 0; //¥­±`¥[¯Z³æ»ù
+    StaffPeriPrice:= 0; //©P¥½¥[¯Z³æ»ù
+    StaffHoliPrice:= 0; //¸`°²¥[¯Z³æ»ù
+    StaffNighPrice:= 0; //©]¯Z¬z¶K³æ»ù
+    StaffSickPrice:= 0;   //¯f°²¸É¶K³æ»ù
+  end;
+  //2014.12.02
+  //AskLeavPrice  :=SalBasePay/AWorkDays/8;       //½Ð°²¦©´Ú³æ»ù
+
+  //2014.12.02 ½Ð°²¦©´Ú³æ»ù¡A·í¤u§@¤é¤p©ó26¤Ñ®É¡A¥H¹ê»Ú¤u§@¤Ñ¼Æ­p¼Æ½Ð°²¦©´Ú³æ»ù
+  //
+  iWorkDays := AWorkDays;
+  //2014.12.03 ¾ã¤ë³£¬O¦©Á~¤ôªº°²
+  if IsAskMonthlong(PayMon, EmpId) then
+    iWorkDays := GetWorkDaysEx(PayMon, EmpInDate, EmpLvDate);    //¥»¤ë¤u§@¤Ñ¼Æ
+  //
+  if iWorkDays<> 0 then
+    AskLeavPrice  :=SalBasePay/iWorkDays/8;       //½Ð°²¦©´Ú³æ»ù
+
+ // stdoverPrice := SalBasePay/AWorkDays/8 ;
+  ASpcOver:=GetSpcOver(EmpId,PayMon);//õì­p¯S®í¥[¯Z
+  hours_3:=hours_3+ASpcOver[0];
+  hours_4:=hours_4+ASpcOver[1];
+  hours_5:=hours_5+ASpcOver[2];
+
+  Hours_6:=min(Hours_6,208);
+
+  Hours_13:=min(Hours_13,208);
+  if (( paymon ='201102' ) and ( Hours_13=192 )) then
+      Hours_13:=208
+  else
+      Hours_13:=min(Hours_13,208)  ;
+
+  if Hours_13 > 208  then  Hours_13 := 208 ;
+
+  //***<<<2013-03-04 hyt add
+  if (paymon ='201302') or (paymon ='201402') then
+  begin
+    if Hours_13 = 192 then  Hours_13 :=208 ;
+    if Hours_14 = 192 then  Hours_14 :=208 ;
+  end;
+  //***>>>
+  
+  //***<<<¤ÀªR³¡¤À°²ªº±¡ªp2014-03-03 hyt add
+  if paymon ='201402' then
+  begin
+    if (Hours_13+Hours_14)=192 then
+    begin
+      if Hours_13>Hours_14 then
+        Hours_13:=208-Hours_14
+      else
+        Hours_14:=208-Hours_13;
+    end;
+  end;
+  //***>>>
+
+  //***<<<2013-07-02 hyt add
+  if (paymon ='201306') or (paymon ='201309') or (paymon ='201406') then
+  begin
+    if Hours_13 = 200 then  Hours_13 :=208 ;
+    if Hours_14 = 200 then  Hours_14 :=208 ;
+  end;
+  //***>>>
+
+  //­pºâ¥[¯Z¶O
+  if AWorkDays<> 0 then
+    RetArr[2]:=Hours_3*StaffNatuPrice+Hours_4*StaffPeriPrice+StaffHoliPrice*Hours_5+Hours_17*(SalBasePay/AWorkDays/8)*GetOver195(PayMon); //1.95
+
+  RetArr[9]:=Hours_3 ;
+  RetArr[10]:=Hours_4 ;
+  RetArr[11]:=Hours_5 ;
+
+  RetArr[8]:=Hours_3* AskLeavPrice+Hours_4* AskLeavPrice+ Hours_5* AskLeavPrice;
+  //­pºâ©]¯Z¬z¶K
+  RetArr[3]:=(NightDays+Hours_2)*StaffNighPrice+NightDays*SalBasePay/208;
+  //­pºâ½Ð°²¦©´Ú¡]¥]¬A¯S§O¼úª÷ÉO¥\ÁZ¼úª÷+¤@¯ë¯f°²¦©´Ú¡^
+  //RetArr[4]:=( Hours_13*(AskLeavPrice+GongSpcPay/208)+Hours_6*AskLeavPrice ) ;
+  //2014.12.03
+  //RetArr[4]:=( FenxiHour(Hours_13,PayMon)*(AskLeavPrice+GongSpcPay/208)+FenxiHour(Hours_6,PayMon)*AskLeavPrice ) ; //2012-03-02 hyt upd
+  //2014.12.03
+  if iWorkDays<> 0 then
+    //RetArr[4]:=( FenxiHour(Hours_13,PayMon)*(AskLeavPrice+GongSpcPay/AWorkDays/8)+FenxiHour(Hours_6,PayMon)*AskLeavPrice ) ; //2012-03-02 hyt upd
+    RetArr[4]:=( FenxiHour(Hours_13,PayMon)*AskLeavPrice+FenxiHour(Hours_6,PayMon)*AskLeavPrice );
+
+  //¦~©³©ÎÂ÷Â¾·í¤ë­pºâ¥¼¥ð¦~°²¸É¶K 2013.09.26 LX ADD**************************>>
+  if (RightStr(PayMon, 2)= '12') or
+     ((EmpLvDate>= MonSDate) and (EmpLvDate<= MonEDate)) or
+     ((EmpId= '079667') or (EmpId= '079178') or (EmpId= '065756') or (EmpId= '077717') or (EmpId= '068340')) or
+     //2016.09.05 ¤U¤ë¤@¸¹Â÷Â¾ªº¡A¦b¥»¤ë¦©¦h¥ð¸É¦©
+     (EmpLvDate=GetNextDay(PayMon)) then
+  begin
+    //
+    fDays:= GetButieDays(EmpId, PayMon);
+    //¥¼¥ð¸Éµo
+    if fDays>= 0 then
+    begin
+      //2014.10.20 ¦~©³¤´¦bÂ¾¡A¥¼¥ð¦~°²¸É¶K4­¿Á~¸ê
+      if (RightStr(PayMon, 2)= '12') and ((EmpLvDate= 0) or (EmpLvDate> MonEDate)) then
+        RetArr[20]:= fDays*8*AskLeavPrice*4
+      else
+        RetArr[20]:= fDays*8*AskLeavPrice;
+    end
+    //¦h¥ð¦©´Ú
+    else if PayMon>= '201602' then
+    begin
+      // RetArr[21]:= Abs(fDays)*8*(AskLeavPrice+wholeSpecsal/208);
+      //2016.02.24  ¤p®ÉÁ~¸ê¤w¥]§t¯S§O¼úª÷
+      RetArr[21]:= Abs(fDays)*8*AskLeavPrice;
+    end;  
+  end;  
+
+  //¯f°²¸É¶K
+  RetArr[5]:=0 ;  //Hours_6*StaffSickPrice;
+  //°±¤u¦©´Ú
+  RetArr[6]:=(Hours_11+Hours_12/2)/208*DutyPay;
+   //2010.07.08 <<
+  //RetArr[12]:=mealday*8000 + mealdays*9000;  //2010.07.08 À\¶O¸É¶K
+  RetArr[12]:=mealday*9000 + mealdays*10000;  //2013.01.18 À\¶O¸É¶K hyt add
+  RetArr[13]:=Hours_17+ASpcOver[3] ;
+  if AWorkDays<> 0 then
+    RetArr[14]:=SalBasePay/AWorkDays/8 ;
+   // 2010.07.08 >>
+
+   //2013-01-31 hyt add
+   //©]¯Z®É¼Æ
+  RetArr[17]:=(NightDays+Hours_2);
+
+  Result:=RetArr;
+end;
+
+function TFormsal08.FenxiHour(fHours:Extended;PayMon:String):Extended;
+{----------2012-03-02 hyt add ¤ÀªR¯S®í¤ë¥÷¤¤ ¥ðº¡¤ë°²ªº±¡ªp----------}
+begin    //4,19,20,21,27
+  Result:= fHours;
+  if fHours > 208  then
+    Result := 208
+  else if fHours=200 then
+  begin
+    if (paymon ='200911') or (paymon ='201202')  or (paymon ='201204')  or (paymon ='201209') then
+      Result := 208
+  end ;
+end;
+
+procedure TFormSal08.tbb_okClick(Sender: TObject);
+begin
+  sel_month.Enabled := false;
+  trb_id.Enabled := true;
+  trb_dept.Enabled := true;
+  tbb_search.Enabled := true;
+  tbb_ok.Enabled := false;
+end;
+
+procedure TFormSal08.tbb_resetClick(Sender: TObject);
+begin
+  adoquery1.Close;
+  tbb_ok.Enabled := true;
+end;
+
+procedure TFormSal08.sb_EmpBeg2Click(Sender: TObject);
+var
+  empid:String;
+begin
+  empid := FindEmpId('emp_id',me_month2.Text);
+  if empid<>'' then
+  begin
+    if TTntSpeedButton(Sender).Name='sb_EmpBeg2' then
+      EditEmpBeg2.Text:= empid
+    else if TTntSpeedButton(Sender).Name='sb_EmpEnd2' then
+      EditEmpEnd2.Text:=empid;
+  end;
+end;
+
+procedure TFormSal08.N1Click(Sender: TObject);
+begin
+  re_Message.Clear;
+end;
+
+{----------------------­pºâ¯S®í¥[¯Z®É¶¡-----------------------------
+SpcOver[0]-¥­±`¥[¯Z¡FSpcOver[1]-©P¥½¥[¯Z¡FSpcOver[2]-¸`°²¥[¯Z
+--------------------------------------------------------------------}
+function  TFormSal08.GetSpcOver(EmpId,PayMon:String):TSpcOver;
+var
+  sql_str,ClasCode:string;
+  time0,time1,time2,time3:double;
+begin
+  time0:=0;
+  time1:=0;
+  time2:=0;
+  time3:=0;
+  sql_str:='select * from hrd_dut_spe_overwork where emp_id='''+empId+''''
+    +' and year(over_date)='+LeftStr(PayMon,4)+' and month(over_date)='+RightStr(PayMon,2);
+  with qry_temp do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sql_str);
+    open;
+    while not Eof do
+    begin
+      ClasCode:=FieldByName('class_code').AsString;
+      if (ClasCode='65') or (ClasCode='66') or (ClasCode='67') or(ClasCode='68') or(ClasCode='80') or (ClasCode='90') then
+        time0:=time0+FieldByName('tot_hour').AsFloat       //¥­±`¥[¯Z
+      else if (ClasCode='69') or (ClasCode='82') or (ClasCode='92')  or (ClasCode='74') or (ClasCode='76')   then //2010-10-27 hyt add 74 2014-03-25 hyt add 76
+        time1:=time1+FieldByName('tot_hour').AsFloat       //©P¥½¥[¯Z
+      else if (ClasCode='72') or (ClasCode='85') or (ClasCode='95') then
+        time2:=time2+FieldByName('tot_hour').AsFloat       //¸`°²¤é¥[¯Z
+      else if (ClasCode='70') or (ClasCode='71')  then
+        time3:=time3+FieldByName('tot_hour').AsFloat;       //¸`°²¤é¥[¯Z
+      Next;
+    end;
+    close;
+  end;
+  result[0]:=time0;
+  result[1]:=time1;
+  result[2]:=time2;
+  result[3]:=time3;
+end;
+
+//­pºâ­Ó¤H©Ò±oµ|
+function  TFormSal08.GetSalTax(SalTot:Double; marryid,Paymon,EmpId:String):Double;
+var
+  BaseSal,LeftSal,rate:double;
+  tax, Posfee, Dedu,Nett,YIncome, nontax,Ytax, Ytax1, Mtax, tax0, tax1, tax2,tax3,tax4,tax5,tax6:double;
+  sTemp:string;
+begin
+  BaseSal := 0 ;
+  LeftSal := 0 ;
+  tax := 0 ;
+  Posfee := 0 ;
+  Dedu := 0 ;
+  Nett := 0 ;
+  YIncome:= 0 ;
+  nontax := 0 ;
+  Ytax := 0;
+  Ytax1 := 0;
+  Mtax := 0 ;
+  tax0 := 0 ;tax1 := 0 ; tax2 := 0 ; tax3 := 0 ; tax4 := 0; tax5 := 0 ; tax6 := 0 ;
+
+  LeftSal:=SalTot;
+
+  //2012-01-18 hyt add ¥[¦~²×¼úª÷ ¥æµ|
+  if PayMon='201201' then
+  begin
+    sTemp:=DB_GetSRecord('SELECT ROUND(pack_amt/12, 0) AS y_sal FROM hrd_year_end_bonus WHERE r_year=''2011'' AND emp_id='''+EmpId+'''');
+    if sTemp<>'' then
+      SalTot :=SalTot+strToFloat(sTemp);
+  end;
+  //2013-01-18 hyt add ¥[¦~²×¼úª÷ ¥æµ|
+  if PayMon='201301' then
+  begin
+    sTemp:=DB_GetSRecord('SELECT ROUND(pack_amt/12, 0) AS y_sal FROM hrd_year_end_bonus WHERE r_year=''2012'' AND emp_id='''+EmpId+'''');
+    if sTemp<>'' then
+      SalTot :=SalTot+strToFloat(sTemp);
+  end;
+  //2014-01-22 hyt add ¥[¦~²×¼úª÷ ¥æµ|
+  if PayMon='201401' then
+  begin
+    sTemp:=DB_GetSRecord('SELECT ROUND(pack_amt/12, 0) AS y_sal FROM hrd_year_end_bonus WHERE r_year=''2013'' AND emp_id='''+EmpId+'''');
+    if sTemp<>'' then
+      SalTot :=SalTot+strToFloat(sTemp);
+  end;
+
+  //2015-02-04 sanjin add ¥[¦~²×¼úª÷ ¥æµ|
+  if PayMon='201501' then
+  begin
+    sTemp:=DB_GetSRecord('SELECT ROUND(pack_amt/12, 0) AS y_sal FROM hrd_year_end_bonus WHERE r_year=''2014'' AND emp_id='''+EmpId+'''');
+    if sTemp<>'' then
+      SalTot :=SalTot+strToFloat(sTemp);
+  end;
+
+  //2015-02-04 sanjin add ¥[¦~²×¼úª÷ ¥æµ|
+  if PayMon='201601' then
+  begin
+    sTemp:=DB_GetSRecord('SELECT ROUND(pack_amt/12, 0) AS y_sal FROM hrd_year_end_bonus WHERE r_year=''2015'' AND emp_id='''+EmpId+'''');
+    if sTemp<>'' then
+      SalTot :=SalTot+strToFloat(sTemp);
+  end;
+
+
+  if SalTot<4000000 then  //2009.05.26 <<
+  begin//°_©ºÂI
+    result:=tax;
+    exit;
+  end;
+  //GetRaise_num
+  if PayMon>='201307' then   //2013-07-30 hyt add §ïµ½¼¾¾i¤H¼ÆªººûÅ@µe­±¦ÓÅÜ°Ê
+  begin
+    rate := 3600000*GetRaise_num(EmpId);
+  end
+  else if PayMon>='201301' then   //2013-01-18 hyt add §ïµ½¼¾¾i¤H¼ÆªººûÅ@µe­±¦ÓÅÜ°Ê
+  begin
+    rate := 1600000*GetRaise_num(EmpId);
+  end
+  else
+  begin
+    // 2009.05.26 <<   2010-10-14 hyt upd toLow==>toUpper
+    if marryid ='A' then
+       rate := 1600000*1;
+    if marryid ='B' then
+       rate := 1600000*2;
+    if marryid ='C' then
+       rate := 1600000*3;
+    if marryid ='D' then
+       rate := 1600000*4;
+    if marryid ='E' then
+       rate := 1600000*5;
+  end;
+
+  if PayMon>='201307' then   //2013-07-30 hyt add
+    salTot := salTot - 9000000 - rate
+  else
+    salTot := salTot - 4000000 - rate ;
+    
+   // 2011¦~8¤ë°_ , 12¤ë¤î«ö·Ó¥H¤U¤½¦¡¦©µ| <<
+  if ( salTot <= 5000000 ) and ( payMon >='201108' ) and ( Paymon <='201112' )   then
+   begin
+     result :=tax;
+     exit;
+    end;
+  // 2011¦~8¤ë°_ , 12¤ë¤î«ö·Ó¥H¤W¤½¦¡¦©µ|  >>
+  
+  //2012-07-31 hyt add  À³¦©©Ò±oµ|¬°¤@¯Å¡] <=5.000.000 D¡^¤º§K¿E­Ó¤H©Ò±oµ|
+  if (SalTot<=5000000) and (PayMon>='201207') and (PayMon<='201212') then
+  begin//°_©ºÂI
+    result:=tax;
+    exit;
+  end;
+  Ytax :=  salTot ;
+  // 2009.05. 26 >>
+  if Ytax > 0 then
+  begin
+       if ( Ytax > 0 ) and ( Ytax <= 5000000  ) then
+          begin
+           tax5 :=Ytax*0.05  ;
+          end;
+       if Ytax >  5000000 then
+          begin
+           tax5 :=5000000*0.05  ;
+          // Ytax :=Ytax - 25000000 ;
+          end;
+       if ( Ytax > 5000000 ) and ( Ytax <= 10000000  ) then
+          begin
+             tax4 :=(Ytax - 5000000 )*0.1  ;
+          end ;
+       if ( Ytax > 10000000  ) then
+          begin
+           tax4 :=(10000000 - 5000000 )*0.1  ;
+          end;
+
+     if ( Ytax > 10000000 ) and ( Ytax <= 18000000  ) then
+         begin
+           tax3 :=(Ytax - 10000000 )*0.15  ;
+         end ;
+      if  ( Ytax > 18000000 ) then
+          begin
+           tax3 :=(18000000 - 10000000 )*0.15  ;
+         //  Ytax :=Ytax - 100000000;
+          end;
+
+     if ( Ytax > 18000000 ) and ( Ytax <=32000000  ) then
+         begin
+           tax2 :=(Ytax - 18000000 )*0.2  ;
+
+         end  ;
+      if  ( Ytax > 32000000 ) then
+          begin
+           tax2 :=(32000000 - 18000000 )*0.2  ;
+         //  Ytax :=Ytax - 100000000;
+          end;
+       if ( Ytax > 32000000 ) and ( Ytax <=52000000  ) then
+         begin
+           tax1 :=(Ytax - 32000000 )*0.25  ;
+
+         end  ;
+      if  ( Ytax > 32000000 ) then
+          begin
+           tax1 :=(52000000 - 32000000 )*0.25  ;
+         //  Ytax :=Ytax - 100000000;
+          end;
+       if ( Ytax > 52000000 ) and ( Ytax <=800000000  ) then
+         begin
+           tax0 :=(Ytax - 52000000 )*0.3  ;
+
+         end  ;
+        if  ( Ytax > 52000000 ) then
+          begin
+           tax1 :=(800000000 - 52000000 )*0.3  ;
+         //  Ytax :=Ytax - 100000000;
+          end;
+      if  ( Ytax > 800000000 ) then
+          begin
+           tax6 := (Ytax - 800000000 )*0.35  ;
+         //  Ytax :=Ytax - 100000000;
+          end;
+  end;
+  Ytax1 := tax1+tax2+tax3+tax4+tax5+tax6;
+  result:=Ytax1;
+end;
+
+function TFormSal08.GetPsalPay(EmpId,PayMon:String;BasePay:Currency):Currency;
+//­pºâ¥ó¸ê¼úª÷
+var
+  Asql:string;
+  psal, psalsupp:double;
+begin
+  if PayMon<'200704' then//2007¦~04¤ë¶}©l
+  begin
+    result:=0;
+    exit;
+  end;
+  Asql:='select * from hrd_sal_award where emp_id='''+empId+''''
+    +' and tr_month='''+PayMon+''' and tr_class=''01''';
+  with DMHrdsys.SQLQuery3 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(Asql);
+    Open;
+    if not Eof then
+      psal:=FieldByName('tr_amt').AsCurrency
+    else
+      psal:=0;
+  end;
+  Asql:='select * from hrd_sal_award_supp where emp_id='''+empId+''''
+    +' and tr_month='''+PayMon+''' ';
+  with DMHrdsys.SQLQuery3 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(Asql);
+    Open;
+    if not Eof then
+      psalsupp:=FieldByName('supp_pay').AsCurrency
+    else
+      psalsupp:=0;
+  end;
+ // if psal>BasePay then
+   // result:=psal-BasePay
+
+  psal := psal + psalsupp ;
+  if psal>BasePay then
+    result:=psal-BasePay
+  else
+    result:=0;
+end;
+
+function TFormSal08.GetEffPay(EmpId,DeptCode,PayMon:String;EmpInDate,EmpLvDate:TDate):Currency;
+//­pºâ®Ä²v¼úª÷
+var
+  Asql:string;
+begin
+  if PayMon<'200704' then//2007¦~04¤ë¶}©l
+  begin
+    result:=0;
+    exit;
+  end;
+  if formatDateTime('yyyymm',EmpInDate)=PayMon then//·í¤ë¶i¼tµL
+  begin
+    result:=0;
+    exit;
+  end;
+  if formatDateTime('yyyymm',EmpLvDate)=PayMon then//·í¤ëÂ÷Â¾µL
+  begin
+    result:=0;
+    exit;
+  end;
+  Asql:='select * from hrd_sal_eff where dept_code='''+DeptCode+''''
+    +' and sal_month='''+PayMon+'''';
+  with DMHrdsys.SQLQuery3 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(Asql);
+    Open;
+    if not Eof then
+      result:=FieldByName('eff_money').AsCurrency
+    else
+      result:=0;
+  end;
+end;
+//¨ú±o ¬r®`¬z¶K 2007.11.03 <<
+function TFormSal08.getvirus(EmpId, PayMon:String):Currency;
+var
+  clsql :string ;
+begin
+  clsql := 'select emp_id from  hrd_sal_virus  where emp_id=''' + EmpId + ''' and sal_mon=''' + paymon + '''' ;
+  with DMHrdsys.SQLQuery1 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add( clsql );
+    open;
+    //SalBaseLvl:=TstringList.Create;
+    if not Eof then
+      result:=35000
+    else
+      result:=0;
+  end;
+end;
+// ¨ú±o ¬r®`¬z¶K 2007.11.03  >>
+ {===============================================================================
+  Name:GetYiCardPay(EmpId,PayMon:String):Currency;
+  ?•Õ??”E?÷ç“ª£L?
+===============================================================================}
+function TFormSal08.GetJiangli(EmpId,PayMon:String):Currency;
+begin
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_sal_jiangli WHERE emp_id='''+EmpId+''' and pay_mon='''+PayMon+'''');
+    Open;
+    if not Eof then
+    begin
+      Result:=FieldByName('money').AsCurrency;
+    end
+    else
+      Result:=0;
+    Close;
+  end;
+end;
+{===============================================================================
+  Name:GetIPSal(EmpId,PayMon:String):Currency;
+  ±o¨ì¦©µ|ªº¦~²×¼úª÷
+===============================================================================}
+function TFormSal08.Getyearsal(EmpId:String):Currency;
+var
+  pay :real ;
+begin
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT pay_tax  FROM year_sal_new WHERE emp_id='''+EmpId+'''');
+    Open;
+    if not Eof then
+    begin
+      pay:=FieldByName('pay_tax').AsCurrency;
+    end
+    else
+      pay := 0 ;
+
+    Close;
+    Result:= pay;
+  end;
+end;
+
+{===============================================================================
+//ºÖ¸S-¦L¨ê¼t-§@·~­ûªº¯S§O¼úª÷-¯S§O³B²z 2011-11-26 hyt add te_pay
+===============================================================================}
+function  TFormSal08.GetSpecSal(EmpId,PayMon:String;EmpInDate,EmpLvDate:TDate):Currency;
+var
+  sSql:string;
+  iWorkDays:integer;
+begin
+  sSql:='SELECT sal_spec, valid_date '+
+        'FROM hrd_sal_mon_spec '+
+        'where spc_month='''+PayMon+''' and emp_id='''+EmpId+''' ';
+
+  Result:=0;
+  with DMHrdsys.qry_pub do
+  begin
+    SQL.Clear ;
+    SQL.Add(sSql);
+    try
+      Open ;
+    except
+      exit;
+    end;
+
+    if not Eof then
+    begin
+      //iWorkDays:=GetWorkDays(PayMon,FieldByName('valid_date').AsDateTime ,EmpLvDate) ; //¨ú¤u§@¤é
+      iWorkDays:=GetWorkDays(PayMon,EmpInDate ,EmpLvDate) ; //¨ú¤u§@¤é  2012-08-04 hyt add
+      if FieldByName('sal_spec').AsString<>'' then
+        Result :=Int(FieldByName('sal_spec').Value *iWorkDays/G_WorkDays) ;
+    end;
+  end;
+end;
+//2012-02-04 hyt add
+procedure TFormSal08.EditEmpBeg2Change(Sender: TObject);
+begin
+  EditEmpEnd2.Text :=EditEmpBeg2.Text ;
+end;
+
+{===============================================================================
+  Name:GetYiCardPay(EmpId,PayMon:String):Currency;
+  ±o¨ì¥¼¥æ¦^ïé«O¥d¦©´Ú     2012-03-22 hyt add
+===============================================================================}
+function TFormSal08.GetYiCardPay(EmpId,PayMon:String):Currency;
+begin
+  with qry_Temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM hrd_sal_yicard WHERE emp_id='''+EmpId+''' and pay_mon='''+PayMon+'''');
+    Open;
+    if not Eof then
+    begin
+      Result:=FieldByName('money').AsCurrency;
+    end
+    else
+      Result:=0;
+    Close;
+  end;
+end;
+{===============================================================================
+¼¾¾i¤H¼Æ  ±q2012-05 ¤ë¥÷¶}©l ¡G ¦³ hrd_emp_raise_data ¤¤¤ÀªR
+===============================================================================}
+function TFormSal08.GetRaise_num(EmpId:String):integer;
+var
+  iRetNum:integer;
+begin
+  iRetNum:=0;
+  if qry_hrd_emp_raise_data.Locate('emp_id',EmpId,[loCaseInsensitive]) then
+  begin
+    iRetNum:=qry_hrd_emp_raise_data.FieldByName('raise_num').Value;
+  end;
+  Result:=iRetNum;
+end;
+{===============================================================================
+µ²±BÂ§ª÷  ±q2013-01 ¤ë¥÷¶}©l   2013-01-16 hyt add
+===============================================================================}
+function TFormSal08.GetMarryAmt(EmpId,PayMon:String):integer;
+var
+  sSql :string;
+begin
+  {if qry_hrd_dut_class_13.Locate('emp_id;ask_mon',VarArrayOf([EmpId,PayMon]),[loCaseInsensitive]) then
+    Result:=200000
+  else
+    Result:=0;
+  }
+  Result:=0;
+
+  if qry_hrd_dut_class_13.Locate('emp_id;ask_mon',VarArrayOf([EmpId,PayMon]),[loCaseInsensitive]) then
+  begin
+    sSql:='select * from hrd_dut_ask '+
+          'where emp_id='''+EmpId+''' and clas_code=''13'' and clas_code_sub=''00'' and dbo.get_YM(s_ask_d)='''+PayMon+''' ';
+    if DB_SeekRecord(sSql) then //¥Ø«e13¬O¥]¬A ¥»¤Hµ²±B©M«Ä¤lµ²±B==¡n³o¸Ì­­©w ¥»¤Hµ²±B ¤~¦³ Â§ª÷ªº 2013-01-28
+      Result:=200000;
+  end ;
+end;
+
+//§ïÅÜ©]¯Z¬z¶Kªº­¿¼Æ 2013-05-30
+function TFormSal08.GetOver195(PayMon:String):Currency;
+begin
+  if PayMon>='201305' then
+    Result:=2.15
+  else
+    Result:=1.95;
+end;
+//±µ¦¬¯f°²«OÀI¸ê®Æ 2013-06-03 hyt add
+procedure TFormSal08.btn_sal_baoClick(Sender: TObject);
+var
+  sSql,ConnStr:string;
+  i:integer;
+begin
+ PayMon:=me_Month2.Text;
+  //¸Ó¤ë¸ê®Æ¤w¸gÂê©w
+  if (PayMon<=LockMonth)  then
+  begin
+    WideMessageDlg(GetLangName(ws_Words,'msg_month_data_locked'),mtError,[mbYes],0);
+    exit;
+  end;
+
+  //open connect
+  try
+      flu_conn.close;
+      ConnStr:='Provider=SQLOLEDB.1;Persist Security Info=False;';
+      ConnStr:=ConnStr+'User ID=web;Password=web;';
+      ConnStr:=ConnStr+'Initial Catalog=flu-erp;Data Source=192.168.7.12;';
+      flu_conn.ConnectionString:=ConnStr ;
+      flu_conn.Open ;
+  except
+      showmessage('Connect Fuluh Server is error');
+      exit;
+  end;
+  //deal data
+  try
+    ADOCommand1.CommandText :='delete from hrd_sal_bao '+
+                              ' where sal_mon='''+PayMon+''' ';
+
+    ADOCommand1.Execute ;
+
+    //¨úcossys¸ê®Æ
+    sSql:='select * from hrd_sal_bao '+
+          ' where sal_mon='''+PayMon+''' and left(emp_id,1)<>''2'' ';
+    with qry_cos_data do
+    begin
+      sql.Clear ;
+      sql.Add(sSql);
+      open;
+    end;
+    //¨úhrdsys¸ê®Æ
+    sSql:='select * from hrd_sal_bao '+
+          ' where sal_mon='''+PayMon+''' ';
+    with qry_sal_bao do
+    begin
+      sql.Clear ;
+      sql.Add(sSql);
+      open;
+      //¼g¾É¤J¸ê®Æ
+      qry_cos_data.First ;
+      while not qry_cos_data.Eof do
+      begin
+        append;
+        for i:=0 to qry_cos_data.FieldCount -1 do
+        begin
+          Fields[i].Value:=qry_cos_data.Fields[i].Value;
+        end;
+        post;
+        qry_cos_data.Next
+      end;
+    end;
+    //´£¥æ
+    qry_sal_bao.UpdateBatch;
+    showmessage('deal ok,total RecordCount:'+intToStr(qry_cos_data.RecordCount ) );
+
+    flu_conn.close;
+  except
+       {showMessage('delete is error!');}
+       showmessage('deal error');
+  end;
+end;
+//¨ú¨|¤I¬z¶K    2013-06-24 hyt add
+function TFormSal08.GetFoster_pay(EmpId,PayMon:String):Currency;
+var
+  sTemp,sSql:string;
+begin
+  sSql:='select count(*) from hrd_sal_foster '+
+        'where emp_id='''+EmpId+''' and buzhu_month_bgn<='''+PayMon+''' '+
+        'and buzhu_month_end>='''+PayMon+''' ';
+  sTemp:=DB_GetSRecord(sSql);
+  if sTemp='' then
+    sTemp:='0';
+  result:=60000*strToInt(sTemp);
+
+  if result>120000 then //³Ì¤j­­ÃB¤£¥i¥H¶W¹L2­Ó¤H §Y12¸U
+    result:=120000;
+end;
+
+//¥Í¤éÂ§ª÷ 2014.09.20
+function TFormSal08.GetBirthDay(EmpId, PayMon, PstCode: String; EmpInDate,
+  EmpLvDate, EmpBirthDay: TDate): Currency;
+var
+  //
+  dDate : TDateTime;
+begin
+  //
+  Result := 0;
+  //¥Í¤é·í¤ë
+  if FormatDateTime('MM', EmpBirthDay) <> Copy(PayMon, 5, 2) then Exit;
+  //Â÷Â¾·í¤ë¨S¦³¥Í¤éÂ§ª÷
+  if (EmpLvDate<> 0) and (FormatDateTime('YYYYMM', EmpLvDate)<= PayMon) then Exit;
+  //¨C¤ë14¸¹¤Î¥H«e¶i¼tªº«ö·í¤ë1¸¹ºâ
+  if DayOf(EmpInDate)<= 14 then
+    dDate := StartOfTheMonth(EmpInDate)
+  //14¸¹¥H«á¶i¼tªº«ö¦¸¤ë1¤éºâ  
+  else begin
+    dDate := IncMonth(EmpInDate, 1);
+    //
+    dDate := StartOfTheMonth(dDate);
+  end;
+  //§@·~­û
+  if PstCode>= '60' then
+    dDate := IncMonth(dDate, 13)
+  //¨ä¾lº¡14­Ó¤ë
+  else
+    dDate := IncMonth(dDate, 14);
+  //¸Õ¥Î´Á«áº¡¤@¦~
+  if FormatDateTime('YYYYMM', dDate)> PayMon then Exit;
+  //
+  Result := BIRTHDAY_ALLOWANCE;
+end;
+
+//2014.12.03 §PÂ_¬O§_¬°¾ã¤ë½Ð¦©Á~°²
+function TFormSal08.IsAskMonthlong(const PayMon, EmpID: string): Boolean;
+var
+  sSQL, sClassCode: string;
+begin
+  //
+  Result := True;
+  //
+  sSQL := 'SELECT *'
+        + '  FROM HRD_DUT_MON'
+        + ' WHERE DUT_MON = '+QuotedStr(PayMon)
+        + '   AND EMP_ID = '+QuotedStr(EmpID)
+        + ' ORDER BY CLAS_CODE';
+  //
+  with qry_temp do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(sSQL);
+    Open;
+    //
+    First;
+    while not Eof do
+    begin
+      //
+      sClassCode := FieldByName('CLAS_CODE').AsString;
+      //
+      if //Äq¤u
+         (sClassCode <> '06') and
+         //¨Æ°²
+         (sClassCode<> '12') and
+         //¸É¶K¯f°²
+         (sClassCode<> '20') and
+         //¥Í¨|°²
+         (sClassCode<> '21') and
+         //µLÁ~°²
+         (sClassCode<> '25') and
+         //¿ð¨ì¡B¦­°h
+         (sClassCode<> '23') and
+         //¶g¥½
+         (sClassCode<> '60') then
+      begin
+        Result := False;
+        Break;
+      end;
+      //
+      Next;
+    end;
+    //
+    Close;
+  end;
+end;
+
+function TFormSal08.GetLeaveSubsidy(AMonth, AEmpID: string; AEpIndt,
+  AEpLedt: TDateTime; boChangeFactory: Boolean=False): Currency;
+  //ÃãÂ¾«e¤»­Ó¤ëªº¥­§¡Á~¸ê  2009¦~¥H«á
+  function GetAverage(AEmpID, AMonth: string): Currency;
+  var
+    //
+    sMonth, sSQL: string;
+    //
+    I, iYear, iMonth: Integer;
+    //
+    cTotal: Currency;
+  begin
+    //
+    cTotal:= 0;
+    //
+    iYear := StrToInt(Copy(AMonth, 1, 4));
+    iMonth:= StrToInt(Copy(AMonth, 5, 2));
+    for I:= 1 to 6 do
+    begin
+      iMonth := iMonth - 1;
+      //
+      if iMonth = 0 then
+      begin
+        iMonth := 12;
+        iYear  := iYear - 1;
+      end;
+      //
+      sMonth := Format('%.4d', [iYear])+Format('%.2d', [iMonth]);
+      //
+      if AMonth< '201601' then
+        sSQL := 'SELECT BASE_PAY'
+              + '  FROM HRD_SAL_PAYMT'
+              + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+              + '   AND PAY_MON = '+QuotedStr(sMonth)
+      else
+        sSQL := 'SELECT SUM(ISNULL(BASE_PAY,0) + ISNULL(MGMT_OFR,0) + ISNULL(TECH_OFR,0) + ISNULL(DUTY_OFR,0) + ISNULL(GRAD_OFR,0) + ISNULL(TE_PAY,0)) AS BASE_PAY'
+              + '  FROM HRD_SAL_PAYMT'
+              + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+              + '   AND PAY_MON = '+QuotedStr(sMonth);
+      with DMHrdsys.SQLQuery4 do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(sSQL);
+        Open;
+        //
+        cTotal := cTotal + FieldByName('BASE_PAY').AsCurrency;
+        //
+        Close;
+      end;
+    end;
+    //
+    Result := StrToCurr(FormatFloat('0', cTotal/6));
+  end;
+
+  //ÃãÂ¾«e¤»­Ó¤ëªº¥­§¡Á~¸ê  2009¦~¥H«e
+  function GetAverageOld(AEmpID, AMonth: string): Currency;
+  var
+    //
+    sMonth, sSQL: string;
+    //
+    I, iYear, iMonth: Integer;
+    //
+    cTotal: Currency;
+  begin
+    //
+    cTotal:= 0;
+    //
+    iYear := StrToInt(Copy(AMonth, 1, 4));
+    iMonth:= StrToInt(Copy(AMonth, 5, 2));
+    for I:= 1 to 6 do
+    begin
+      iMonth := iMonth - 1;
+      //
+      if iMonth = 0 then
+      begin
+        iMonth := 12;
+        iYear  := iYear - 1;
+      end;
+      //
+      sMonth := Format('%.4d', [iYear])+Format('%.2d', [iMonth]);
+      //
+      sSQL := 'SELECT (ISNULL(BASE_PAY, 0) + ISNULL(MGMT_OFR, 0) + ISNULL(TECH_OFR, 0) +'
+            + '       ISNULL(DUTY_OFR, 0) + ISNULL(ENVR_OFR, 0) + ISNULL(GRAD_OFR, 0)) AS SUM_AMT'
+            + '  FROM HRD_SAL_PAYMT'
+            + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+            + '   AND PAY_MON = '+QuotedStr(sMonth);
+      with DMHrdsys.SQLQuery4 do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(sSQL);
+        Open;
+        //
+        cTotal := cTotal + FieldByName('SUM_AMT').AsCurrency;
+        //
+        Close;
+      end;
+    end;
+    //
+    Result := StrToCurr(FormatFloat('0', cTotal/6));
+  end;
+var
+  iCount, iCountOld: Integer;
+  //
+  sSQL: string;
+  //
+  cBasePay: Currency;
+  //
+  dRate: Double;
+  //
+  dDate: TDateTime;
+begin
+  // 2016.06.13 ºÖ¸SÅÜ¶¶ªN
+  if boChangeFactory then
+    dDate := GetEndOfLastMonth(PayMon)
+  else
+    dDate := 0;  
+
+  iCount := 0;
+  iCountOld := 0;
+  //
+  Result := 0;
+  //¦bÂ¾
+  if (AEpLedt= 0) and (boChangeFactory=False) then Exit;
+  //«D¥»¤ëÂ÷Â¾
+  if (FormatDateTime('YYYYMM', AEpLedt)<> AMonth) and (boChangeFactory= False) then Exit;
+  //¤u§@º¡12­Ó¤ë
+  if (MonthsBetweenEx(AEpLedt-1, AEpIndt)< 12) and (MonthsBetweenEx(dDate, AEpIndt)< 12) then Exit;
+  //³Ìªñ6­Ó¤ë¥­§¡Á~¸ê
+  cBasePay := GetAverageOld(AEmpID, AMonth);
+  //¬J¨S¶R«OÀI¡A¤S¨SªðÁÙªº¤ë¼Æ   2009¥H«e
+  sSQL := 'SELECT COUNT(EMP_ID) AS MONTH_COUNT'
+        + '  FROM HRD_SAL_PAYMT'
+        + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+        //2009¦~¥H«e
+        + '   AND PAY_MON <=''200812'''
+        //¤£¥]§tÂ÷Â¾·í¤ë
+        + '   AND PAY_MON <> '+QuotedStr(AMonth);
+  with DMHrdsys.SQLQuery4 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(sSQL);
+    Open;
+    //
+    iCount := FieldByName('MONTH_COUNT').AsInteger;
+    Close;
+  end;
+  //­pºâ2008¦~12¤ë¥÷¤Î¤§«eªº¶i¼t¤ë¼Æ
+  iCountOld := (2008-YearOf(AEpIndt))*12+(12-MonthOf(AEpIndt) + 1);
+  //10¸¹¥H«á¶i¼tªº¡Aºâ¦¸¤ë
+  if DayOf(AEpIndt)> 10 then
+    iCountOld := iCountOld -1;
+  //
+  if iCountOld< 0 then
+    iCountOld := 0;
+  //
+  dRate := 0;
+  if (iCount>= 1) and (iCount<= 5) then
+    dRate := 1
+  else if (iCount>= 6) and (iCount<= 12) then
+    dRate := 2
+  else if (iCount>= 13) and (iCount<= 17) then
+    dRate := 3
+  else if (iCount>= 18) and (iCount<= 24) then
+    dRate := 4
+  else if (iCount>= 25) and (iCount<= 29) then
+    dRate := 5
+  else if (iCount>= 30) and (iCount<= 36) then
+    dRate := 6
+  else if (iCount>= 37) and (iCount<= 41) then
+    dRate := 7
+  else if (iCount>= 42) and (iCount<= 48) then
+    dRate := 8;
+  //
+  Result := Result + cBasePay/2*0.5*dRate;
+  //¬J¨S¶R«OÀI¡A¤S¨SªðÁÙªº¤ë¼Æ   2009¥H«á
+  sSQL := 'SELECT COUNT(EMP_ID) AS MONTH_COUNT'
+        + '  FROM HRD_SAL_PAYMT'
+        + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+        + '   AND (PICC_SHIYE = 0 OR PICC_SHIYE IS NULL)'
+        + '   AND (PICC_BACK = 0 OR PICC_BACK IS NULL)'
+        //
+        + '   AND PAY_MON >=''200901'''
+        //2016.08.30 7¤ë1¤é°_ÅÜ§ó¬°¶¶³Ç¡A¤§«e¤w¥þ³¡µo©ñÂ÷Â¾¸É¶K
+        + '   AND PAY_MON <''201607'''
+        //¤£¥]§tÂ÷Â¾·í¤ë
+        + '   AND PAY_MON <> '+QuotedStr(AMonth);
+  with DMHrdsys.SQLQuery4 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(sSQL);
+    Open;
+    //
+    iCount := FieldByName('MONTH_COUNT').AsInteger;
+    Close;
+  end;
+  //2016.04.23 ¤£¦b°Ï§O·sÂÂ¨î¡A¥þ³¡«ö·sªº°õ¦æ
+  iCount := iCount + iCountOld;
+  //2016.08.25 201607ºÖ¸SÂà¶¶³Ç¡A¥þ³¡¦bÂ¾­û¤u¤wµoÂ÷Â¾¸É¶K
+  if AMonth > '201607' then
+  begin
+    //¬J¨S¶R«OÀI¡A¤S¨SªðÁÙªº¤ë¼Æ   2009¥H«á
+    sSQL := 'SELECT COUNT(EMP_ID) AS MONTH_COUNT'
+          + '  FROM HRD_SAL_PAYMT'
+          + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+          + '   AND (PICC_SHIYE = 0 OR PICC_SHIYE IS NULL)'
+          + '   AND (PICC_BACK = 0 OR PICC_BACK IS NULL)'
+          //
+          + '   AND PAY_MON >=''201607'''
+          //¤£¥]§tÂ÷Â¾·í¤ë
+          + '   AND PAY_MON <> '+QuotedStr(AMonth);
+    with DMHrdsys.SQLQuery4 do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Open;
+      //
+      iCount := FieldByName('MONTH_COUNT').AsInteger;
+      Close;
+    end;
+  end;
+
+  //
+  if iCount<= 0 then
+  begin
+    Result := 0;
+    Exit;
+  end;
+  //³Ìªñ6­Ó¤ë¥­§¡Á~¸ê
+  cBasePay := GetAverage(AEmpID, AMonth);
+  {2016.04.23 ¤£¦b°Ï§O·sÂÂ¨î¡A¥þ³¡«ö·sªº°õ¦æ
+  //6­Ó¤ë¥H¤º¡A0.5­¿
+  if iCount< 6 then
+    Result := Result + cBasePay/2*0.5
+  //6­Ó¤ë(§t)¥H¤W¡A1­¿
+  else
+    Result := Result + cBasePay/2;
+  }
+  //2016.04.23 ¤£¦b°Ï§O·sÂÂ¨î¡A¥þ³¡«ö·sªº°õ¦æ
+
+  //
+  dRate := 0;
+  if (iCount>= 1) and (iCount<= 5) then
+    dRate := 1
+  else if (iCount>= 6) and (iCount<= 12) then
+    dRate := 2
+  else if (iCount>= 13) and (iCount<= 17) then
+    dRate := 3
+  else if (iCount>= 18) and (iCount<= 24) then
+    dRate := 4
+  else if (iCount>= 25) and (iCount<= 29) then
+    dRate := 5
+  else if (iCount>= 30) and (iCount<= 36) then
+    dRate := 6
+  else if (iCount>= 37) and (iCount<= 41) then
+    dRate := 7
+  else if (iCount>= 42) and (iCount<= 48) then
+    dRate := 8
+   else if (iCount>= 49) and (iCount<= 54) then
+    dRate := 9
+  else if (iCount>= 55) and (iCount<= 60) then
+    dRate := 10;  
+
+  Result := cBasePay/2*0.5*dRate;
+  {
+  //6­Ó¤ë¥H¤º¡A0.5­¿
+  if iCount< 6 then
+    Result := cBasePay/2*0.5
+  //6­Ó¤ë(§t)¥H¤W¡A1­¿
+  else
+    Result := cBasePay/2;
+  }
+end;
+
+
+//2016.01.29 ±o¨ì¤wµoÁ~¸ê
+function TFormSal08.GetYiFaJinE(const AMonth, AEmpID: string): Double;
+var
+  sSQL: string;
+begin
+  Result := 0;
+  if (AMonth <> '201601') and (AMonth <> '201602') and (AMonth <> '201701') then Exit;
+  //
+  if AMonth= '201701' then
+  begin
+    sSQL := 'SELECT BASE_PAY'
+          + '  FROM HRD_SAL_PAYMT_HALF'
+          + ' WHERE PAY_MON = '+QuotedStr(AMonth)
+          + '   AND EMP_ID = '+QuotedStr(AEmpID);
+    with DMHrdsys.SQLQuery4 do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Open;
+      if IsEmpty then
+        Result := 0
+      else
+        Result := FieldByName('BASE_PAY').AsFloat;
+      Close;
+    end;
+  end;
+  //
+  if FormatDateTime('YYYYMMDD', GetServerDateTime)> '20160125' then
+  begin
+    //
+    sSQL := 'SELECT ACTU_PAY'
+          + '  FROM HRD_SAL_PAYMT_201601'
+          + ' WHERE PAY_MON = ''201601'''
+          + '   AND EMP_ID = '+QuotedStr(AEmpID);
+    with DMHrdsys.SQLQuery4 do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Open;
+      Result := FieldByName('ACTU_PAY').AsFloat;
+      Close;
+    end;
+    //
+    if AMonth= '201602' then
+    begin
+      sSQL := 'SELECT ACTU_PAY'
+            + '  FROM HRD_SAL_PAYMT'
+            + ' WHERE PAY_MON = ''201601'''
+            + '   AND EMP_ID = '+QuotedStr(AEmpID);
+      with DMHrdsys.SQLQuery4 do
+      begin
+        Close;
+        SQL.Clear;
+        SQL.Add(sSQL);
+        Open;
+        Result := FieldByName('ACTU_PAY').AsFloat - Result;
+        Close;
+      end;
+    end;
+  end;
+end;
+
+//±o¨ìÀ³¸É¶Kªº¦~°²¤Ñ¼Æ 2013.09.26 LX ADD
+function TFormSal08.GetButieDays(AEmpID, PayMonth: string): Double;
+var
+  sYear: string;
+  //
+  aryYixiu: TAnnualLeaveDays;
+begin
+  //
+  Result := 0;
+  //
+  sYear:= Copy(PayMon, 1, 4);
+  //À³¸É¶K = ¥i¥ð - ¤w¥ð
+  aryYixiu:= GetYXTS(AEmpID, sYear);
+  //
+  Result:= GetKXTS(AEmpID, sYear) - aryYixiu[0] - aryYixiu[1];
+end;
+
+function TFormSal08.GetYXTS_16(AEmpID, AYear: string): Double;
+var
+  //¥þ³¡¤Ñ¼Æ
+  HasDays: Double;
+  //
+  sSQL: string;
+  //
+  _16Hours, _16Minutes, dHours, dMinutes: Double;
+  //
+  sFieldName: string;
+  //
+  I: Integer;
+begin
+  //********************¤w¥ð¦~°² 2013.09.23 LX ADD******************************
+  _16Hours  := 0;
+  //
+  _16Minutes:= 0;
+  //
+  sSQL:= 'SELECT *'
+       + '  FROM HRD_DUT_MON'
+       //¤TºØ¦~°² 2014.02.27
+       + ' WHERE CLAS_CODE = ''16'''
+       + '   AND EMP_ID = '+QuotedStr(AEmpID)
+       + '  AND SUBSTRING(DUT_MON, 1, 4) = '+QuotedStr(AYear);
+  //
+  with DMHrdsys.SQLQuery3 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(sSQL);
+    Open;
+    //
+    First;
+    while not Eof do
+    begin
+      //
+      for I:= 1 to 31 do
+      begin
+        //
+        sFieldName:= 'day'+Format('%.2d', [I]);
+        //
+        if Trim(FieldByName(sFieldName).AsString)= '' then
+          Continue;
+        //
+        dHours  := StrToFloat(Copy(FieldByName(sFieldName).AsString, 1, 2));
+        //
+        dMinutes:= StrToFloat(Copy(FieldByName(sFieldName).AsString, 3, 2));
+        //
+        if dHours>= 8 then
+        begin
+          dHours  := 8;
+          dMinutes:= 0;
+        end;
+        //
+        _16Hours  := _16Hours + dHours;
+        //
+        _16Minutes:= _16Minutes + dMinutes;
+      end;
+      //
+      Next;
+    end;
+    //
+    _16Hours  := _16Hours + _16Minutes/60;
+    //
+    HasDays   := _16Hours/8;
+    //
+    Close;
+  end;
+  //
+  Result:= HasDays;
+end;
+
+//2016.03.19 ±o¨ì§@·~­ûªº¯S§O¼úª÷
+function TFormSal08.GetSpcPayOf60(const AMonth, AEmpID: string): Double;
+var
+  sSQL: string;
+begin
+  Result := 0;
+  //
+  sSQL := 'SELECT sal_spec'
+        + '  FROM HRD_SALTRAN'
+        + ' WHERE EMP_ID = '+QuotedStr(AEmpID)
+        + '   AND CONVERT(VARCHAR(8),VALID_DATE,112) <= '+QuotedStr(AMonth+'15')
+        + ' ORDER BY VALID_DATE DESC';
+  with DMHrdsys.SQLQuery4 do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(sSQL);
+    Open;
+    if not IsEmpty then
+      Result := FieldByName('sal_spec').AsFloat
+    else
+      Result := 0;  
+    Close;
+  end;
+end;
+
+function TFormSal08.getLastWeixiuPrice(iEmpId, iPayMon: string; iEmpInDate,
+  iEmpLvDate: TDateTime): Currency;
+var
+  lastMonthEDate:TDateTime;
+  pre_mon:string;  //¤W¤@­Ó¤ë
+  lastMonthWorkDays:Integer;
+  cPrice:Currency;
+  sSql:string;
+begin
+  lastMonthEDate := EncodeDate(StrToInt(LeftStr(iPayMon,4)),StrToInt(RightStr(iPayMon,2)),1)-1;
+  pre_mon := FormatDateTime('YYYYMM',lastMonthEDate);
+  lastMonthWorkDays := GetWorkDaysEx(pre_mon,iEmpInDate,iEmpLvDate);
+  with qryLastPaymt do
+  begin
+    if Active then
+      Close;
+    sql.Clear;
+    sSql := 'select * from hrd_sal_paymt p,hrd_emp e where p.emp_id=e.emp_id and p.emp_id='+QuotedStr(iEmpId)+' and p.pay_mon='+QuotedStr(pre_mon);
+    SQL.Add(sSql);
+    Open;
+    if recordcount=0 then
+      cPrice := 0
+    else
+    begin
+      if FieldByName('pst_code').AsString='60' then
+        cPrice := (FieldByName('base_pay').AsCurrency+FieldByName('duty_ofr').AsCurrency
+                  +FieldByName('te_pay').AsCurrency)/lastMonthWorkDays/8
+      else
+        cPrice := (FieldByName('base_pay').AsCurrency+FieldByName('duty_ofr').AsCurrency
+                  +FieldByName('mgmt_ofr').AsCurrency+FieldByName('tech_ofr').AsCurrency
+                  +FieldByName('grad_ofr').AsCurrency
+                  +FieldByName('te_pay').AsCurrency)/lastMonthWorkDays/8;
+    end;
+  end;
+  Result := cPrice;
+end;
+
+//2016.06.13 Âà¼t
+function TFormSal08.IsChangeFactory(const AMonth, AEmpID: string): Boolean;
+var
+  sSQL: string;
+begin
+  sSQL := 'SELECT *'
+        + '  FROM HRD_EMP_CHANGE'
+        + ' WHERE CHANGE_MONTH = '+QuotedStr(AMonth)
+        + '   AND EMP_ID = '+QuotedStr(AEmpID);
+  Result := CheckRecordExist(sSQL);      
+end;
+
+//2016.06.13 ±o¨ì¤W­Ó¤ëªº³Ì«á¤@¤Ñ
+function TFormSal08.GetEndOfLastMonth(PayMon: string): TDateTime;
+var
+  iYear, iMonth: Integer;
+  dDate: TDateTime;
+begin
+  iYear := StrToInt(Copy(PayMon, 1, 4));
+  iMonth:= StrToInt(Copy(PayMon, 5, 2));
+  if iMonth= 1 then
+  begin
+    iYear := iYear - 1;
+    iMonth := 12;
+  end
+  else
+    iMonth := iMonth - 1;
+  dDate := EncodeDate(iYear, iMonth, 1);
+  //
+  dDate := EndOfTheMonth(dDate);
+end;
+
+//2016.08.01
+function TFormSal08.IsYiFa(const AEmpID: string): Boolean;
+var
+  sSQL: string;
+begin
+  sSQL := 'SELECT *'
+        + '  FROM HRD_EMP_CHANGE'
+        + ' WHERE EMP_ID = '+QuotedStr(AEmpID);
+  Result := CheckRecordExist(sSQL);  
+end;
+
+function TFormSal08.GetWorkDays_Real(const AMonth: string; Date_B,
+  Date_E: TDateTime): Integer;
+var
+  iBegin, iEnd, iSunDays: Integer;
+begin
+  iBegin := DayOf(MonSDate);
+  iEnd   := DayOf(MonEDate);
+  //¥ð®§¤Ñ¼Æ
+  iSunDays := GetSunDayCount(iBegin, iEnd, AMonth);
+  //
+  Result := iEnd - iBegin + 1 - iSunDays;
+end;
+
+function TFormSal08.GetWorkDays_Act(const AMonth: string; Date_B,
+  Date_E: TDateTime): Integer;
+var
+  iBegin, iEnd, iSunDays: Integer;  
+begin
+  //2016.03.01  «e´X¤Ñ¤H¨Æ¦³­n¨D¤u§@¤Ñ¼Æ¤Ö©ó26«ö¹ê»Ú¤Ñ¼Æºâ¡A¶W¹L26«ö26¤Ñºâ
+  Result := 26;
+  Exit;
+  //
+  iBegin := DayOf(MonSDate);
+  iEnd   := DayOf(MonEDate);
+  //¥ð®§¤Ñ¼Æ
+  iSunDays := GetSunDayCount(iBegin, iEnd, AMonth);
+  //
+  Result := iEnd - iBegin + 1 - iSunDays;
+  //
+  if Result > 26 then
+    Result := 26;
+end;
+
+function TFormSal08.GetNextDay(const AMonth: string): TDate;
+var
+  iYear, iMonth: Integer;
+  dDate: TDate;
+begin
+  iYear := StrToInt(Copy(AMonth, 1, 4));
+  iMonth:= StrToInt(Copy(AMonth, 5, 2));
+  dDate:= EncodeDate(iYear, iMonth, 1);
+  dDate:= EndOfTheMonth(dDate);
+  dDate := Trunc(dDate);
+  dDate := IncDay(dDate);
+  Result := dDate;
+end;
+
+function TFormSal08.GetWorkDaysEx2(PayMon: String; EmpInDate, EmpLvDate,
+  theEndMonth: TDateTime): Integer;
+var
+  WorkDays,
+  TheInDay,
+  TheLvDay,
+  HaveInMonths,
+  SunDays,
+  TheMaxDay:   Integer;
+  DateBegin, DateEnd: TDateTime;
+begin
+  //
+  DateBegin := MonSDate;
+  DateEnd   := MonEDate;
+  //
+  if DateBegin = 0 then
+    DateBegin:=StartOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  //¤ë¤î 2014.01.14 ¤W¥b¤ë¥uºâ15¤Ñ
+  if DateEnd = 0 then
+    DateEnd:=EndOfAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  //­û¤u¤w¶i¼t¤ë¼Æ
+  HaveInMonths:= StrToInt(RightStr(PayMon,2))+
+                 (StrToInt(LeftStr(PayMon,4))-
+                  YearOf(EmpInDate))*12-
+                 MonthOf(EmpInDate);
+  //­û¤u¶i¼t¤é
+  TheInDay:= DayOf(EmpInDate);
+  //­û¤uÂ÷Â¾¤é
+  if (EmpLvDate<> 0) then
+    TheLvDay:= DayOf(EmpLvDate) - 1;
+  //
+  TheMaxDay:= DaysInAMonth(StrToInt(LeftStr(PayMon,4)),StrToInt(RightStr(PayMon,2)));
+  //·s¶i­û¤u
+  if (HaveInMonths= 0)and(FormatDateTime('DD',EmpInDate)>'01') then
+  begin
+    //¦bÂ¾
+    if (EmpLvDate=0) or (EmpLvDate> theEndMonth ) then
+    begin
+      //
+      SunDays:=GetSunDayCount(TheInDay, TheMaxDay, PayMon);
+      //
+      WorkDays:= TheMaxDay - TheInDay + 1 - SunDays;
+      // 2013¦~5¤ë°_¡A·í¤u§@¤Ñ¬°0¤Ñ®É¡A±j¨îµ¹¤©1­Ó¤u§@¤Ñ
+      if WorkDays<= 0 then
+        WorkDays:= 1;
+    end
+    //Â÷Â¾
+    else begin
+      //¥ð®§¤Ñ¼Æ
+      SunDays:=GetSunDayCount(TheInDay, TheLvDay, PayMon);
+      //
+      WorkDays:=TheLvDay - TheInDay + 1 - Sundays;
+    end;
+  end
+  //«D·s¶i­û¤u
+  else begin
+    //¦bÂ¾
+    if (EmpLvDate= 0) or (EmpLvDate> theEndMonth) then
+    begin
+      WorkDays:=26;
+      {2016.03.02 ¥H¹ê»Ú¤Ñ¼Æ­pºâ
+      //¥ð®§¤Ñ¼Æ
+      SunDays:=GetSunDayCount(DayOf(DateBegin), DayOf(DateEnd), PayMon);
+      //
+      WorkDays:= DayOf(DateEnd) - DayOf(DateBegin) + 1 - Sundays;
+      //¤u§@¤é¶W¹L26¤Ñ«ö26¤Ñºâ¡A¤Ö©ó26¤Ñ¥H¹ê»Ú¤Ñ¼Æ­pºâ
+      if WorkDays> 26 then
+        WorkDays:=26;
+      }
+
+    end
+    //Â÷Â¾
+    else begin
+      //
+      SunDays:=GetSunDayCount(1, TheLvDay, PayMon);
+      //
+      WorkDays:= TheLvDay - SunDays;
+    end;
+  end;
+  {2013.12.05 lx Â÷Â¾­û¤u¤£¯à¸É
+  //2013¦~5¤ë°_¡A·í¤u§@¤Ñ¬°0¤Ñ®É¡A±j¨îµ¹¤©1­Ó¤u§@¤Ñ
+  if WorkDays< 1 then
+    WorkDays:= 1;
+  }
+  //
+  Result:=WorkDays;
+end;
+
+
+end.

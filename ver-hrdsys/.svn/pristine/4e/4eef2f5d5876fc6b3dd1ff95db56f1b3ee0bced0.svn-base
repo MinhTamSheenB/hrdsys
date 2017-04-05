@@ -1,0 +1,527 @@
+{*************************************************************************
+Name：Hrd22
+Author: anil
+Create date:2005-09-06
+Modify date:2005-09-08
+Commentate:離職員工復職作業
+*************************************************************************}
+unit UnitHrd22;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, TntForms, StdCtrls, Buttons, TntButtons, TntStdCtrls, ExtCtrls,
+  TntExtCtrls, ComCtrls, TntComCtrls,DB, Grids, DBGrids, TntDBGrids,DateUtils,
+  TntDialogs,WSDLIntf,StrUtils, ADODB, Mask, DBCtrls, TntDbCtrls;
+
+type
+  TFormHrd22 = class(TTntForm)
+    TntPanel1: TTntPanel;
+    TntPanel2: TTntPanel;
+    TntGroupBox3: TTntGroupBox;
+    TntDBGrid1: TTntDBGrid;
+    TntPanel3: TTntPanel;
+    qry_Tran: TADOQuery;
+    ds_Tran: TDataSource;
+    bbtn_Cancel: TTntBitBtn;
+    bbtn_Save: TTntBitBtn;
+    Panel13: TPanel;
+    Panel3: TPanel;
+    Panel7: TPanel;
+    TntGroupBox2: TTntGroupBox;
+    TntLabel39: TTntLabel;
+    TntLabel43: TTntLabel;
+    TntLabel42: TTntLabel;
+    TntLabel41: TTntLabel;
+    TntLabel58: TTntLabel;
+    TntLabel44: TTntLabel;
+    TntLabel51: TTntLabel;
+    TntLabel60: TTntLabel;
+    TntLabel59: TTntLabel;
+    TntLabel3: TTntLabel;
+    TntLabel4: TTntLabel;
+    TntLabel6: TTntLabel;
+    TntLabel9: TTntLabel;
+    TntLabel5: TTntLabel;
+    TntLabel62: TTntLabel;
+    sb_epid_date: TTntSpeedButton;
+    TntLabel64: TTntLabel;
+    DBEditEpIdNo: TTntDBEdit;
+    DBEditNameVim: TTntDBEdit;
+    DBEditNameChs: TTntDBEdit;
+    DBCobEngStatus: TTntDBComboBox;
+    DBCobChsStatus: TTntDBComboBox;
+    DBEditIddt: TTntDBEdit;
+    DBEditAreaVim: TTntDBEdit;
+    GrpWork: TTntGroupBox;
+    TntLabel45: TTntLabel;
+    TntLabel47: TTntLabel;
+    TntLabel46: TTntLabel;
+    TntLabel48: TTntLabel;
+    TntLabel49: TTntLabel;
+    TntLabel11: TTntLabel;
+    TntLabel12: TTntLabel;
+    TntLabel13: TTntLabel;
+    TntLabel16: TTntLabel;
+    TntLabel50: TTntLabel;
+    CobInfo: TTntComboBox;
+    CobDept: TTntComboBox;
+    CobProf: TTntComboBox;
+    Panel8: TPanel;
+    Panel9: TPanel;
+    TntGroupBox1: TTntGroupBox;
+    EditEmpId: TTntEdit;
+    RbEmpId: TTntRadioButton;
+    RbIdno: TTntRadioButton;
+    EditEpidNo: TTntEdit;
+    ADOQuery1: TADOQuery;
+    DataSource1: TDataSource;
+    RbOldEmp: TTntRadioButton;
+    RbNewEmp: TTntRadioButton;
+    TntDBEdit1: TTntDBEdit;
+    TntDBEdit2: TTntDBEdit;
+    TntDBEdit3: TTntDBEdit;
+    TntDBEdit4: TTntDBEdit;
+    TntDBEdit5: TTntDBEdit;
+    TntLabel1: TTntLabel;
+    TntLabel2: TTntLabel;
+    TntLabel7: TTntLabel;
+    qry_Tranepid_no: TStringField;
+    qry_Tranold_emp: TStringField;
+    qry_Trannew_emp: TStringField;
+    qry_Tranlast_in_date: TDateTimeField;
+    qry_Tranlast_left_date: TDateTimeField;
+    qry_Tranthis_in_date: TDateTimeField;
+    ADOQuery1upd_user: TStringField;
+    ADOQuery1upd_date: TDateTimeField;
+    ADOQuery1emp_id: TStringField;
+    ADOQuery1emp_chs: TWideStringField;
+    ADOQuery1epid_no: TStringField;
+    ADOQuery1epbirth: TDateTimeField;
+    ADOQuery1epsexd: TStringField;
+    ADOQuery1ifmarry: TStringField;
+    ADOQuery1epAddrchs: TWideStringField;
+    ADOQuery1tpAddrchs: TWideStringField;
+    ADOQuery1edu_code: TStringField;
+    ADOQuery1chs_status: TStringField;
+    ADOQuery1eng_status: TStringField;
+    ADOQuery1epid_date: TDateTimeField;
+    ADOQuery1epid_area: TWideStringField;
+    ADOQuery1factory: TStringField;
+    ADOQuery1dept_code: TStringField;
+    ADOQuery1epindt: TDateTimeField;
+    ADOQuery1epledt: TDateTimeField;
+    ADOQuery1left_reason: TWideStringField;
+    ADOQuery1pst_code: TStringField;
+    ADOQuery1info_code: TStringField;
+    ADOQuery1spc_id: TStringField;
+    ADOQuery1name_eng: TWideStringField;
+    ADOQuery1name_vim: TWideStringField;
+    ADOQuery1epAddrvim: TWideStringField;
+    ADOQuery1epAddreng: TWideStringField;
+    ADOQuery1tpAddrvim: TWideStringField;
+    ADOQuery1tpAddreng: TWideStringField;
+    ADOQuery1epid_vim: TWideStringField;
+    ADOQuery1epid_eng: TWideStringField;
+    ADOQuery1emp_phone: TStringField;
+    ADOQuery1birth_addr: TWideStringField;
+    ADOQuery2: TADOQuery;
+    qry_Tranupd_user: TStringField;
+    qry_Tranupd_date: TDateTimeField;
+    DTPickEpindt: TTntDateTimePicker;
+    EditSpcid: TTntEdit;
+    EditLedt: TTntEdit;
+    TntLabel8: TTntLabel;
+    EditReason: TTntEdit;
+    ADOQuery1left_sts: TStringField;
+    Panel1: TPanel;
+    RbShoes: TTntRadioButton;
+    RBPrint: TTntRadioButton;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    procedure SaveData;
+    function CheckInputValid():boolean;
+    procedure SetEnableSave(flag:boolean);
+    //auto general
+    procedure TntFormCreate(Sender: TObject);
+    procedure bbtn_SaveClick(Sender: TObject);
+    procedure RbIdnoClick(Sender: TObject);
+    procedure RbEmpIdClick(Sender: TObject);
+    procedure EditEpidNoChange(Sender: TObject);
+    procedure ADOQuery1AfterOpen(DataSet: TDataSet);
+    procedure CobInfoChange(Sender: TObject);
+    procedure bbtn_CancelClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormHrd22: TFormHrd22;
+  
+implementation
+uses
+  UnitDMHrdsys,UnitHrdUtils;
+var
+  LangStr:TWideStrings;
+  pri_arr:TPrvArr;//權限數組
+  last_ledt:TDateTime;
+{$R *.dfm}
+
+{===============================================================================
+  初始化程序
+===============================================================================}
+procedure TFormHrd22.TntFormCreate(Sender: TObject);
+begin
+  InitLang;// Init language
+  pri_arr:=GetPrvArr(username,'hrd22');
+  InitForm;// Init Form
+
+  if G_sFactory='F' then
+    RBPrint.Checked :=false
+  else
+    RBPrint.Checked :=true;
+
+end;
+
+procedure TFormHrd22.InitLang;
+var
+  ThisFormUsedWords:String;
+begin
+  SetComponentLang(self);//set component language text
+  ThisFormUsedWords:='save,cancel,compute,sal01_titl,error_empid,save_success,save_fail,'+
+    'msg_input_error,sal01_error1,sal01_error2,sal01_error3,sal01_confirm1,query_condition,'+
+    'not_find_data,msg_emp_onwork,with_old_empid,with_new_empid,msg_confirm_save,'
+    +'msg_check_left_in_date,msg_same_spcid,hrd08_dept_null,hrd08_leftdate_must_null,'
+    +'hrd08_input_leftdate,msg_deny_emp,';
+  LangStr:=GetLangWideStrs(ThisFormUsedWords);
+end;
+
+procedure TFormHrd22.InitForm;
+{*************************************************************************
+TO DO:初始化Form
+*************************************************************************}
+var
+  SqlStr:string;
+begin
+  if G_sFactory='F' then
+    SqlStr:='select dept_code+'' ''+abbr_titl from hrd_dept where is_del=''0'' and left(dept_code,1) in (''F'',''S'') '
+  else
+    SqlStr:='select dept_code+'' ''+abbr_titl from hrd_dept where is_del=''0'' and dept_code like ''V%'' ' ;
+  //SqlStr:='select dept_code+'' ''+abbr_titl from hrd_dept where is_del=''0''';
+  SetComboxList(SqlStr,CobDept);
+  SqlStr:='select info_code+'' ''+info_chs from hrd_inwork';
+  SetComboxList(SqlStr,CobInfo);
+  SqlStr:='select pst_code+'' ''+pst_chs from hrd_prof';
+  SetComboxList(SqlStr,CobProf);
+  {DTPickDate.Date:=date;
+  GetDeptRange(CobDeptBegin);
+  GetDeptRange(CobDeptEnd);}
+end;
+
+procedure TFormHrd22.RbIdnoClick(Sender: TObject);
+begin
+  EditEmpId.Color:=clBtnFace;
+  EditEmpId.Enabled:=false;
+  EditEpidNo.Color:=clWhite;
+  EditEpidNo.Enabled:=true;
+  EditEpidNo.SetFocus;
+end;
+
+procedure TFormHrd22.RbEmpIdClick(Sender: TObject);
+begin
+  EditEmpId.Color:=clWhite;
+  EditEmpId.Enabled:=true;
+  EditEmpId.SetFocus;
+  EditEpidNo.Color:=clBtnFace;
+  EditEpidNo.Enabled:=false;
+end;
+
+procedure TFormHrd22.EditEpidNoChange(Sender: TObject);
+//查詢
+var
+  sql_str,cptName:string;
+begin
+  cptName:=TtntEdit(Sender).Name;
+  if cptName='EditEmpId' then
+  begin//by emp_id
+    if (Length(trim(TtntEdit(Sender).Text))<6) then
+      exit;
+    sql_str:='select * from hrd_emp where emp_id='''+trim(TtntEdit(Sender).Text)+'''';
+  end
+  else
+  begin//by epid_no
+    if (Length(trim(TtntEdit(Sender).Text))<9) then
+      exit;
+    sql_str:='select * from hrd_emp where epid_no='''+trim(TtntEdit(Sender).Text)+''' order by emp_id desc';
+  end;
+  GrpWork.Enabled:=true;
+  with ADOQuery1 do
+  begin
+    Close;
+    Sql.Clear;
+    Sql.Add(sql_str);
+    Open;
+    if Eof then
+    begin
+      WideShowMessage(GetLangName(LangStr,'not_find_data'));
+      GrpWork.Enabled:=false;
+      Exit;
+    end
+    else
+    if FieldByName('left_sts').AsString='1' then
+    begin   //2013-01-21 hyt add
+      WideShowMessage(GetLangName(LangStr,'msg_deny_emp'));
+      GrpWork.Enabled:=false;
+      close;
+      Exit;
+    end;
+    if FieldByName('epledt').AsString='' then
+    begin
+      WideShowMessage(GetLangName(LangStr,'msg_emp_onwork'));
+      GrpWork.Enabled:=false;
+    end;
+    last_ledt:=FieldByName('epledt').AsDateTime;//記錄離職日期
+  end;
+  //sql_str:='select * from hrd_emp_left_in where epid_no='''+ADOQuery1.FieldByName('epid_no').AsString+'''';
+  sql_str:='select * from hrd_emp_left_in where epid_no like '''+ADOQuery1.FieldByName('epid_no').AsString+'%''';
+  with qry_tran do
+  begin
+    Close;
+    Sql.Clear;
+    Sql.Add(sql_str);
+    Open;
+  end;
+end;
+
+procedure TFormHrd22.ADOQuery1AfterOpen(DataSet: TDataSet);
+begin
+  with Dataset do
+  if not Eof then
+  begin
+    SetComBoxIndex(CobDept,FieldByName('dept_code').AsString);
+    SetComBoxIndex(CobInfo,FieldByName('info_code').AsString);
+    SetComBoxIndex(CobProf,FieldByName('pst_code').AsString);
+    DTPickEpindt.Date:=FieldByName('epindt').AsDateTime;
+    EditSpcid.Text:=FieldByName('spc_id').AsString;
+    EditLedt.Text:=FieldByName('epledt').AsString;
+    EditReason.Text:=FieldByName('left_reason').AsString;
+  end;
+  SetEnableSave(false);
+end;
+
+function TFormHrd22.CheckInputValid():boolean;
+{*************************************************************************
+TO DO:提交前檢查輸入的有效性
+*************************************************************************}
+begin
+  if trim(CobDept.Text)='' then
+    begin//部門代號
+      WideMessageDlg(GetLangName(LangStr,'hrd08_dept_null'),mterror,[mbOK],0);
+      CobDept.SetFocus;
+      result:=false;
+      exit;
+    end;
+
+    if G_sFactory='F' then
+    begin
+      if UpperCase(LeftStr(CobDept.Text,1))='V'  then
+      begin
+        WideMessageDlg('DeptCode is error',mterror,[mbOK],0);
+        CobDept.SetFocus;
+        result:=false;
+        exit;
+      end;
+    end  
+    else
+    begin
+      if UpperCase(LeftStr(CobDept.Text,1))<>'V'  then
+      begin
+        WideMessageDlg('DeptCode is error',mterror,[mbOK],0);
+        CobDept.SetFocus;
+        result:=false;
+        exit;
+      end;
+    end;
+
+
+  {if trim(DBEditSpcId.Text)='' then
+    begin//識別卡號
+      WideMessageDlg(GetLangName(LangStr,'hrd08_SpcId_null'),mterror,[mbOK],0);
+      DBEditSpcId.SetFocus;
+      result:=false;
+      exit;
+    end;}
+  if trim(EditSpcId.Text)<>'' then
+    if CheckRecordExist('select * from hrd_emp where spc_id='''+trim(EditSpcId.Text)+''' and emp_id<>'''+trim(EditEmpId.Text)+''' and epledt is null') then
+    begin//識別卡號不能重复
+      WideMessageDlg(GetLangName(LangStr,'msg_same_spcid'),mterror,[mbOK],0);
+      EditSpcId.SetFocus;
+      result:=false;
+      exit;
+    end;
+{  if trim(CobFactory.Text)='' then
+    begin//廠區
+      WideMessageDlg(GetLangName(LangStr,'hrd08_factory_null'),mterror,[mbOK],0);
+      CobFactory.SetFocus;
+      result:=false;
+      exit;
+    end;}
+  if ((leftstr(CobInfo.Text,1)='0') or (leftstr(CobInfo.Text,1)='B')) and (editLedt.Text<>'') then
+    begin//不能輸入離職日期
+      WideMessageDlg(GetLangName(LangStr,'hrd08_leftdate_must_null'),mterror,[mbOK],0);
+      editLedt.SetFocus;
+      result:=false;
+      exit;
+    end;
+  if ((leftstr(CobInfo.Text,1)<>'0') and (leftstr(CobInfo.Text,1)<>'B')) then
+    begin//請輸入離職日期
+      WideMessageDlg(GetLangName(LangStr,'hrd08_input_leftdate'),mterror,[mbOK],0);
+      editLedt.SetFocus;
+      result:=false;
+      exit;
+    end;
+  if (DateOf(DTPickEpindt.Date)<last_ledt) then
+    begin//進廠日期小於離職日期
+      if RbNewEmp.Checked then//使用新工號
+      //if WideMessageDlg(GetLangName(LangStr,'msg_check_left_in_date'),mterror,[mbYes,mbNo],0)=mrYes then;
+      begin
+        WideMessageDlg(GetLangName(LangStr,'msg_check_left_in_date'),mterror,[mbOK],0);
+        DTPickEpindt.SetFocus;
+        result:=false;
+        exit;
+      end;
+    end;
+  result:=true;
+end;
+
+{===============================================================================
+  保存
+===============================================================================}
+procedure TFormHrd22.bbtn_SaveClick(Sender: TObject);
+begin
+  if RbOldEmp.Checked then//使用舊工號
+  begin
+    exit ; //2013-01-21 hyt add
+  end;
+  if not CheckInputValid then
+    exit;
+  if wideMessageDlg(GetLangName(LangStr,'msg_confirm_save'),mtConfirmation,[mbyes,mbno],0)=mrno then
+    exit;
+  DMHrdsys.conn.BeginTrans;//開始事務
+  try//保存資料
+    SaveData;//保存員工主檔
+    WideMessageDlg(GetLangName(LangStr,'save_success'),mtInformation,[mbYes],0);
+    DMHrdsys.conn.CommitTrans;//提交事務
+    SetEnableSave(false);
+  except
+    WideMessageDlg(GetLangName(LangStr,'save_fail'),mtInformation,[mbYes],0);
+    DMHrdsys.conn.RollbackTrans;//回滾事務
+    SetEnableSave(true);
+  end;
+end;
+{===============================================================================
+  保存數據
+===============================================================================}
+procedure TFormHrd22.SaveData;
+var
+  sqlstr,epid_no,old_emp,new_emp,last_in_date,last_left_date,this_in_date,up_date:string;
+begin
+  up_date:=FormatDateTime('yyyy/mm/dd hh:nn:ss',GetServerDateTime);
+  with ADOQuery1 do
+  begin
+    epid_no:=FieldByName('epid_no').AsString;
+    old_emp:=FieldByName('emp_id').AsString;
+    last_in_date:=FormatDateTime('yyyy/mm/dd',FieldByName('epindt').AsDateTime);
+    last_left_date:=FormatDateTime('yyyy/mm/dd',FieldByName('epledt').AsDateTime);
+  end;
+  if RbOldEmp.Checked then//使用舊工號
+  begin
+    new_emp:=ADOQuery1.FieldByName('emp_id').AsString;
+  end
+  else//使用新工號
+  begin
+    ADOQuery2.Clone(ADOQuery1);//將ADOQuery1複製到ADOQuery2
+    with ADOQuery1 do
+    begin
+      if RbPrint.Checked  then//化工     adidas
+         new_emp:= getNewEmpId('L')//產生新工號
+      else
+         new_emp:= getNewEmpId('V');//產生新工號
+     // new_emp:=GetNewEmpId(LeftStr(CobDept.Text,1));
+      Append;
+      FieldByName('emp_id').AsString:=new_emp;
+      FieldByName('emp_chs').AsString:=ADOQuery2.FieldByName('emp_chs').AsString;
+      FieldByName('name_vim').AsString:=ADOQuery2.FieldByName('name_vim').AsString;
+      FieldByName('epid_no').AsString:=ADOQuery2.FieldByName('epid_no').AsString;
+      FieldByName('epid_date').AsString:=ADOQuery2.FieldByName('epid_date').AsString;
+      FieldByName('epid_vim').AsString:=ADOQuery2.FieldByName('epid_vim').AsString;
+      FieldByName('epsexd').AsString:=ADOQuery2.FieldByName('epsexd').AsString;
+      FieldByName('ifmarry').AsString:=ADOQuery2.FieldByName('ifmarry').AsString;
+      FieldByName('epbirth').AsString:=ADOQuery2.FieldByName('epbirth').AsString;
+      FieldByName('chs_status').AsString:=ADOQuery2.FieldByName('chs_status').AsString;
+      FieldByName('eng_status').AsString:=ADOQuery2.FieldByName('eng_status').AsString;
+      FieldByName('edu_code').AsString:=ADOQuery2.FieldByName('edu_code').AsString;
+      FieldByName('tpAddrvim').AsString:=ADOQuery2.FieldByName('tpAddrvim').AsString;
+      FieldByName('emp_phone').AsString:=ADOQuery2.FieldByName('emp_phone').AsString;
+      FieldByName('birth_addr').AsString:=ADOQuery2.FieldByName('birth_addr').AsString;
+    end;
+  end;
+  with ADOQuery1 do
+  begin
+    Edit;
+    FieldByName('upd_user').AsString:=username;
+    FieldByName('upd_date').AsString:=up_date;
+    FieldByName('dept_code').AsString:=LeftStr(CobDept.Text,6);
+    FieldByName('info_code').AsString:=LeftStr(CobInfo.Text,1);
+    FieldByName('pst_code').AsString:=LeftStr(CobProf.Text,2);
+    this_in_date:=FormatDateTime('yyyy/mm/dd',DTPickEpindt.Date);
+    FieldByName('epindt').AsString:=this_in_date;
+    FieldByName('epledt').Value:=null;
+    FieldByName('spc_id').AsString:=EditSpcid.Text;
+    Post;
+    UpdateBatch;
+  end;
+  //寫復職檔
+  with qry_Tran do
+  begin
+    Append;
+    FieldByName('epid_no').AsString:=epid_no;
+    FieldByName('old_emp').AsString:=old_emp;
+    FieldByName('new_emp').AsString:=new_emp;
+    FieldByName('last_in_date').AsString:=last_in_date;
+    FieldByName('last_left_date').AsString:=last_left_date;
+    FieldByName('this_in_date').AsString:=this_in_date;
+    FieldByName('upd_user').AsString:=username;
+    FieldByName('upd_date').AsString:=up_date;
+    Post;
+    UpdateBatch;
+  end;
+end;
+
+procedure TFormHrd22.CobInfoChange(Sender: TObject);
+begin
+  if (LeftStr(CobInfo.Text,1)='0') or (LeftStr(CobInfo.Text,1)='B') then
+  begin
+    EditLedt.Text:='';
+    DTPickEpindt.Date:=GetServerDatetime; //2013-01-21 hyt add
+    SetEnableSave(true);
+  end;
+end;
+
+procedure TFormHrd22.SetEnableSave(flag:boolean);
+begin
+  bbtn_Save.Enabled:=flag;
+  bbtn_Cancel.Enabled:=flag;
+end;
+
+procedure TFormHrd22.bbtn_CancelClick(Sender: TObject);
+begin
+  ADOQuery1.Cancel;
+  SetEnableSave(false);
+end;
+
+end.

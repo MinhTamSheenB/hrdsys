@@ -1,0 +1,517 @@
+unit UnitDut40;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,
+  TntComCtrls,WSDLIntf, DB, ADODB,TntDialogs,strutils, TntDB,Qt, QuickRpt,
+  DBClient, Provider, DateUtils, ComObj, ExcelXP;
+
+type
+  //
+  TFormDut40 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    dsWeek: TDataSource;
+    ADOQuery1: TADOQuery;
+    Panel5: TPanel;
+    PanelGrid: TPanel;
+    DBGridWeek: TTntDBGrid;
+    TntGroupBox1: TTntGroupBox;
+    Label_month: TTntLabel;
+    DTPickDate_Begin: TTntDateTimePicker;
+    TntLabel2: TTntLabel;
+    DTPickDate_End: TTntDateTimePicker;
+    BtnQuery: TTntButton;
+    TntButton1: TTntButton;
+    cdsWeek: TClientDataSet;
+    cdsWeekHOURS_CLASS: TStringField;
+    cdsWeekCOUNT_N: TIntegerField;
+    cdsWeekCOUNT_W: TIntegerField;
+    DBGridDay: TTntDBGrid;
+    cdsDay: TClientDataSet;
+    dsDay: TDataSource;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    procedure SetPrintDataset;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure BtnQueryClick(Sender: TObject);
+    procedure ADOQuery1AfterScroll(DataSet: TDataSet);
+    procedure TntButton1Click(Sender: TObject);
+    procedure DTPickDate_BeginChange(Sender: TObject);
+    procedure cdsWeekAfterScroll(DataSet: TDataSet);
+    procedure cdsWeekHOURS_CLASSGetText(Sender: TField; var Text: String;
+      DisplayText: Boolean);
+  private
+    //
+    procedure ExportDataToExcel;
+    //
+    procedure CreateDataSet;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormDut40: TFormDut40;
+
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys;
+var
+  Langstr,LangC,LangE,LangV:TWideStrings;//語言字符串
+  pri_arr:TPrvArr;//權限數組
+{$R *.dfm}
+
+procedure TFormDut40.FormCreate(Sender: TObject);
+begin
+  InitLang;// Init language
+  pri_arr:=GetPrvArr(username,'dut40');
+  InitForm;// Init Form
+end;
+
+procedure TFormDut40.InitLang;
+{*************************************************************************
+TO DO:初始化語言
+*************************************************************************}
+var
+  keys:String;
+begin
+  SetComponentLang(self);//set component language text
+  keys:='vietnam_chingluh_company,dut43_titl,date,fld_year,fld_smonth,fld_day,'
+       +'not_find_data,total,current_location,print_finish,just_doing_empid,finish';
+  LangC:=GetLangWideStrs(keys,'C');
+  LangE:=GetLangWideStrs(keys,'E');
+  LangV:=GetLangWideStrs(keys,'V');
+  //
+  if userlang='V' then
+    LangStr:=LangV
+  else if userlang='E' then
+    LangStr:=LangE
+  else
+    LangStr:=LangC;
+end;
+
+procedure TFormDut40.InitForm;
+begin
+  DTPickDate_Begin.Date:= StartOfTheWeek(Date);
+  DTPickDate_End.Date  := EndOfTheWeek(Date);
+end;
+
+procedure TFormDut40.SetPrintDataset;
+//設置打印數據集
+var
+  sSQL: string;
+  //
+  dBegin, dEnd: TDate;
+  //
+  fHours: Double;
+  //
+  sDept, sEmpID, sClasCode, sSeg, sFieldName: string;
+  //
+  EmpListN, EmpListW, SegList: TStringList;
+  //
+  I, iCount: Integer;
+begin
+  //
+  EmpListN := TStringList.Create;
+  EmpListW := TStringList.Create;
+  SegList  := TStringList.Create;
+  try
+    //
+    dBegin:= DTPickDate_Begin.Date;
+    //
+    dEnd  := DTPickDate_End.Date;
+    //
+    CreateDataSet;
+    //
+    sSQL := 'SELECT A.WRK_DATE, A.EMP_ID, A.CLAS_CODE, A.S_START, A.S_END, B.DEPT_CODE, C.CLAS_CHS'
+          + '  FROM HRD_DUT_DAY A, HRD_EMP B, HRD_DUT_CLASS C'
+          + ' WHERE A.EMP_ID = B.EMP_ID'
+          + '   AND A.CLAS_CODE = C.CLAS_CODE'
+          + '   AND A.CLAS_CODE >= ''61'''
+          + '   AND A.CLAS_CODE <> ''64'''
+          + '   AND A.WRK_DATE >= '+QuotedStr(FormatDateTime('YYYY/MM/DD', dBegin))
+          + '   AND A.WRK_DATE <= '+QuotedStr(FormatDateTime('YYYY/MM/DD', dEnd))
+          //Adidas調度組
+          + '   AND B.DEPT_CODE <> ''F10500''';
+    //
+    with ADOQuery1 do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Open;
+      if IsEmpty then
+      begin
+        Close;
+        Exit;
+      end;
+      //
+      if not cdsWeek.Active then
+        cdsWeek.CreateDataSet
+      else
+        cdsWeek.EmptyDataSet;
+      //
+      while not Eof do
+      begin
+        //
+        sEmpID:= FieldByName('EMP_ID').AsString;
+        //
+        sDept := FieldByName('DEPT_CODE').AsString;
+        //
+        sClasCode := FieldByName('CLAS_CODE').AsString;
+        //
+        fHours:= StrToIntDef(Copy(FieldByName('S_END').AsString, 1, 2), 0) -
+                 StrToIntDef(Copy(FieldByName('S_START').AsString, 1, 2), 0) +
+                 (StrToIntDef(Copy(FieldByName('S_END').AsString, 3, 2), 0) -
+                  StrToIntDef(Copy(FieldByName('S_START').AsString, 3, 2), 0))/60;
+        //線外
+        if sDept < 'F30000' then
+        begin
+          if EmpListW.IndexOfName(sEmpID)= -1 then
+            EmpListW.Append(sEmpID+'='+FloatToStr(fHours))
+          else
+            EmpListW.Values[sEmpID] := FloatToStr( StrToFloat(EmpListW.Values[sEmpID]) +fHours);
+        end
+        //線內
+        else begin
+          if EmpListN.IndexOfName(sEmpID)= -1 then
+            EmpListN.Append(sEmpID+'='+FloatToStr(fHours))
+          else
+            EmpListN.Values[sEmpID] := FloatToStr( StrToFloat(EmpListN.Values[sEmpID]) +fHours);
+        end;
+
+        //
+        if sClasCode > '64' then
+        begin
+          //
+          sFieldName := FormatDateTime('MM"月"DD"日"', FieldByName('WRK_DATE').AsDateTime);
+          //
+          sSeg :=  FieldByName('CLAS_CHS').AsString+'('+Copy(FieldByName('S_START').AsString, 1, 2)+':'
+                                                       +Copy(FieldByName('S_START').AsString, 3, 2)+'-'
+                                                       +Copy(FieldByName('S_END').AsString, 1, 2)+':'
+                                                       +Copy(FieldByName('S_END').AsString, 3, 2)+')';
+          if not cdsDay.Locate('project', sSeg, []) then
+          begin
+            cdsDay.Append;
+            cdsDay.FieldByName('project').AsString := sSeg;
+            cdsDay.FieldByName(sFieldName).AsInteger := cdsDay.FieldByName(sFieldName).AsInteger + 1;
+            cdsDay.Post;
+          end
+          else begin
+            cdsDay.Edit;
+            cdsDay.FieldByName(sFieldName).AsInteger := cdsDay.FieldByName(sFieldName).AsInteger + 1;
+            cdsDay.Post;
+          end;
+        end;
+
+        //
+        Next;
+      end;
+      //
+      Close;
+    end;
+    //
+    if not cdsWeek.Active then
+      cdsWeek.CreateDataSet
+    else
+      cdsWeek.EmptyDataSet;
+    //
+    cdsWeek.Append;
+    cdsWeekHOURS_CLASS.AsString := '00';
+    cdsWeek.Post;
+    cdsWeek.Append;
+    cdsWeekHOURS_CLASS.AsString := '01';
+    cdsWeek.Post;
+    cdsWeek.Append;
+    cdsWeekHOURS_CLASS.AsString := '02';
+    cdsWeek.Post;
+    cdsWeek.Append;
+    cdsWeekHOURS_CLASS.AsString := '03';
+    cdsWeek.Post;
+    //
+    iCount := EmpListW.Count;
+    for I:= 0 to EmpListW.Count - 1 do
+    begin
+      cdsWeek.First;
+      //
+      fHours := StrToFloat(EmpListW.ValueFromIndex[I]);
+      //
+      if fHours= 54 then
+      begin
+        cdsWeek.Edit;
+        cdsWeekCOUNT_W.AsInteger := cdsWeekCOUNT_W.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else if fHours<= 54 then
+      begin
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_W.AsInteger := cdsWeekCOUNT_W.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else if fHours<= 60 then begin
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_W.AsInteger := cdsWeekCOUNT_W.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else begin
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_W.AsInteger := cdsWeekCOUNT_W.AsInteger + 1;
+        cdsWeek.Post;
+      end;
+      //
+      SetStatusText(Format('%d / %d', [I + 1, iCount]));
+    end;
+
+    //
+    iCount := EmpListN.Count;
+    for I:= 0 to EmpListN.Count - 1 do
+    begin
+      cdsWeek.First;
+      //
+      fHours := StrToFloat(EmpListN.ValueFromIndex[I]);
+      //
+      if fHours= 0 then
+      begin
+        cdsWeek.Edit;
+        cdsWeekCOUNT_N.AsInteger := cdsWeekCOUNT_N.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else if fHours<= 54 then
+      begin
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_N.AsInteger := cdsWeekCOUNT_N.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else if fHours<= 60 then begin
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_N.AsInteger := cdsWeekCOUNT_N.AsInteger + 1;
+        cdsWeek.Post;
+      end
+      else begin
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Next;
+        cdsWeek.Edit;
+        cdsWeekCOUNT_N.AsInteger := cdsWeekCOUNT_N.AsInteger + 1;
+        cdsWeek.Post;
+      end;
+      //
+      SetStatusText(Format('%d / %d', [I + 1, iCount]));
+    end;
+
+    cdsDay.IndexFieldNames :=  'project';
+  finally
+    EmpListN.Free;
+    EmpListW.Free;
+    SegList.Free;
+  end;
+end;
+
+procedure TFormDut40.BtnQueryClick(Sender: TObject);
+begin
+  //
+  BtnQuery.Enabled:= False;
+  //
+  cdsWeek.AfterScroll:= nil;
+  try
+    SetPrintDataset;
+  finally
+    BtnQuery.Enabled:= True;
+    //
+    cdsWeek.AfterScroll:= cdsWeekAfterScroll;
+  end;
+end;
+
+procedure TFormDut40.ADOQuery1AfterScroll(DataSet: TDataSet);
+begin
+  with DataSet do
+    setStatusText(GetLangName(LangStr,'current_location')+':'+inttostr(RecNo)+' '+GetLangName(LangStr,'total')+':'+inttostr(RecordCount));
+end;
+
+//
+procedure TFormDut40.ExportDataToExcel;
+var
+  //
+  MyExcel: Variant;
+  //
+  iRows, iCols, I, iBegin: Integer;
+begin
+  //
+  try
+    //
+    MyExcel:= CreateOleObject('Excel.Application');
+    MyExcel.WorkBooks.Add;
+  except
+    WideShowMessage('創建Excel文件失敗');
+    Exit;
+  end;
+  //
+  MyExcel.Visible:= False;
+  try
+    iRows:= 1;
+    //
+    MyExcel.Cells[iRows, 1]:= '周工時報表';
+    //
+    Inc(iRows);
+    //
+    iCols:= 0;
+    //
+    for I:= 0 to DBGridWeek.FieldCount- 1 do
+    begin
+      //
+      MyExcel.Columns[I + 1].NumberFormatLocal:= '@ ';
+      //
+      MyExcel.Cells[iRows, I + 1]:= DBGridWeek.Columns[I].Title.Caption;
+      //
+      Inc(iCols);
+    end;
+    //
+    cdsWeek.First;
+    while not cdsWeek.Eof do
+    begin
+      //
+      Inc(iRows);
+      //
+      for I:= 0 to DBGridWeek.FieldCount- 1 do
+        MyExcel.Cells[iRows, I + 1]:= cdsWeek.Fields[I].Value;
+      //
+      cdsWeek.Next;
+    end;
+    //
+    MyExcel.Range[MyExcel.Cells.Item[1, 1], MyExcel.Cells.Item[1, iCols]].MergeCells:= True;
+    MyExcel.Range[MyExcel.Cells.Item[1, 1], MyExcel.Cells.Item[1, iCols]].Font.Size:= 18;
+    MyExcel.Range[MyExcel.Cells.Item[1, 1], MyExcel.Cells.Item[1, iCols]].Font.Bold:= True;
+    //
+    MyExcel.Range[MyExcel.Cells.Item[3, 1], MyExcel.Cells.Item[iRows, iCols]].Font.Size:= 9;
+    //
+    MyExcel.Range[MyExcel.Cells.Item[1, 1], MyExcel.Cells.Item[iRows, iCols]].Borders.LineStyle:= xlContinuous;
+
+
+    //
+    Inc(iRows, 3);
+    iBegin := iRows;
+    iCols := DBGridDay.FieldCount;
+    //
+    for I := 0 to DBGridDay.FieldCount- 1 do
+    begin
+      MyExcel.Cells[iRows, I + 1] := DBGridDay.Columns[I].Title.Caption;
+    end;
+    //
+    DBGridDay.DataSource.DataSet.First;
+    while not DBGridDay.DataSource.DataSet.Eof do
+    begin
+      Inc(iRows);
+      for I:= 0 to DBGridDay.DataSource.DataSet.FieldCount- 1 do
+      begin
+        MyExcel.Cells[iRows, I + 1] := DBGridDay.DataSource.DataSet.Fields[I].AsString;
+      end;
+      //
+      DBGridDay.DataSource.DataSet.Next;
+    end;
+    //
+    MyExcel.Range[MyExcel.Cells.Item[iBegin, 1], MyExcel.Cells.Item[iRows, iCols]].Font.Size:= 9;
+    //
+    MyExcel.Range[MyExcel.Cells.Item[iBegin, 1], MyExcel.Cells.Item[iRows, iCols]].Borders.LineStyle:= xlContinuous;
+
+    //
+    MyExcel.Cells.EntireColumn.AutoFit;
+  finally
+    MyExcel.Visible:= True;
+  end;
+end;
+
+procedure TFormDut40.TntButton1Click(Sender: TObject);
+begin
+  //
+  ExportDataToExcel;
+end;
+
+procedure TFormDut40.DTPickDate_BeginChange(Sender: TObject);
+begin
+  DTPickDate_End.Date   := EndOfTheWeek(DTPickDate_Begin.Date);
+end;
+
+procedure TFormDut40.cdsWeekAfterScroll(DataSet: TDataSet);
+begin
+  with DataSet do
+    setStatusText(GetLangName(LangStr,'current_location')+':'+inttostr(RecNo)+' '+GetLangName(LangStr,'total')+':'+inttostr(RecordCount));
+end;
+
+procedure TFormDut40.cdsWeekHOURS_CLASSGetText(Sender: TField;
+  var Text: String; DisplayText: Boolean);
+begin
+  //
+  if Sender.AsString= '' then Exit;
+  //
+  if Sender.AsString = '00' then
+    Text := '0'
+  else if Sender.AsString = '01' then
+    Text := '1-54'
+  else if Sender.AsString = '02' then
+    Text := '55-60'
+  else if Sender.AsString = '03' then
+    Text := '61及以上';  
+end;
+
+procedure TFormDut40.CreateDataSet;
+var
+  dDate: TDateTime;
+  //
+  I: Integer;
+begin
+  dDate := DTPickDate_Begin.Date;
+  with cdsDay do
+  begin
+    if Active then Close;
+    //
+    FieldDefs.Clear;
+    //
+    with FieldDefs.AddFieldDef do
+    begin
+      Name     := 'project';
+      DataType := ftString;
+      Size     := 200;
+    end;
+    //
+    while dDate < DTPickDate_End.Date do
+    begin
+      with FieldDefs.AddFieldDef do
+      begin
+        DataType := ftInteger;
+        Name     := FormatDateTime('MM"月"DD"日"', dDate);
+      end;
+      dDate := IncDay(dDate);
+    end;
+    //
+    CreateDataSet;
+  end;
+  //
+  for I := 0 to DBGridDay.FieldCount - 1 do
+  begin
+    if DBGridDay.Columns[I].FieldName = 'project' then
+    begin
+      DBGridDay.Columns[I].Title.Caption := '項目';
+      DBGridDay.Columns[I].Width := 120;
+    end
+    else
+      DBGridDay.Columns[I].Width := 80;
+  end;
+end;
+
+end.

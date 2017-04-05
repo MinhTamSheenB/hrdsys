@@ -1,0 +1,347 @@
+unit UnitDut24;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs,tntDialogs, ExtCtrls,StrUtils, ComCtrls, Grids, DBGrids, StdCtrls, Buttons, Mask,
+  DBCtrls, TntExtCtrls, TntDBGrids, TntDbCtrls, TntStdCtrls, TntButtons,
+  DB, ADODB, DBClient, Provider,DateUtils,WSDLIntf, TntComCtrls, CheckLst,
+  TntCheckLst, Menus, TntMenus, ImgList, TntForms;
+
+type
+  TformDut24 = class(TForm)
+    TntPanel1: TTntPanel;
+    TntPanel2: TTntPanel;
+    TntPanel6: TTntPanel;
+    TntPanel7: TTntPanel;
+    TntPanel9: TTntPanel;
+    TntPanel10: TTntPanel;
+    TntGroupBox2: TTntGroupBox;
+    TntButton3: TTntButton;
+    TntButton4: TTntButton;
+    TntButton5: TTntButton;
+    sb_save: TTntSpeedButton;
+    TntGroupBox1: TTntGroupBox;
+    TntLabel2: TTntLabel;
+    CB_DEPT: TTntComboBox;
+    bb_search: TTntBitBtn;
+    bb_reset: TTntBitBtn;
+    clb_emp: TTntCheckListBox;
+    Label_s_ask_d: TTntLabel;
+    Label_s_ask_h: TTntLabel;
+    TntLabel6: TTntLabel;
+    TntLabel8: TTntLabel;
+    TntLabel10: TTntLabel;
+    TntLabel11: TTntLabel;
+    DTPickSdate: TTntDateTimePicker;
+    DTPickEdate: TTntDateTimePicker;
+    Label_clas_code: TTntLabel;
+    ADOQuery1: TADOQuery;
+    TntEdit1: TTntEdit;
+    EditSHour: TTntEdit;
+    EditSTime: TTntEdit;
+    EditEHour: TTntEdit;
+    EditETime: TTntEdit;
+    procedure InitLangInfo;
+    function checkinput:boolean;
+    function HasYearHoliday(empid:string):boolean;
+
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure bb_searchClick(Sender: TObject);
+    procedure bb_resetClick(Sender: TObject);
+    procedure TntButton3Click(Sender: TObject);
+    procedure TntButton4Click(Sender: TObject);
+    procedure TntButton5Click(Sender: TObject);
+    procedure sb_saveClick(Sender: TObject);
+    procedure EditSHourChange(Sender: TObject);
+    procedure EditSTimeChange(Sender: TObject);
+    procedure EditEHourChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  formDut24: TformDut24;
+  LangStr:TWideStrings;
+  PanelX,PanelY :integer;
+
+implementation
+
+uses
+  UnitDMHrdsys,UnitHrdUtils;
+{$R *.dfm}
+
+procedure TformDut24.InitLangInfo;
+var
+  ThisFormUsedWords:String;
+begin
+  //定義要用到的語言
+ ThisFormUsedWords:='peoplesum,peopleovr,save_fail,save_success,begin,end,'+
+    'error_input_hour,error_hour,msg_ask_over_days_60,msg_ask_over_days,'+
+    'save_success,dut02_exist_excuse';
+ LangStr:=GetLangWideStrs(ThisFormUsedWords);
+ SetComponentLang(self);
+end;
+
+procedure TformDut24.FormCreate(Sender: TObject);
+var
+  prvArr:TPrvArr;
+begin
+  DTPickSdate.Date := now;
+  DTPickEdate.Date := now;
+  prvArr:=GetPrvArr(userName,'Dut24');
+  if prvArr[ADD] then
+  begin
+    self.Enabled:=true;
+  end
+  else
+    self.Enabled:=false;
+  GetDeptRange(cb_dept);
+  InitLangInfo;
+end;
+
+procedure TformDut24.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SetStatusText('');
+end;
+
+procedure TformDut24.bb_searchClick(Sender: TObject);
+var
+  i:integer;
+begin
+  with adoQuery1 do
+  begin
+    close;
+    sql.clear;
+    sql.Add('select * from hrd_emp where ((epledt is null)or(epledt>'''+
+          formatdatetime('yyyy/mm/dd',GetServerDatetime)+
+          ''')) and dept_code='''+leftstr(cb_dept.Text,6)+'''');
+    open;
+    clb_emp.Items.Clear;
+    i:=0;
+    while not eof do
+    begin
+      clb_emp.Items.Add(widestring(fieldbyname('emp_id').Value+'-'+fieldbyname('emp_chs').Value));
+      next; 
+      i := i + 1;
+    end;
+  end;
+  cb_dept.Enabled:=false;
+  bb_search.Enabled:=false;
+  bb_reset.Enabled:=true;
+  tntbutton3.Enabled:=true;
+  tntbutton4.Enabled:=true;
+  tntbutton5.Enabled:=true;
+end;
+
+procedure TformDut24.bb_resetClick(Sender: TObject);
+begin
+  adoquery1.close;
+  clb_emp.Clear;
+  bb_reset.Enabled:=false;
+  bb_search.Enabled:=true;
+  cb_dept.Enabled:=true;
+  tntbutton3.Enabled:=false;
+  tntbutton4.Enabled:=false;
+  tntbutton5.Enabled:=false;
+end;
+
+procedure TformDut24.TntButton3Click(Sender: TObject);
+var
+  i:integer;
+begin
+  for i:=0 to clb_emp.Items.Count-1 do
+  begin
+    if clb_emp.Checked[i]=false then
+      clb_emp.Checked[i]:=true;
+  end;
+end;
+
+procedure TformDut24.TntButton4Click(Sender: TObject);
+var
+  i:integer;
+begin
+  for i:=0 to clb_emp.Items.Count-1 do
+  begin
+    if clb_emp.Checked[i]=true then
+      clb_emp.Checked[i]:=false;
+  end;
+end;
+
+procedure TformDut24.TntButton5Click(Sender: TObject);
+var
+  i:integer;
+begin
+  for i:=0 to clb_emp.Items.Count-1 do
+    clb_emp.Checked[i]:=not clb_emp.Checked[i];
+end;
+
+procedure TformDut24.sb_saveClick(Sender: TObject);
+var
+  i:integer;
+  emp_id,sql_str,timestr,s_d,e_d,s_h,e_h,s_t,e_t,SqlStr:string;
+begin
+  if not checkinput then
+    exit;
+  try
+    DMHrdSys.conn.BeginTrans;
+    timestr:=formatDatetime('yyyy/mm/dd hh:mm',GetServerdatetime);
+    s_d:=formatdatetime('yyyy/mm/dd',DTPickSDate.DateTime);
+    e_d:=formatdatetime('yyyy/mm/dd',DTPickEDate.DateTime);
+    s_h:=EditSHour.Text;
+    e_h:=EditEHour.Text;
+    s_t:=EditSTime.Text;
+    e_t:=EditETime.Text;
+    SqlStr:='';
+    for i:=0 to clb_emp.Count-1 do
+    begin
+      if clb_emp.Checked[i] then
+      begin
+        emp_id:=leftstr(clb_emp.Items[i],6);
+        if not HasYearHoliday(emp_id) then
+        begin
+          DMHrdSys.conn.RollbackTrans;
+          WideShowMessage('員工'+clb_emp.Items[i]+'年假已請完或此次請假天數過多');
+          exit;
+        end;
+        sql_str:='select * from hrd_dut_ask where emp_id='''+emp_id+
+           ''' and s_ask_d='''+formatdatetime('yyyy/mm/dd',DTPickSDate.Date)+
+           ''' and s_ask_h='''+formatdatetime('yyyy/mm/dd',DTPickEDate.Date)+'''';
+        if CheckRecordExist(sql_str)then
+        begin
+          WideShowMessage('員工'+clb_emp.Items[i]+GetLangName(LangStr,'dut02_exist_excuse'));
+          DMHrdSys.conn.RollbackTrans;
+          exit;
+        end;
+        SqlStr:=SqlStr+'insert into hrd_dut_ask'+
+             '(upd_user,upd_date,emp_id,clas_code,s_ask_d,s_ask_h,s_ask_t,e_ask_d,e_ask_h,e_ask_t)'+
+             ' values('''+UserName+''','''+timestr+''','''+emp_id+''',''16'','''+
+             s_d+''','''+s_h+''','''+s_t+''','''+e_d+''','''+e_h+''','''+e_t+''');';
+      end;
+    end;
+    with DMhrdsys.ADOCommand1 do
+        begin
+          Commandtext:=SqlStr;
+          execute;
+    end;
+    DMHrdSys.conn.CommitTrans;
+    wideshowmessage(GetLangName(LangStr,'save_success'));
+  except
+    DMHrdSys.conn.RollbackTrans;
+    exit;
+  end;
+end;
+
+function TformDut24.checkinput:boolean;
+begin
+  result:=false;
+  if (length(EditShour.Text)=0) or (length(EditEhour.Text)=0) or (length(EditStime.Text)=0) or (length(EditEtime.Text)=0) then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'error_input_hour'),mterror,[mbOK],0);
+      exit;
+    end
+  else if (length(EditShour.Text)<>2) or (length(EditEhour.Text)<>2) or (length(EditStime.Text)<>2) or (length(EditEtime.Text)<>2) then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'error_hour'),mterror,[mbOK],0);
+      exit;
+    end;
+  result:=true;
+end;
+
+function TFormDut24.HasYearHoliday(empid:string):boolean;
+//檢查是否有年假可請
+var
+  tclas_code,temp_id,pst_code:string;
+  AllDays,HasDays,CurDays:double;
+  ask_d,epindt,s_ask_d,e_ask_d,s_time,e_time,t_time:Tdatetime;
+  Flds:TFields;
+  i:integer;
+begin
+
+    tclas_code:='16';
+    temp_id:=empid;
+    ask_d:=DTPickSDate.Date;
+    s_ask_d:=DTPickSDate.Date;
+    e_ask_d:=DTPickEDate.Date;
+    s_time:=ShortstrToTime(EditSHour.Text+EditSTime.Text);
+    e_time:=ShortstrToTime(EditEHour.Text+EditETime.Text);
+    t_time:=e_time-s_time;
+    if (s_time<=12/24) and (e_time>=13/24) then
+      t_time:=t_time-1/24;
+    CurDays:=t_time*3;
+    CurDays:=CurDays+e_ask_d-s_ask_d;
+    if (DayOfWeek(e_ask_d)<DayOfWeek(s_ask_d)) then
+      CurDays:=CurDays-1;
+  with DMHrdsys.SQLQuery1 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add('select * from hrd_dut_ask where emp_id='''+temp_id+''''
+      +' and clas_code=''16'' and YEAR(s_ask_d)='+IntToStr(YearOf(ask_d)));
+    open;
+    HasDays:=0;//計算已請年假天數
+    while not Eof do
+    begin
+      s_time:=ShortstrToTime(FieldByName('s_ask_h').AsString+FieldByName('s_ask_t').AsString);
+      e_time:=ShortstrToTime(FieldByName('e_ask_h').AsString+FieldByName('e_ask_t').AsString);
+      t_time:=e_time-s_time;
+      if (s_time<=12/24) and (e_time>=13/24) then
+        t_time:=t_time-1/24;
+      HasDays:=HasDays+t_time*3;
+      next;
+    end;
+  end;
+  //計算一年共可請假天數
+  Flds:=GetEmpInfo(temp_id);
+  epindt:=Flds.FieldByName('epindt').AsDateTime;
+  pst_code:=Flds.FieldByName('pst_code').AsString;
+  AllDays:=12;
+  if yearof(epindt)=YearOf(ask_d) then//當年進廠
+  begin
+    if MonthOf(epindt-10)<>12 then
+      AllDays:=AllDays-MonthOf(epindt-10);
+    if DayOf(ask_d)>=10 then
+      AllDays:=AllDays+1;
+  end;
+  if pst_code='60' then
+    AllDays:=AllDays+2;//作業員年假多兩天
+  if HasDays+CurDays>AllDays then
+  begin
+    WideShowMessage(GetLangName(LangStr,'msg_ask_over_days'));
+    result:=false;
+    exit;
+  end;
+  if (HasDays+CurDays>12) and (pst_code='60') then
+  begin//作業員超過12天時提示
+    if WideMessageDlg(GetLangName(LangStr,'msg_ask_over_days_60'),mtConfirmation,[mbYes, mbNo],0)=mryes then
+      result:=true //繼續
+    else
+      result:=false;
+    exit;
+  end;
+  result:=true;
+end;
+
+procedure TformDut24.EditSHourChange(Sender: TObject);
+begin
+  if length(EditSHour.text)=2 then
+    EditSTime.SetFocus;
+end;
+
+procedure TformDut24.EditSTimeChange(Sender: TObject);
+begin
+  if length(EditSTime.text)=2 then
+    EditEHour.SetFocus;
+end;
+
+procedure TformDut24.EditEHourChange(Sender: TObject);
+begin
+  if length(EditEHour.text)=2 then
+    EditETime.SetFocus;
+end;
+
+end.

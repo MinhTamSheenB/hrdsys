@@ -1,0 +1,2215 @@
+object hrdMainForm: ThrdMainForm
+  Left = 176
+  Top = 160
+  HorzScrollBar.Visible = False
+  VertScrollBar.Visible = False
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Hrdsys'
+  ClientHeight = 531
+  ClientWidth = 800
+  Color = clBtnFace
+  DefaultMonitor = dmDesktop
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  Menu = MainMenu1
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  Visible = True
+  OnClose = TntFormClose
+  OnCreate = FormCreate
+  OnKeyDown = TntFormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 800
+    Height = 510
+    Align = alClient
+    BevelOuter = bvNone
+    Caption = 'Panel2'
+    TabOrder = 0
+    object PageControl1: TTntPageControl
+      Left = 1
+      Top = 0
+      Width = 796
+      Height = 494
+      ActivePage = SheetMain
+      Align = alCustom
+      PopupMenu = PopupMenu1
+      TabOrder = 0
+      TabPosition = tpBottom
+      OnChange = PageControl1Change
+      object SheetMain: TTntTabSheet
+        Caption = #23376#30059#38754
+        OnHide = SheetMainHide
+        OnShow = SheetMainShow
+        object TntPanel1: TTntPanel
+          Left = -3
+          Top = -2
+          Width = 793
+          Height = 67
+          Caption = 'TntPanel1'
+          TabOrder = 0
+          object Image1: TImage
+            Left = 1
+            Top = 1
+            Width = 784
+            Height = 64
+            Align = alCustom
+            Picture.Data = {
+              0A544A504547496D6167652F1D0000FFD8FFE000104A46494600010101006000
+              600000FFE1001645786966000049492A0008000000000000000000FFDB004300
+              080606070605080707070909080A0C140D0C0B0B0C1912130F141D1A1F1E1D1A
+              1C1C20242E2720222C231C1C2837292C30313434341F27393D38323C2E333432
+              FFDB0043010909090C0B0C180D0D1832211C2132323232323232323232323232
+              3232323232323232323232323232323232323232323232323232323232323232
+              3232323232FFC0001108003C030C03012200021101031101FFC4001F00000105
+              01010101010100000000000000000102030405060708090A0BFFC400B5100002
+              010303020403050504040000017D010203000411051221314106135161072271
+              14328191A1082342B1C11552D1F02433627282090A161718191A25262728292A
+              3435363738393A434445464748494A535455565758595A636465666768696A73
+              7475767778797A838485868788898A92939495969798999AA2A3A4A5A6A7A8A9
+              AAB2B3B4B5B6B7B8B9BAC2C3C4C5C6C7C8C9CAD2D3D4D5D6D7D8D9DAE1E2E3E4
+              E5E6E7E8E9EAF1F2F3F4F5F6F7F8F9FAFFC4001F010003010101010101010101
+              0000000000000102030405060708090A0BFFC400B51100020102040403040705
+              040400010277000102031104052131061241510761711322328108144291A1B1
+              C109233352F0156272D10A162434E125F11718191A262728292A35363738393A
+              434445464748494A535455565758595A636465666768696A737475767778797A
+              82838485868788898A92939495969798999AA2A3A4A5A6A7A8A9AAB2B3B4B5B6
+              B7B8B9BAC2C3C4C5C6C7C8C9CAD2D3D4D5D6D7D8D9DAE2E3E4E5E6E7E8E9EAF2
+              F3F4F5F6F7F8F9FAFFDA000C03010002110311003F00F76A514DA51D6BE6E3B9
+              B3171401839EBF5A5A2BA1249DD0876EFF00657F2A377FB2BF95368AD3DA4856
+              06C1391C5262968A86EEEEC0296928A005A28A2AD30168A28AB00A28A2980DA2
+              8A286025252D252189494B54F5496F61D2EEA4D3ADD6E2F56263044E70AEFD81
+              3C7F4A43643FDB7A61D5A4D2BEDB17DBA38FCC7833F305E39FD45593796DFF00
+              3F117FDF62BC035F3E285F1A79BAD68B6B15DEBB08B25B65983295CA2E46C724
+              741D7DEA95C78645CF89B56D2B45F0FC5729A7CE632D2DF796719C03F33AFA1E
+              95D5F568F591CBF587D8FA2FED96DFF3F317FDFC15357CEFE1FF000A5ADD78DE
+              DBC3DADE8A96A6589A53E4DE17380091C8623B7D6BB4F89BAA783AE356B6D37C
+              45FDA9E7DA2174FB1850B87C75CFFBA2B3961D2928A77FEBD4D235DB8B9356FE
+              BD0F5092448A2692460A8A0B33138000AA7A56AF61ADD90BCD36E92E6DC92BBD
+              3D4578AD9EB5E19B0F0DEBDA6F83ADB599EFF50B7542B3461BE504A9C6DE7EEB
+              B572134575A4E8A3369AFD9CDC0F32490C706EFA6D1DB3DEAA384BE97B132C55
+              BA1F535634BE29D121FB7799A9C0BF60205D64FF00AA24ED19FC6B3B45D366B9
+              F87769A647A94B05DBD9A6FB98DF7491BB0DC79C83D735E0DAE69BAA697ADEAD
+              A5493EA93CB7136D4255BFD376B7DE619F9BD475E6B3A3878CDB4DEC5D5AF282
+              4D2DCFA63FB42D3FB33FB4BED0BF63F27CFF003B3F2F978DDBBF2A669DA9D9EA
+              D64B796172B716EE485910F071C5792C9E1AF1A695E07965B6D755F4C9B49F32
+              EAD2FB77990AF9477451821B680BC755E7B0C559F85B69E2D6D234E9EDEFEC57
+              4012BEFB765CCA7E639FE0F5FF006A94A84541C9490E35E4E4A2E27ACCB22451
+              992470883AB31000AA936AB6106A10E9F35E4297938262819C0771CF41F81AE2
+              FE24FF006AEA307F635B786E7D4AD248D65FB4C53EC31CB961D31CE38EBC1CD7
+              95786353D767F11E992DBD9CBA9DD6948C1206930DE5F231EB81BBDFD3A514B0
+              DCF0E6B8EA627927CB63E86B4D6B4CBFB292F2D2FEDE6B588957992505148E4E
+              4FE22AE8219410720F391DEBE64B18FC43242FE1182D2E6544B9371756909019
+              8E1010C79C01B47B027A6457BC784AE751B8D09A1BAD13FB1CDBE21B7819F70D
+              81460D4E230DECD5D3B8E8623DA3B35637AE6E22B4B696E27711C312192473D0
+              28E49AAFA6EA965AC592DE69F72B716EC480E9D322BC87C737BE39D1344306B5
+              AD6992C17D987C9B68FE7618F9BF806074EFDEA1D16FF5FD174982C6C3C69E16
+              82DE304AC6D2E586492727CB3DC9A6B097873737E7FE40F1569F2B5FD7DE7B7D
+              46F2C7163CC754CFF79B15E69A35D78E356BB02D7C57E1EBC8A26533ADBFCC42
+              E7FEB9FD6A2F8B70DB5C6B7E1182F5B6DAC973224EDD3085A2DDFA66B2587FDE
+              283668F11EE39A47A6FDAEDF19FB44781FED8A6FDAEDFF00E7E23FFBF82BE6AB
+              BD1E31E16BAD720478ACE5D4D6DED518E4EC0B2373FF008E8FAE6B4B5587C2AB
+              A5DC1B2F0FEBD05C85FDDCB71F714FBD6EF02BA4BF0FF8263F5D7D63F8FF00C0
+              3E870C1D432B641EE0E4535E458C02EE14120025B1935CF7807FE443D1BFEBDC
+              76F735C8F8FAEDFC55E26D3BC1BA7B92165135E48BFF002CFDBF0524FD4A8EB5
+              C91A3CD51C2FA2BDDFA1D52ADCB4D4EDBF43D3D98229666C2819249C01480865
+              041C83CE41AE7FC61A0B6B5E0FBBD32D7225118300E7965C103F1C63F1AC7F86
+              3E245D5FC3CBA6CE76DFE9CA21911860941C29FE87E9EF51ECAF4DD44F62BDAD
+              AA2835B9DBBBAC6B9770A3D49C0A88DDDBFF00CFC47FF7F05725F1166B56D3AD
+              2C6F347D435286690C98B20728540EBD7AEE3F9579CFF67F87FF00E84CF127FD
+              F4DFE15A52C37B48F337F97F999D5C4F24B952FCFF00C8F72FB55BFF00CFC47F
+              F7F053D5D5D7723861EA0E45783C9A66852432AC7E13D7EDDFCB6225959B6210
+              0F278E95E81F097FE4468BFEBBC9DBDC515B0AA9D3E74FFAFBD8E8E25CE7C8D7
+              F5F723BAE7DFF4A69CFBD2FF009E9487FCF15C2760873EF473EFFA507FCF149F
+              E7A521873EF4DE7DE97FCF4A3FCF4A4509CFBFE949F9FE747F9E947F9E952313
+              F3A4E7DE8FF3D283FE78A061CFBFE94DE7DFF3A5FF003F76931FE76D48C4E7DF
+              F3A39F7FD28FF3F7693FCFDDA430E7DFF3A439F7A3FCFDDA4FF3F76A461CFBFE
+              749CFBD2E3FCEDA4C7F9C521887F1FCE939F7A08F6FF00C76931EDFF008ED218
+              BCFBFE949F9FE7463DBFF1DA4FC3FF001DA57187E7F9D273EFF9D18F6FFC7693
+              1EDFF8ED48C3F3FCE9BCFBFE74BF87FE3B498FF3B69141CFBFE74873EFF9D2E3
+              DBFF001DA43F4FD290C4FCFF003A39F7FCE931EDFF008ED18F6FFC7690C4E7DF
+              F3A39F7FCE8C7B7FE3B49F87FE3B4861CFBFE749CFBFE7463DBFF1DA4C7B7FE3
+              B52C61CFBFE749CFBD1F87FE3B498FF3B690C39F7FCE90E7DFF3A5C7B7FE3B48
+              47B7FE3B486273EFF9D273EFF9D2E3DBF4A4C7B7FE3B53728439F7FCE839FF00
+              6BF3A08F6FFC76908F6FFC7690C4E7FDAFCC52F3EFF9D371EDFF008E518F6FFC
+              7290C5E7FDAFCE8E7FDAFCE931EDFF008ED18F6FFC76A405E7FDAFCE8E7FDAFC
+              E931EDFF008ED18F6FFC76803D080CD3E9B429E739FC2BE969B57B1F2AC75145
+              15A8828A28A0028A28A0028A296980668A28AAD405A29314735577D500B45266
+              97354A4980DA4A5A29809494B494862550D5F55B4D0F4AB9D4AF5CA5B5BAEE72
+              064FF927157E992C49344D14A8AF1B82AC8C3208A4BCC6FC8F9BBFE132D62F3E
+              20FF00C24E749FB4BC11F9915ABA93E541D0118FF7B3BB9196CE2B1EFEE66D6A
+              3BEF11DC69FA57EF2E0F9ABF687572E70784F3338F9BAF4FCABD6F4F40BFB406
+              A2A8A02AE9AA0003007CB1D795E85E1DD575DF0C5C2E99E1A5BC737181A809B6
+              BC780A766D2C07FF00B55E9C251DED6D11E64E32DAF7D59ADE0E69F42F1B6812
+              8B2D2C1BE708AD05C34ACA8F8072048769C377FCABA4F8D5E21D52CAF20D1ADE
+              EB669F756A1E78BCB53B8EF3DC8C8E83A62B9FB3D2AF34AF1C784A1BCF0F2691
+              27DA101659779B820AE58F271FA75AE8BE31F86F54D42F7FB6D638D74EB1B40A
+              D21906E2DBCFF0FF00C085437175A2DF6344A4A9492EE70B6367AF78DB49710A
+              C575FD896F1AC70E36B98BE6E063EF74FAFA56758CFA17DBEEDEEB49BB96278D
+              52DAD62988225E3EF375C75E304F6F7AEB343F05F892C3C2F71AB8D4FEC5A45D
+              5AADC5CFD93E69DE2037600F97B13FC4063D68F03F84742F16788358B78A2BD3
+              A4C76EBF67B890ED9124F97938E33F7B8E78AD1D48A4DDF45D8C9539369757DC
+              EF7E1AF846F7C37E1CD426BD8043797FF3792092C88036D07AF3F31F7F5E7A78
+              9FF62DD5ADE59DA5F68BAA25C4A5BF72616579476D808CFF003AF6FF000E7833
+              5C8B41D57C3BAF6A6F2E98CCA969242FFBD0839C8273B474F979EF8E3AF17AFF
+              00C3CB1D3BC71A0E9505D6A72DB5EE7CD95E40CE9C9FBA42E07EB5852AA94E57
+              96E6F569B708D96C605BE8BE17B1F0C5D2F8826D42C7C46B1C8D0DA490BA8270
+              7CBCFC9C64FB8FC2AFF81F4DF02DE43A68D5351BA8F5C92E42A4081B696DFF00
+              273B08E78EFF00956B3F87EF7464D7B4DB2F056A1A88BA0F6F15F5E5CC7215C6
+              F5591079631F7B3D7B0E6A7F0AFF006E786F49B7B593E1D1BDB985CB8BB67457
+              E4923F809E3EB5729B71767F8AFEAC4C61692BAFC19BDF16D2C25D26D04B78C9
+              7B139686DD2ED203229E189DC0E718AF13B986386369A2564973F7C6A114A7F2
+              519AF6EF1E7DAAF7568ACADFC11FDAF388B30DE4E7F72B9EDD8673D8B0F5E95C
+              16BFF0E2E744F09DEEBBAA4B0A5E6F411DADA80238F2C0727E9FFEB351859C61
+              0516F72B130729B6BA1C9C1044A81C2306600B11AA42A4FE18CFE15EF5E1DD53
+              47D0FE1FA4F05DBDDDB58445A731C8277576F99972BC705BD801C938E6BCF13E
+              1B6A9A74165ABE956769ACDB5C5BA4925A5D001812A09C723F3041F635E89E02
+              76363750FF00C22B2682AB202C8C4ED95B1C91900F61CF4F7EB518B9C6714D6A
+              9178684A12699E3FE309B59D7FECDE27D42310DA5D4DE4D95B39E918E73DB83E
+              BDCE7B62B6FF00B2755FFA15BC1FFF008103FF008F5745F1A115B4ED12323E53
+              745703D302A5F10F803C23A0694DA87F615EDE2A32868E0B872C01E33D69AAEB
+              923D2F7B7F5742745A9CBADADFD6CCCFF8488F1F88FC491C90DBC0EA503476E7
+              31A9DCFC2F278FC4D5AF8AAD6A9E21F0735EECFB20BA733F99F77CBDF0EECFB6
+              334DF84F62D06ADAF5DC1A7DD59E9F2B20B7170A41C65B8E7AE38F5A97E27DBC
+              577E29F055B4E824866BD64743DD4BC208AC9B5F5BF97E86A97FB2FCFF0053CB
+              FC44F159DC6A7A5E9175F68D0C5E24D1303B955F636003F42C33DF6574DAEDD7
+              88E2D66FBC37AEF8A923B516FE63CD242364A300E000339EBF95697C4A8B4FB7
+              B583C29A16873C775E7A5DB7D9E0CAC8BB5D7B6493CFE950F89B42F1678C5FFB
+              726F0FC566F688A22B72DBA49D324E08CF38F4C0272473C0AE85514945CAC96B
+              BDAFD2CCE77071724B57A6D7B75BA3A9F05DCDE6B1F0D3EC9A5B496175023416
+              F7532655C8FE21FCBBE0FAE2974BD0AD7E1C785B51D5EEE65B9D48C45E6B824F
+              CCE7EEA0CF382D8F72793D80D7F04F8917C43A39C6992D83DA110C916CDB1861
+              D93E9E9DAB8CF1869BE3EF154CF60DA55B269D04EC6368E6551301F74B65F3D3
+              D875AE1579549424D455EECEC7654E338FBCED645CF00DC43E16F01CDAEEB571
+              2AC77B399064331C670381DC9C9EC0E454D73E108F5AD72C7C59E15D552CC4E4
+              493B28C861FC440F53C82A78CFBD569347F8917FA61D3657D1A0B331F92622A3
+              6ECC631C29E9F9D37E1826A9A16B9ABF862FA36648313091013186E3A1FF0068
+              107B74AB9E9CF56325CDDB7D098FD9A728BB77DB53BCF124F2DB785F569E1731
+              CD1594CF1BA9C10C10906BCB3C3B16A7ADE8D15F5C7C4692C2572C0DBC9202C3
+              071D4C83AFD2BD6F56B1FED3D1EF6C3CC317DAA07877E33B77295CE3F1AE3B4A
+              F84FE1DB4D3D21D42DFEDF72092D71E63C5B8678F955F0315CF42AC214DA93D6
+              FD93FCCDEBD29CE69C76F5B7E462783353D4350F0E78BA3BED466BDF222648DE
+              47DDC6C7E9EC702B6FE12FFC88D17FD7793F98AE7EEA2B6F86D6FAAE95B2F2F7
+              FB5A06313C508548B875DA7E624E322BA7F85D697167E09B75B8864899E57755
+              7182549EB5AE26CE9CA51D9B56FB8CF0F75523196E93BFDE765C7F934D3F87E7
+              4FE7DFF4A69CFBD7967A434FE1F9D1F97E74A73EF473EFFA5218DFCBF3A4FCBF
+              3A773EF4DE7DE9141F97E74DE3DBF3A773EFFA527E7F9D48C6FE5F9D071EDF9D
+              2FE749CFBD2189F97E74DFCBF3A7F3EFFA5379F7FCE90C4FCBF3A4FCBF3A5E7D
+              FF003A39F7FD2A46378F6FCE93F2FCE9DCFBFE74873EF48637F2FCE938F6FCE9
+              DCFBFE749CFBD218D3F87E747E5F9D29FC7F3A4E7DE9586378F6FCE93F2FCE9F
+              CFBFE949F9FE748637F2FCE93F2FCE9DF9FE749CFBFE752319F97E747E5F9D3B
+              F3FCE9BCFBFE749941F97E74D3F87E74EE7DFF003A439F7FCE90C6FE5F9D1F97
+              E74BF9FE7473EFF9D218DFCBF3A4E3DBF3A5E7DFF3A39F7FCEA6C31BF97E749F
+              97E74EE7DFF3A4E7DFF3A431BC7B7E749F97E74EE7DFF3A4E7DEA4627E5F9D34
+              FE1F9D3B9F7FCE90E7DFF3A431B9FA7FDF549F97FDF54EE7DFF3A4E7DFF3A450
+              D3F87FDF54871EDFF7D538E7DFF3A0E7FDAFCE90C6F1EDFF007D5271EDFF007D
+              52F3FED7E62979F7FCEA6C319C7B7FDF5471EDFF007D53B9FF006BF3A39FF6BF
+              3A40378F6FFBEA8E3DBFEFAA773FED7E7473FED7E7401E834AA391C719A4A703
+              9C0AFA4A7F11F2CC5A2948C5256ED5B4648514518A2D700A28A2900514514C05
+              A2928E6A9301D4527347355CC02D2714628C50EEFA009451494D2B005252D253
+              189494B49523034D34E358F75E21B2B3F11D9687379A2EAF2379216DBF21DBD4
+              67D7AF1FFD6C8937B0DB4B73568AE7DBC5F60750D4ECE0B6BDB9934EF2C4ED04
+              3BD77B9C041EA477EC077ADD67456552EA19BEE827934A516B70524F61D4959C
+              FAEE9A9AE2E8CD74A2FDA13388FF00D8CEDEBD3AF6EB547C31E2FD27C5B6B34F
+              A648F985B6C91CA36BAFA1C73C1A5C92B5EC3E757B1BD49599A36BF65AE43793
+              5AEF55B4BA92D65F306DC3A633F8722AF99E25DB99106F04AE5873F4A969A766
+              545A6AE87FF9E949FE7A534488C701D4923380DDAB2BC47E22B4F0CE982FAEE3
+              9E546956148EDD433B3374C0245249C9D90DB515766B1FF3C531D15D76BA0653
+              D8AE4563693E241AB5CBC2FA36AD6055776FBEB7F2D0F4180C0919A7F89BC436
+              FE19D127D4EE2379922280C719F9BE638EF4724B9B97A873C6DCDD0D6C003006
+              00ED8A3FCF4A0BAE09DC3038273D2B1F48F115AEAF7BA9DB468D13D85D1B662E
+              461DB1DBF5A9E56D5D14E493B3355E347C6F456C7232B9C53BFCF4A5AE66E7C7
+              3A2C178F6EAD7573E5B6C924B6B69258D1BD37283CFD33494652D904A518EECE
+              93FCF4A4FF003D2B1F4FF115AEA1AD6ABA6AA347269CD12BBC8400E5C1231F91
+              AD62E8ACA0B282DC004E09A4E2E3A32A324F542FF9E949FE7A5233A2B282EA0B
+              7405B934D7963465567505B800B6335050EFF3D293FCF4A52400492001CE49AE
+              517C79A7CFA8DBDB5A596A1750CD702D96F6187306FEFF003679C7D31DE9C612
+              96C8529C63BB3A9FF3D293FCF4A4DE858A0752C3A8CF22B33C41AFD9F86F4A6D
+              46F848D0AB2A62219624D4A8B93B22DC9455D9A9FE7A534FF9E2A3B9B986D2DE
+              4B8B8916386352CEC4F000A82C353B2D534F8AFAD2757B79143063C607BE7A54
+              59DAE3E657B16FFCF4A4FF003D2B234BD7EDF56D4B53B3863606C2458DDC9E1C
+              919E3F5AD7E3FC9A2517176638C9495D09FE7A521FF3C52F1FE4D34FE1F9D414
+              07FCF149FE7A507F0FCE8FCBF3A4313FCF4A3FCF4A3F2FCE93F2FCEA4A13FCF4
+              A3FCF4A5FCBF3A6F1EDF9D2189FE7A507FCF147E5F9D071EDF9D2189FE7EED26
+              3FCEDA5FCBF3A6FE5F9D2187F9FBB49FE7EED2FE5F9D27E5F9D48C4FF3F7693F
+              CFDDA5E3DBF3A4FCBF3A430C7F9DB498FF0038A3F2FCE938F6FCE90C423DBFF1
+              DA4C7B7FE3B4A7F0FCE8FCBF3A45098F6FFC7693F0FF00C768E3DBF3A4FCBF3A
+              900C7B7FE3B498F6FF00C7697F2FCE93F2FCE91427E1FF008ED263FCEDA3F2FC
+              E8FCBF3A4C618F6FFC7690FD3F4A5FCBF3A69FC3F3A43131EDFF008ED18F6FFC
+              768FCBF3A3F2FCEA46263DBFF1DA4FC3FF001DA5FCBF3A4E3DBF3A43131EDFF8
+              ED263DBFF1DA5FCBF3A4FCBF3A4C627E1FF8ED263FCEDA5E3DBF3A4FCBF3A918
+              63DBFF001DA423DBFF001DA5FCBF3A69FC3F3A45063DBF4A4C7B7FE3B467E9FF
+              007D527E5FF7D521811EDFF8ED211EDFF8ED07F0FF00BEA90E3DBFEFAA43131E
+              DFF8E518F6FF00C72978F6FF00BEA938F6FF00BEAA4618F6FF00C768C7B7FE3B
+              49C7B7FDF5471EDFF7D520171EDFF8ED18F6FF00C76938F6FF00BEA8E3DBFEFA
+              A00F4414EA6515F4719D8F961F453296B45310F18EF9A438ED4DA2AB9F4B0875
+              14945170168CD252D500B45252D5A0168A4A5AB00A28A434C04A28A4A0029296
+              92A4625252D252181AE33E2168DA85F69F61AA68D179BAB69572B3C09DDD78DC
+              BDBAF1C77C62BB234869C66E2EE8251E6566797DFF0083353B7F86F169F0C4D7
+              3ABDD5EC7777A430CB48CF96E7DB8FCB3583AA783F5DBBF185FDD6ABA65FDFAB
+              DD196DA4B378D43203F22F9ACD98C01E833EFD2BDB692B48E2248CDE1E2CF3A9
+              7C13693FC518AFA4D0E2FECE6D3FCE95B6E63FB579A4FE2718AC9F0D780B55B3
+              F0B586A7A7E74AF12DB99015947C93C65CFC920FE47E9EC47AD5266A7EB12B58
+              7EC237B9E2567E1BF12224536B1A0DC5DE9B2EA7737575A6C1301B9D953631E4
+              6E1B81C7B0F7E59A5781758BB3A3D96A7A44F0DA5B3DF79B99460064053A37F7
+              B03DF07B66BDC29B54F172E884B0D1EE78F783FC297FA4EABE0FD4D34AB8B791
+              E2B98F51CE415FBC10BE7A64638F6AEBFE23E9377AD6836569696F24EC750859
+              D63E084E727DBAF5AEC4D1594ABB94D4FB1A46825070EE79E78A7C056D6FE17B
+              A8FC376121BA32C5218CDC3B1902367037B1C77AE77C43A1F883C473F88EF61D
+              0EEEDFEDB15AA4314EC818EC75CF7F63F857B19A4CD10C4CA3E6C25868CBC8F1
+              ED7342F100D3FC4FA2C1A25D5C7F696A66F60B88D93CBD85C1C1E78E94FD6BC0
+              37F756FE2AD456C59F5196FC4BA795906EF2F7024AE0F048FC78AF5EA4A6B172
+              5B2FEB4FF207858BDDFF005AFF00995E592E4583C91401AE844596167C02F8FB
+              B9E7BFD6BC98685AA7D94C3A3F87B5DD2751624E63D4B65B44FDC8E4E47B771C
+              0AF5FCD06B1A759D3BD91AD4A4A76BB3C8F51F006A77ABE27BBBEB6173A83C36
+              E2CE60F81248A83CC60BEF8E33EA6AB6A1E17F106A0F7897FA2CF73A95D2DB9B
+              2BFF00B40D966A31B94F3C639F5C9E7DCFB1D266B458C9AE9FD69FE466F0907D
+              7FAD7FCCF18D5BC1FAEDD789EEE5D5ECAFB528DE406DE6B5318DEA3EEAEF63FB
+              BED9F9793939ABBAC786F53BAF1A0BE8342B995E49A2693EDAEAF0A85C72B2AB
+              065C7A739EE3B57AD5252FAE4B4D3A587F548F7327C53637BA9F86351B2D3E4D
+              97534251093807D47E2323F1AE7F46BBF107F665AE9367E1D3A62416C6292E2E
+              6750A8E1481B00C96F9B073D2BB5A4AE78D5B4796D73774AF2E6B9E55E1AF0CE
+              A916BBA35C49A4CF617564D2B6A57D24C1BED5BBA6393BB3FA56CFC408EF75FF
+              0007CB059E977C5D6F555A268C6F64527E75009C8E983FA57774956F14DCD4DA
+              D885864A0E17DCE3B51967F166957D6975E17BB8A1581E581EF0A06F3769D984
+              0490793CFE1DEB981E11BBB2D0FC3CFF00D84D736FCBEAB631B049257C7C85B9
+              E76E4F1D8FD4E3D633EC29A4FB0A51C5382B4568396194F593D4E2BE1F69373A
+              5FF6CB4BA649A7DBDC5D7996F048C09098FA9AED79F7FD28CFB0A4CFB0AC2AD4
+              7525CCCDA9D354E2A285E7DFF4A69CFBD19F61484FB0ACEE68073EF473EFFA53
+              73EC28CFB0A9B942F3EF4DE7DE973EC29BF80A5718BCFBFE949F9FE74669BF80
+              A9B8C5FCE939F7A33EC2909F6145C62F3EFF00A5379F7FCE93F01467D854DC61
+              CFBFE7473EFF00A5267D85267D852B8EC2F3EFF9D21CFBD27E1484FB0A9B8EC2
+              F3EFF9D273EF499F61467D852B9407F1FCE939F7A696F61F9526EF61F952B8EC
+              3F9F7FD293F3FCE99BBD87E5416F61F952B8EC3BF3FCE939F7FCE9BBBD853777
+              B0FCA95C761FF9FE74DE7DFF003A4DDEC3F2A6EEF61F952B8EC3F9F7FCE90E7D
+              FF003A6EEF61485BD87E55371D877E7F9D1CFBFE74CDDEC3F2A4DDEC3F2A571D
+              8773EFF9D1CFBFE74CDDEC3F2A377B0FCA95CAB0EE7DFF003A4E7DFF003A66EF
+              61F95216F615371D87F3EFF9D273EF4CDDEC29377B0FCA95C761FCFBFE74873E
+              FF009D3777B0FCA90B7B0A9B8EC3B9F7FCE939F7FCE9BBBD87E549BBD87E545C
+              761C73EFF9D073FED7E74C2DEC3F2A42DECBF954DC761DCFFB5F98A5E7DFF3A8
+              F77FB2BF95216F61F952B8EC49CFFB5F9D1CFF00B5F9D47BBFD95FCA8DDFECAF
+              E54AE1624E7FDAFCE8E7FDAFCEA3DDFECAFE546EFF00657F2A2E163FFFD9}
+          end
+        end
+        object TntPanel2: TTntPanel
+          Left = 0
+          Top = 64
+          Width = 785
+          Height = 401
+          Caption = 'TntPanel2'
+          TabOrder = 1
+          object TntPageControl1: TTntPageControl
+            Left = 0
+            Top = 0
+            Width = 785
+            Height = 401
+            ActivePage = TntTabSheet8
+            TabOrder = 0
+            TabPosition = tpBottom
+            object TntTabSheet7: TTntTabSheet
+              Caption = 'syshrd'
+              object TntGroupBox1: TTntGroupBox
+                Left = 128
+                Top = 8
+                Width = 505
+                Height = 249
+                Caption = 'maint._area'
+                Color = clBtnFace
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clMaroon
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentColor = False
+                ParentFont = False
+                TabOrder = 0
+                object Formhrd07: TTntStaticText
+                  Left = 16
+                  Top = 184
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd07'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formhrd12: TTntStaticText
+                  Left = 144
+                  Top = 184
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd12'
+                  TabOrder = 1
+                  OnDblClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormHrd10: TTntStaticText
+                  Left = 264
+                  Top = 184
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd10'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formhrd11: TTntStaticText
+                  Left = 392
+                  Top = 184
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd11'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formhrd17: TTntStaticText
+                  Left = 208
+                  Top = 40
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd17'
+                  TabOrder = 4
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel3: TTntPanel
+                  Left = 64
+                  Top = 143
+                  Width = 373
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 5
+                end
+                object TntPanel4: TTntPanel
+                  Left = 63
+                  Top = 143
+                  Width = 1
+                  Height = 42
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 6
+                end
+                object TntPanel5: TTntPanel
+                  Left = 190
+                  Top = 143
+                  Width = 1
+                  Height = 42
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 7
+                end
+                object TntPanel6: TTntPanel
+                  Left = 311
+                  Top = 143
+                  Width = 1
+                  Height = 42
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 8
+                end
+                object TntPanel7: TTntPanel
+                  Left = 437
+                  Top = 143
+                  Width = 1
+                  Height = 42
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 9
+                end
+                object TntPanel8: TTntPanel
+                  Left = 252
+                  Top = 81
+                  Width = 1
+                  Height = 63
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 10
+                end
+              end
+              object TntGroupBox2: TTntGroupBox
+                Left = 128
+                Top = 264
+                Width = 505
+                Height = 89
+                Caption = 'reports_area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 1
+                object Formhrd14: TTntStaticText
+                  Left = 168
+                  Top = 24
+                  Width = 120
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd14'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormHrd13: TTntStaticText
+                  Left = 32
+                  Top = 24
+                  Width = 120
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_hrd13'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+              end
+            end
+            object TntTabSheet8: TTntTabSheet
+              Caption = 'sysdut'
+              object TntGroupBox3: TTntGroupBox
+                Left = 112
+                Top = 16
+                Width = 530
+                Height = 249
+                Caption = 'maint._area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clPurple
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                object FormDut05: TTntStaticText
+                  Left = 132
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut05'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut10: TTntStaticText
+                  Left = 268
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut10'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut06: TTntStaticText
+                  Left = 408
+                  Top = 182
+                  Width = 88
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut06'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut08: TTntStaticText
+                  Left = 128
+                  Top = 101
+                  Width = 95
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut08'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel9: TTntPanel
+                  Left = 60
+                  Top = 158
+                  Width = 391
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 4
+                end
+                object TntPanel10: TTntPanel
+                  Left = 59
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 5
+                end
+                object TntPanel11: TTntPanel
+                  Left = 176
+                  Top = 159
+                  Width = 1
+                  Height = 25
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 6
+                end
+                object TntPanel12: TTntPanel
+                  Left = 312
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 7
+                end
+                object TntPanel13: TTntPanel
+                  Left = 451
+                  Top = 158
+                  Width = 1
+                  Height = 24
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 8
+                end
+                object TntPanel14: TTntPanel
+                  Left = 176
+                  Top = 137
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 9
+                end
+                object FormDut01: TTntStaticText
+                  Left = 16
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut01'
+                  TabOrder = 10
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut03: TTntStaticText
+                  Left = 137
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut03'
+                  TabOrder = 11
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut02: TTntStaticText
+                  Left = 263
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut02'
+                  TabOrder = 12
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut04: TTntStaticText
+                  Left = 400
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut04'
+                  TabOrder = 13
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut07: TTntStaticText
+                  Left = 15
+                  Top = 187
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut07'
+                  TabOrder = 14
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel15: TTntPanel
+                  Left = 56
+                  Top = 79
+                  Width = 396
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 15
+                end
+                object TntPanel16: TTntPanel
+                  Left = 178
+                  Top = 80
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 16
+                end
+                object TntPanel17: TTntPanel
+                  Left = 56
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 17
+                end
+                object TntPanel18: TTntPanel
+                  Left = 451
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 18
+                end
+                object TntPanel19: TTntPanel
+                  Left = 308
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 19
+                end
+                object TntPanel20: TTntPanel
+                  Left = 178
+                  Top = 58
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 20
+                end
+                object TntPanel21: TTntPanel
+                  Left = 224
+                  Top = 116
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 21
+                end
+                object FormDut13: TTntStaticText
+                  Left = 254
+                  Top = 101
+                  Width = 91
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut13'
+                  TabOrder = 22
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut20: TTntStaticText
+                  Left = 375
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut20'
+                  TabOrder = 23
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel22: TTntPanel
+                  Left = 343
+                  Top = 118
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 24
+                  Visible = False
+                end
+              end
+              object TntGroupBox4: TTntGroupBox
+                Left = 112
+                Top = 268
+                Width = 530
+                Height = 89
+                Caption = 'reports_area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 1
+                object FormDut16: TTntStaticText
+                  Left = 144
+                  Top = 24
+                  Width = 120
+                  Height = 18
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut16'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut12: TTntStaticText
+                  Left = 8
+                  Top = 24
+                  Width = 129
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut11'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut21: TTntStaticText
+                  Left = 8
+                  Top = 56
+                  Width = 129
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut21'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut18: TTntStaticText
+                  Left = 144
+                  Top = 56
+                  Width = 120
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut18'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut19: TTntStaticText
+                  Left = 400
+                  Top = 24
+                  Width = 120
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BiDiMode = bdLeftToRight
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut19'
+                  ParentBiDiMode = False
+                  TabOrder = 4
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut17: TTntStaticText
+                  Left = 272
+                  Top = 24
+                  Width = 120
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut17'
+                  TabOrder = 5
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormDut14: TTntStaticText
+                  Left = 272
+                  Top = 56
+                  Width = 120
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_dut14'
+                  TabOrder = 6
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText26: TTntStaticText
+                  Left = 401
+                  Top = 57
+                  Width = 120
+                  Height = 17
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_other'
+                  TabOrder = 7
+                end
+              end
+            end
+            object TntTabSheet9: TTntTabSheet
+              Caption = 'syssal'
+              object TntGroupBox5: TTntGroupBox
+                Left = 124
+                Top = 12
+                Width = 506
+                Height = 249
+                Caption = 'maint._area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clPurple
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                object FormSal01: TTntStaticText
+                  Left = 19
+                  Top = 168
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal01'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal04: TTntStaticText
+                  Left = 144
+                  Top = 168
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal04'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal06: TTntStaticText
+                  Left = 266
+                  Top = 169
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal06'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal03: TTntStaticText
+                  Left = 394
+                  Top = 170
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal03'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal08: TTntStaticText
+                  Left = 146
+                  Top = 55
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal08'
+                  TabOrder = 4
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel23: TTntPanel
+                  Left = 65
+                  Top = 129
+                  Width = 373
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 5
+                  object TntPanel24: TTntPanel
+                    Left = 0
+                    Top = 0
+                    Width = 373
+                    Height = 1
+                    BevelOuter = bvNone
+                    Caption = 'TntPanel1'
+                    Color = clBlack
+                    TabOrder = 0
+                  end
+                end
+                object TntPanel25: TTntPanel
+                  Left = 64
+                  Top = 130
+                  Width = 1
+                  Height = 37
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 6
+                end
+                object TntPanel26: TTntPanel
+                  Left = 190
+                  Top = 128
+                  Width = 1
+                  Height = 41
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 7
+                end
+                object TntPanel27: TTntPanel
+                  Left = 311
+                  Top = 130
+                  Width = 1
+                  Height = 40
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 8
+                end
+                object TntPanel28: TTntPanel
+                  Left = 438
+                  Top = 130
+                  Width = 1
+                  Height = 40
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 9
+                end
+                object TntPanel29: TTntPanel
+                  Left = 190
+                  Top = 95
+                  Width = 1
+                  Height = 33
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 10
+                end
+                object TntPanel30: TTntPanel
+                  Left = 235
+                  Top = 73
+                  Width = 60
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 11
+                end
+                object FormSal09: TTntStaticText
+                  Left = 296
+                  Top = 53
+                  Width = 89
+                  Height = 41
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal09'
+                  TabOrder = 12
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+              end
+              object TntGroupBox6: TTntGroupBox
+                Left = 126
+                Top = 260
+                Width = 502
+                Height = 86
+                Caption = 'reports_area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 1
+                object FormSal10: TTntStaticText
+                  Left = 64
+                  Top = 27
+                  Width = 120
+                  Height = 38
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal10'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal11: TTntStaticText
+                  Left = 192
+                  Top = 27
+                  Width = 120
+                  Height = 38
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal11'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object FormSal12: TTntStaticText
+                  Left = 320
+                  Top = 27
+                  Width = 120
+                  Height = 38
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_sal12'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+              end
+            end
+            object TntTabSheet12: TTntTabSheet
+              Caption = 'sysmed'
+              object TntGroupBox7: TTntGroupBox
+                Left = 112
+                Top = 10
+                Width = 505
+                Height = 249
+                Caption = 'maint._area'
+                Color = clBtnFace
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clPurple
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentColor = False
+                ParentFont = False
+                TabOrder = 0
+                object Formmed08: TTntStaticText
+                  Left = 132
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med08'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText37: TTntStaticText
+                  Left = 268
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = '                                     '#24235#23384#26376#32080
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText38: TTntStaticText
+                  Left = 408
+                  Top = 182
+                  Width = 88
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = '                                     '#20854#20182#32173#35703
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText39: TTntStaticText
+                  Left = 134
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = '                                     '#34277#21697#29376#27841
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel31: TTntPanel
+                  Left = 60
+                  Top = 158
+                  Width = 391
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 4
+                end
+                object TntPanel32: TTntPanel
+                  Left = 59
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 5
+                end
+                object TntPanel33: TTntPanel
+                  Left = 176
+                  Top = 159
+                  Width = 1
+                  Height = 25
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 6
+                end
+                object TntPanel34: TTntPanel
+                  Left = 312
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 7
+                end
+                object TntPanel35: TTntPanel
+                  Left = 451
+                  Top = 158
+                  Width = 1
+                  Height = 24
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 8
+                end
+                object TntPanel36: TTntPanel
+                  Left = 176
+                  Top = 137
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 9
+                end
+                object Formmed01: TTntStaticText
+                  Left = 16
+                  Top = 24
+                  Width = 97
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med01'
+                  TabOrder = 10
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed02: TTntStaticText
+                  Left = 137
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med02'
+                  TabOrder = 11
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed05: TTntStaticText
+                  Left = 263
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med05'
+                  TabOrder = 12
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed06: TTntStaticText
+                  Left = 400
+                  Top = 24
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med06'
+                  TabOrder = 13
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed04: TTntStaticText
+                  Left = 15
+                  Top = 187
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med04'
+                  TabOrder = 14
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel37: TTntPanel
+                  Left = 56
+                  Top = 79
+                  Width = 396
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 15
+                end
+                object TntPanel38: TTntPanel
+                  Left = 178
+                  Top = 80
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 16
+                end
+                object TntPanel39: TTntPanel
+                  Left = 56
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 17
+                end
+                object TntPanel40: TTntPanel
+                  Left = 451
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 18
+                end
+                object TntPanel41: TTntPanel
+                  Left = 308
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 19
+                end
+                object TntPanel42: TTntPanel
+                  Left = 178
+                  Top = 58
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 20
+                end
+                object TntPanel43: TTntPanel
+                  Left = 224
+                  Top = 116
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 21
+                end
+                object TntStaticText45: TTntStaticText
+                  Left = 254
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = '                                     '#35386#26039#38283#26041
+                  TabOrder = 22
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText46: TTntStaticText
+                  Left = 375
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = '                                     '#38936#34277#30331#35352
+                  TabOrder = 23
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel44: TTntPanel
+                  Left = 343
+                  Top = 118
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 24
+                end
+              end
+              object TntGroupBox8: TTntGroupBox
+                Left = 112
+                Top = 268
+                Width = 505
+                Height = 89
+                Caption = 'reports_area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 1
+                object Formmed09: TTntStaticText
+                  Left = 144
+                  Top = 24
+                  Width = 111
+                  Height = 18
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med09'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed07: TTntStaticText
+                  Left = 8
+                  Top = 24
+                  Width = 113
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med07'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed12: TTntStaticText
+                  Left = 8
+                  Top = 56
+                  Width = 113
+                  Height = 17
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med12'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed15: TTntStaticText
+                  Left = 384
+                  Top = 24
+                  Width = 113
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med15'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object Formmed13: TTntStaticText
+                  Left = 264
+                  Top = 24
+                  Width = 113
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_med13'
+                  TabOrder = 4
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText52: TTntStaticText
+                  Left = 145
+                  Top = 57
+                  Width = 113
+                  Height = 17
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_other'
+                  TabOrder = 5
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+              end
+            end
+            object TntTabSheet13: TTntTabSheet
+              Caption = 'sysfhrd'
+              object TntGroupBox9: TTntGroupBox
+                Left = 88
+                Top = 10
+                Width = 561
+                Height = 249
+                Caption = 'maint._area'
+                Color = clBtnFace
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clPurple
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentColor = False
+                ParentFont = False
+                TabOrder = 0
+                object formfhrd105: TTntStaticText
+                  Left = 132
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd105'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd304: TTntStaticText
+                  Left = 268
+                  Top = 185
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd304'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd301: TTntStaticText
+                  Left = 408
+                  Top = 182
+                  Width = 88
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd301'
+                  TabOrder = 2
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd102: TTntStaticText
+                  Left = 120
+                  Top = 101
+                  Width = 105
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd102'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel45: TTntPanel
+                  Left = 176
+                  Top = 158
+                  Width = 137
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 4
+                end
+                object TntPanel47: TTntPanel
+                  Left = 176
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 5
+                end
+                object TntPanel48: TTntPanel
+                  Left = 312
+                  Top = 159
+                  Width = 1
+                  Height = 26
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 6
+                end
+                object TntPanel49: TTntPanel
+                  Left = 451
+                  Top = 158
+                  Width = 1
+                  Height = 24
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 7
+                  Visible = False
+                end
+                object TntPanel50: TTntPanel
+                  Left = 176
+                  Top = 137
+                  Width = 1
+                  Height = 21
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 8
+                end
+                object formfhrd103: TTntStaticText
+                  Left = 16
+                  Top = 24
+                  Width = 97
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd103'
+                  TabOrder = 9
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd104: TTntStaticText
+                  Left = 136
+                  Top = 24
+                  Width = 97
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd104'
+                  TabOrder = 10
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd302: TTntStaticText
+                  Left = 263
+                  Top = 24
+                  Width = 98
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd302'
+                  TabOrder = 11
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd303: TTntStaticText
+                  Left = 400
+                  Top = 24
+                  Width = 97
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd303'
+                  TabOrder = 12
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd101: TTntStaticText
+                  Left = 15
+                  Top = 187
+                  Width = 89
+                  Height = 35
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd101'
+                  TabOrder = 13
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel51: TTntPanel
+                  Left = 56
+                  Top = 79
+                  Width = 396
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 14
+                  Visible = False
+                end
+                object TntPanel52: TTntPanel
+                  Left = 178
+                  Top = 80
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 15
+                  Visible = False
+                end
+                object TntPanel53: TTntPanel
+                  Left = 56
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 16
+                  Visible = False
+                end
+                object TntPanel54: TTntPanel
+                  Left = 451
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 17
+                  Visible = False
+                end
+                object TntPanel55: TTntPanel
+                  Left = 308
+                  Top = 59
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 18
+                  Visible = False
+                end
+                object TntPanel56: TTntPanel
+                  Left = 178
+                  Top = 58
+                  Width = 1
+                  Height = 20
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel2'
+                  Color = clBlack
+                  TabOrder = 19
+                  Visible = False
+                end
+                object TntPanel57: TTntPanel
+                  Left = 224
+                  Top = 116
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 20
+                end
+                object formfhrd201: TTntStaticText
+                  Left = 254
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd201'
+                  TabOrder = 21
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd203: TTntStaticText
+                  Left = 375
+                  Top = 101
+                  Width = 89
+                  Height = 36
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd203'
+                  TabOrder = 22
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntPanel58: TTntPanel
+                  Left = 343
+                  Top = 118
+                  Width = 30
+                  Height = 1
+                  BevelOuter = bvNone
+                  Caption = 'TntPanel1'
+                  Color = clBlack
+                  TabOrder = 23
+                end
+              end
+              object TntGroupBox10: TTntGroupBox
+                Left = 88
+                Top = 268
+                Width = 561
+                Height = 89
+                Caption = 'reports_area'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'MS Sans Serif'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 1
+                object formfhrd306: TTntStaticText
+                  Left = 144
+                  Top = 24
+                  Width = 130
+                  Height = 18
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd306'
+                  TabOrder = 0
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd401: TTntStaticText
+                  Left = 8
+                  Top = 24
+                  Width = 130
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd401'
+                  TabOrder = 1
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd305: TTntStaticText
+                  Left = 416
+                  Top = 24
+                  Width = 130
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd305'
+                  TabOrder = 2
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd307: TTntStaticText
+                  Left = 280
+                  Top = 24
+                  Width = 130
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd307'
+                  TabOrder = 3
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object formfhrd402: TTntStaticText
+                  Left = 280
+                  Top = 56
+                  Width = 130
+                  Height = 17
+                  Cursor = crHandPoint
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_fhrd402'
+                  TabOrder = 4
+                  Visible = False
+                  OnClick = showSubForm
+                  OnMouseMove = TitleMouseMove
+                end
+                object TntStaticText19: TTntStaticText
+                  Left = 145
+                  Top = 57
+                  Width = 130
+                  Height = 17
+                  Alignment = taCenter
+                  AutoSize = False
+                  BorderStyle = sbsSingle
+                  Caption = 'btn_other'
+                  TabOrder = 5
+                  Visible = False
+                end
+              end
+            end
+            object TntTabSheet1: TTntTabSheet
+              Caption = #32318#25928#32771#35413
+              object BtnJixiao: TTntBitBtn
+                Left = 272
+                Top = 136
+                Width = 233
+                Height = 57
+                Caption = #36914#20837#32318#25928#32771#35413
+                TabOrder = 0
+                OnClick = BtnJixiaoClick
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  object PanelTopIcon: TPanel
+    Left = 725
+    Top = 4
+    Width = 30
+    Height = 15
+    BevelOuter = bvNone
+    TabOrder = 1
+    Visible = False
+    object ImageMin: TImage
+      Left = 0
+      Top = 0
+      Width = 15
+      Height = 15
+      Align = alLeft
+      Picture.Data = {
+        07544269746D617026050000424D260500000000000036040000280000000F00
+        00000F0000000100080000000000F0000000C40E0000C40E0000000100000000
+        0000F4C28000F98C6300EC783300F99A7400FFE7D000F9771A00FFFFF300F385
+        5200FB7B4D00F5794600F46D3300F77F5400F57D4B00FFFAE400F58D5E00BB47
+        0E00F9825900E96E3900F2744400F3DACA00E4580600F36C2A00FAA68900C14A
+        1700E35E2100FFFEF900FB825300FFFEFE00C3490B00F3571600FD6D0B00EB6B
+        2D00EF743800F97B4200F36D2000F4723C00F2FFFE00FA6B3200EA742400EE9C
+        7800F6804B00EF855400F6FEFD00F76D1C00BA4E2800E85D1800DD521A00FC94
+        6C00EA936100D95D2700F65D0500F6FFF800FBFFFF00FC875B00FC743D00F4BE
+        9500FEBC9400FA743500F56B1200C0421200FC9C8000E8612D00D8510000E961
+        2700FFFCFF00EF803E00FDFFFF00F2916B00FC811F00FE792400EE6A2500FC91
+        6600FC754500C83D0200FA6D3B00F2652A00DB470200F4601C00FFF8FF00F165
+        2400FCB28C00F6732400FA691E00FFFFFB00F8FFFC00F07A3B00F5630F00EC6E
+        1B00FC672500F0722C00F8FFFF00F1683200FBFFF900BC3F0300FAFDFF00FB63
+        2B00F0711900F6AE9100FEB49800FEC09B00FFF3F300EE764200E0624000F297
+        6900FF6C2F00FBFFFC00F2885C00FC9C7000F2772F00F3895400F57A6000F26A
+        4800FAA67600F44F1000BC622B00AF501F00F4B89A00FD7B3600D85F1C00D863
+        2000FA633000F4653800FDFFFC00FEFDFF00FBF9FF00FD691500F8651D00F473
+        4C00000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00002F131304131313041313131313137500042C5D49493E4949493E4949493E
+        1300137172781E1E713E1E781E1E1E4904001371786E631637162F78781E3E49
+        1300137172161B1B1B1B63441E781E491300131E2F16241313133778721E7549
+        040004716E7578667578781E44781E49130024782F307875787878781E721E49
+        130004756E756E756E7244727278783E130013782F6E3078757878781E1E7249
+        13000441162F2F6E6E417878727878711300132F002F756E4178756E7875782C
+        13001B2F1616272F2F6E2F2F7566783E1300132F302F786E75417878781E7172
+        1300410413040413041304131B1313133000}
+      Stretch = True
+      OnClick = ImageMinClick
+    end
+    object ImageClose: TImage
+      Left = 15
+      Top = 0
+      Width = 15
+      Height = 455
+      Picture.Data = {
+        07544269746D617026050000424D260500000000000036040000280000000F00
+        00000F0000000100080000000000F0000000C40E0000C40E0000000100000000
+        00005464E500FCC48E001943DA00CDD2F300FFFFF9003758DB00224CE6002E4B
+        BC00F9FFFF004764DC00475CE5001938B0001B53E5001547E900FFFAFF006983
+        E9001C38A800F8BB90000445DF007685F100758CEC00FCF6EC000237D9000A3D
+        E3003B61E400909BEE004B6AEC005B76EA000429AC00FAFEF500F7FDFE00FEFC
+        FF00617FE300384EE3004D6BE5000625B500586AEF002B45CF007B94E8005370
+        E100F2FEFF006979F300FFFEF6004D70E700FBFFFB005F7CE5003C5AE300103D
+        D500F1FAFF004165E7000C46E4005971E7003464E400556BDB00152DB2002450
+        DB002B53E5006A7BED00042AD700FFFDFF003455E1006474E2006174EC002E5C
+        DC00345CEC00F2FFFA001C49CF005374EA004363EC00ADB8F100234BD6002B52
+        DC005E82E600547BE1005C79E7003D69E2002646DC0096AAF2002B4BD6003B55
+        EB002D59E500F7FFFA001D4DDF00244FE3004866E6003762EB00FFFBFB008DA2
+        EE000531A5003659E400FFFFFC00FDFFFC001132A0003361DE007F97F10090AB
+        E300FFF8F0002859D9000C41CE00284EEB00F3F3FF002055ED003B5FE700235C
+        EE000B51DE003E5CDF003960F200E7DEFF00FCFFFF002A63E4001D4DF2009CB1
+        FF00456ADF00FBFBFB005C75F5004E62EB00456DEB002F4BCE00FFFCFC00F8FF
+        F700EAFFFF000526C900193AC6005075DE00294BDA002144D2006974ED00FFFF
+        FF00000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000150303150303031503030303031515001525165816165879165879167958
+        03006F165D635D5D255D251716161679030003165D7257256A6A671719681679
+        030003166A457F195D5D256F7F1916580300035D6A256F7F6F256F7F14166779
+        030078257235256F7F6F7F0316631616150003356A74355D037F6F175D675D79
+        0300786A7220636F7F6F7F6F162563100300036A20726F7F5F256F7F5F256716
+        0300155D72197F19636A635F7F14251003006B145F19036A5D356A6319352516
+        78007820191414203572356A356A6A580300155F14355D735D6A635D635D2516
+        1500150303157803036B0303780303151500}
+      OnClick = NPCloseClick
+    end
+  end
+  object Panel4: TPanel
+    Left = 0
+    Top = 510
+    Width = 800
+    Height = 21
+    Align = alBottom
+    BevelOuter = bvNone
+    Caption = 'Panel4'
+    TabOrder = 2
+    object StatusBar1: TTntStatusBar
+      Left = 0
+      Top = 0
+      Width = 600
+      Height = 21
+      Align = alClient
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -12
+      Font.Name = '????'
+      Font.Style = []
+      Panels = <>
+      UseSystemFont = False
+    end
+    object StatusBar2: TTntStatusBar
+      Left = 600
+      Top = 0
+      Width = 200
+      Height = 21
+      Align = alRight
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -12
+      Font.Name = '????'
+      Font.Style = []
+      Panels = <
+        item
+          Width = 100
+        end
+        item
+          Width = 100
+        end>
+      UseSystemFont = False
+    end
+    object ProgressBar1: TProgressBar
+      Left = 395
+      Top = 2
+      Width = 200
+      Height = 19
+      Step = 1
+      TabOrder = 2
+    end
+  end
+  object MainMenu1: TTntMainMenu
+    BiDiMode = bdLeftToRight
+    OwnerDraw = True
+    ParentBiDiMode = False
+    Left = 452
+    Top = 12
+    object N1: TTntMenuItem
+      Caption = #31995#32113#33756#21934
+      object N2: TTntMenuItem
+        Caption = #20027#30059#38754
+        OnClick = N2Click
+      end
+      object N3: TTntMenuItem
+        Caption = #36864#20986
+        OnClick = N3Click
+      end
+    end
+  end
+  object PopupMenu1: TTntPopupMenu
+    Left = 490
+    Top = 13
+    object NPClose: TTntMenuItem
+      Caption = #38364#38281
+      OnClick = NPCloseClick
+    end
+  end
+  object PopupMenuNil: TTntPopupMenu
+    Left = 525
+    Top = 13
+  end
+end

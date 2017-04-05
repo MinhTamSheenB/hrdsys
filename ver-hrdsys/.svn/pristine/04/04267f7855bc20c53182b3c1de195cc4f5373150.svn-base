@@ -1,0 +1,515 @@
+{*************************************************************************
+Namedut19
+Author: Leo
+Create date:2005-11-16
+Modify date:2005-11-??
+Commentate:
+*************************************************************************}
+unit UnitDut19;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,DateUtils,
+  TntComCtrls,WSDLIntf,QRPrntr, DB, ADODB,TntDialogs,strutils, TntDB,Qt, QuickRpt,
+  DBClient,QRCtrls,QRExport,math;
+
+type
+  TFormDut19 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    DataSource1: TDataSource;
+    ADOQuery1: TADOQuery;
+    TntGroupBox1: TTntGroupBox;
+    CobDeptBegin: TTntComboBox;
+    CobDeptEnd: TTntComboBox;
+    TntDBGrid1: TTntDBGrid;
+    bb_reset: TTntBitBtn;
+    bb_ok: TTntBitBtn;
+    Btn_Print: TTntBitBtn;
+    PrintDialog1: TPrintDialog;
+    EditEmpBegin: TTntEdit;
+    EditEmpEnd: TTntEdit;
+    TntLabel3: TTntLabel;
+    TntCheckBox1: TTntCheckBox;
+    TntCheckBox2: TTntCheckBox;
+    TntGroupBox2: TTntGroupBox;
+    TntEdit1: TTntEdit;
+    TntEdit2: TTntEdit;
+    qry_pub: TADOQuery;
+    TntLabel1: TTntLabel;
+    TntLabel2: TTntLabel;
+    TntLabel4: TTntLabel;
+    TntLabel5: TTntLabel;
+    TntEdit3: TTntEdit;
+    TntLabel6: TTntLabel;
+    TntEdit4: TTntEdit;
+    TntLabel7: TTntLabel;
+    TntLabel8: TTntLabel;
+    TntEdit5: TTntEdit;
+    TntLabel9: TTntLabel;
+    TntEdit6: TTntEdit;
+    TntLabel10: TTntLabel;
+    TntLabel11: TTntLabel;
+    TntEdit7: TTntEdit;
+    TntLabel12: TTntLabel;
+    TntEdit8: TTntEdit;
+    TntLabel13: TTntLabel;
+    TntLabel14: TTntLabel;
+    TntEdit9: TTntEdit;
+    TntLabel15: TTntLabel;
+    TntEdit10: TTntEdit;
+    TntLabel16: TTntLabel;
+    TntLabel17: TTntLabel;
+    TntEdit11: TTntEdit;
+    TntLabel18: TTntLabel;
+    TntEdit12: TTntEdit;
+    TntLabel19: TTntLabel;
+    TntCheckBox3: TTntCheckBox;
+    dtpBegin: TTntDateTimePicker;
+    dtpEnd: TTntDateTimePicker;
+    ADOQuery1emp_id: TStringField;
+    ADOQuery1clas_code: TStringField;
+    ADOQuery1s_ask_d: TDateTimeField;
+    ADOQuery1s_ask_h: TStringField;
+    ADOQuery1s_ask_t: TStringField;
+    ADOQuery1e_ask_d: TDateTimeField;
+    ADOQuery1e_ask_h: TStringField;
+    ADOQuery1e_ask_t: TStringField;
+    ADOQuery1emp_chs: TWideStringField;
+    ADOQuery1dept_code: TStringField;
+    ADOQuery1abbr_titl: TWideStringField;
+    ADOQuery1addup: TFloatField;
+    ADOQuery1s_datetime: TStringField;
+    ADOQuery1e_datetime: TStringField;
+    TntCheckBox4: TTntCheckBox;
+    CobClasBegin: TTntComboBox;
+    ADOQuery1clas_name: TWideStringField;
+    ADOQuery1upd_user: TStringField;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    procedure GetData(SqlStr:widestring);
+    Procedure DealAEmpId(EmpID:string);
+    function GetAddUp(sDate,eDate:Tdate;sHour,eHour,sMinute,eMinute:double;AEmpId:string):double;
+    procedure GetSum;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure bb_okClick(Sender: TObject);
+    procedure bb_resetClick(Sender: TObject);
+    procedure CobDeptBeginChange(Sender: TObject);
+    procedure EditEmpBeginDblClick(Sender: TObject);
+    procedure TntCheckBox1Click(Sender: TObject);
+    procedure TntDBGrid1TitleClick(Column: TColumn);
+    procedure ADOQuery1CalcFields(DataSet: TDataSet);
+    procedure Btn_PrintClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure ADOQuery1AfterScroll(DataSet: TDataSet);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormDut19: TFormDut19;
+  matNum,affNum,wedNum,funNum,injNum,allNum:integer;
+  matDays,affDays,wedDays,funDays,injDays,allDays:Double;
+  InDate,LvDate:TDate;
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys;
+var
+  Langstr:TWideStrings;//粂ē才﹃
+  pri_arr:TPrvArr;//舦计舱
+{$R *.dfm}
+
+procedure TFormDut19.InitLang;
+{*************************************************************************
+TO DO:﹍て粂ē
+*************************************************************************}
+var
+  keys:String;
+begin
+  keys:='dut08_error2,just_doing_empid,Complete_data,current_location,msg_date_e_great_b,dut19_printitl';
+  LangStr:=GetLangWideStrs(keys);
+  SetComponentLang(self);
+end;                        
+
+procedure TFormDut19.InitForm;
+{*************************************************************************
+TO DO:﹍てForm
+*************************************************************************}
+var
+  sql_str,fld_name:string;
+begin
+  if userLang='E' then
+    fld_name:='dept_code+'' ''+eng_abbr'
+  else if userLang='V' then
+    fld_name:='dept_code+'' ''+vim_abbr'
+  else
+    fld_name:='dept_code+'' ''+abbr_titl';
+  sql_str:='select '+fld_name+' as dept_name,dept_code from hrd_dept';
+  GetDeptRange(cobdeptbegin);
+  GetDeptRange(cobdeptend);
+  //SetComboxList(sql_str,CobDeptBegin);
+  //SetComboxList(sql_str,CobDeptEnd);
+  CobDeptBegin.ItemIndex:=0;
+  CobDeptEnd.ItemIndex:=CobDeptEnd.Items.Count-1;
+  sql_str:='select clas_code+''-''+clas_chs,clas_code from hrd_dut_class where clas_code>=''08'' and clas_code<=''25''';
+  SetComboxList(sql_str,CobClasBegin);
+  dtpBegin.Date:=encodedate(YearOf(GetServerDatetime),1,1);
+  dtpEnd.Date:= DateOf(GetServerDatetime);
+end;
+
+procedure TFormDut19.FormCreate(Sender: TObject);
+begin
+  pri_arr:=GetPrvArr(UserName,'dut19');
+  InitLang;// Init language
+  InitForm;// Init Form
+end;
+
+
+procedure TFormDut19.bb_okClick(Sender: TObject);
+var
+  SqlStr:wideString;
+begin
+  if TntCheckBox1.Checked and (EditEmpEnd.Text<>'') and (EditEmpBegin.Text>EditEmpEnd.Text) then
+  begin
+    wideshowmessage(GetLangName(LangStr,'dut08_error2'));
+    exit; 
+  end;
+  if TntCheckBox3.Checked and (dtpBegin.date>dtpEnd.Date) then
+  begin
+    wideshowmessage(GetLangName(LangStr,'msg_date_e_great_b'));
+    exit;
+  end;
+  
+  bb_ok.Enabled:=false;
+
+  SqlStr:='select a.*,b.emp_chs,b.dept_code,c.abbr_titl'+
+     ' from hrd_dut_ask a,hrd_emp b,hrd_dept c '+
+     'where a.emp_id=b.emp_id and b.dept_code=c.dept_code ';
+  if TntCheckBox1.Checked then
+  begin
+    if Trim(EditEmpBegin.Text)<>'' then
+      SqlStr:=SqlStr+' and a.emp_id>='''+Trim(EditEmpBegin.Text)+''' ';
+    if Trim(EditEmpEnd.Text)<>'' then
+      SqlStr:=SqlStr+' and a.emp_id<='''+Trim(EditEmpEnd.Text)+''' ';
+  end;  
+  if TntCheckBox2.Checked then
+  begin
+    if Trim(CobDeptBegin.Text)<>'' then
+      SqlStr:=SqlStr+' and b.dept_code>='''+leftstr(CobDeptBegin.Text,6)+''' ';
+    if Trim(CobDeptEnd.Text)<>'' then
+      SqlStr:=SqlStr+' and b.dept_code<='''+leftstr(CobDeptEnd.Text,6)+''' ';
+  end;
+  if TntCheckBox3.Checked then
+  begin
+    SqlStr:=SqlStr+' and (((a.s_ask_d>='''+formatdatetime('yyyy/mm/dd',dtpBegin.Date)+''') and (a.e_ask_d<='''+formatdatetime('yyyy/mm/dd',dtpEnd.Date)+''')) ';
+    SqlStr:=SqlStr+' or  ((a.s_ask_d<='''+formatdatetime('yyyy/mm/dd',dtpBegin.Date)+''') and (a.e_ask_d>='''+formatdatetime('yyyy/mm/dd',dtpBegin.Date)+''')) ';
+    SqlStr:=SqlStr+' or  ((a.s_ask_d<='''+formatdatetime('yyyy/mm/dd',dtpEnd.Date)+''') and (a.e_ask_d>='''+formatdatetime('yyyy/mm/dd',dtpEnd.Date)+'''))) ';
+  end;
+  if TntCheckBox4.Checked then
+    SqlStr:=SqlStr+' and a.clas_code='''+leftstr(CobClasBegin.Text,2)+''' ';
+    
+  //if Checktempuser(username)  = false  then
+  //   begin
+   //    sqlstr:=sqlstr + ' and  not exists( select *from hrd_deny_emp where emp_id=a.emp_id ) '
+   //  end;
+  GetData(SqlStr);//眔闽戈癟
+  setstatustext(GetLangName(Langstr,'just_doing'));
+  GetSum;//眔参璸计沮
+  setstatustext(GetLangName(LangStr,'Complete_data'));
+  tntcheckbox1.Enabled:=false;
+  tntcheckbox2.Enabled:=false;
+  
+  EditEmpBegin.Enabled:=false;
+  EditEmpEnd.Enabled:=false;
+  CobDeptBegin.Enabled:=false;
+  CobDeptEnd.Enabled:=false;
+  
+  bb_reset.Enabled := true;
+  btn_print.Enabled := true;
+end;
+
+procedure TFormDut19.bb_resetClick(Sender: TObject);
+var
+  i:integer;
+begin
+  adoquery1.Close;
+
+  TntCheckBox1.Enabled:=true;
+//  TntCheckBox2.Enabled:=true;
+  TntCheckBox3.Enabled:=true;
+  
+  TntCheckBox1.Checked:=false;
+//  TntCheckBox2.Checked:=false;
+  TntCheckBox3.Checked:=false; 
+  
+  bb_ok.Enabled := true;
+  bb_reset.Enabled := false;
+  btn_print.Enabled := false;
+  
+  for i:=1 to 12 do
+  begin
+    TtntEdit(findcomponent('TntEdit'+inttostr(i))).Text:='';
+  end;
+end;
+
+procedure TFormDut19.CobDeptBeginChange(Sender: TObject);
+begin
+CobDeptEnd.Text:=CobDeptBegin.Text;
+  {if CobDeptBegin.ItemIndex>CobDeptEnd.ItemIndex then
+  begin
+    CobDeptEnd.ItemIndex:=CobDeptBegin.ItemIndex;
+  end;}
+end;
+
+procedure TFormDut19.EditEmpBeginDblClick(Sender: TObject);
+var
+  empid:string;
+begin
+  empid:=FindEmpId('emp_id');
+  if empid<>'' then
+  begin
+    TEdit(sender).Text:=empid;
+  end;
+end;
+
+procedure TFormDut19.TntCheckBox1Click(Sender: TObject);
+begin
+  EditEmpBegin.Enabled:=TntCheckbox1.Checked;
+  EditEmpEnd.Enabled:=TntCheckbox1.Checked;
+  CobDeptBegin.Enabled:=TntCheckbox2.Checked;
+  CobDeptEnd.Enabled:=TntCheckbox2.Checked;
+  dtpBegin.Enabled:=TntCheckbox3.Checked;
+  dtpEnd.Enabled:=TntCheckbox3.Checked;
+  CobClasBegin.Enabled:=TntCheckbox4.Checked;
+//  CobClasEnd.Enabled:=TntCheckbox4.Checked;
+end;
+
+procedure TFormDut19.GetData(SqlStr:widestring);
+begin
+  with adoquery1 do
+  begin
+    sql.Clear;
+    sql.Add(SqlStr);
+    Open;
+    setProcessBar(true,1,RecordCount);
+    while not eof do
+    begin
+      setProcessBar(false,1);
+      SetStatusText(GetLangName(LangStr,'just_doing_empid')+fieldbyname('emp_id').value+' '+IntToStr(RecNo)+'/'+IntToStr(RecordCount));
+     // DealAEmpId(fieldbyname('emp_id').value);
+      next;
+    end;
+    setProcessBar(true);
+
+  end;
+end;
+
+Procedure TFormDut19.DealAEmpId(EmpID:string);
+begin
+  {
+  with clientdataset1 do
+  begin
+    Append;
+    fieldbyname('emp_id').AsString:=EmpID;
+    fieldbyname('emp_chs').Value:=Adoquery1.fieldbyname('emp_chs').Value;
+    fieldbyname('dept_code').AsString:=Adoquery1.fieldbyname('dept_code').AsString;
+    fieldbyname('abbr_titl').Value:=Adoquery1.fieldbyname('abbr_titl').Value;
+    fieldbyname('epindt').AsDateTime := Adoquery1.fieldbyname('epindt').AsDateTime;
+    fieldbyname('CanRestYearHoliday').AsFloat:=CanRest;
+    fieldbyname('SpringFestivalHoliday').AsFloat:=SpFest;
+    fieldbyname('RestYearHoliday').AsFloat:=Rest;
+    fieldbyname('remaindays').AsFloat:=Remain;
+  end;    }
+end;
+
+procedure TFormDut19.TntDBGrid1TitleClick(Column: TColumn);
+begin
+  DBGridSortByTitle(Column);
+end;
+
+procedure TFormDut19.ADOQuery1CalcFields(DataSet: TDataSet);
+var
+  ADate:TDate;
+  clas_code,clas_name:string;
+begin
+  clas_code:=Dataset.FieldByName('clas_code').AsString;
+  with DMHrdsys.SQLQuery1 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add('select * from hrd_dut_class where clas_code='''+clas_code+'''');
+    open;
+    clas_name:=FieldByName('clas_code').AsString+'--'+FieldByName('clas_chs').AsString;
+  end;
+  with adoquery1 do
+  begin
+    FieldByName('clas_name').AsString:=clas_name;
+    FieldByName('addup').Value:=GetAddUp(
+         fieldbyname('s_ask_d').AsDateTime,
+         fieldbyname('e_ask_d').AsDateTime,
+         fieldbyname('s_ask_h').AsFloat,
+         fieldbyname('e_ask_h').AsFloat,
+         fieldbyname('s_ask_t').AsFloat,
+         fieldbyname('e_ask_t').AsFloat,
+         fieldbyname('emp_id').AsString
+         );
+    Adate:=Fieldbyname('s_ask_d').AsDateTime;
+    fieldbyname('s_datetime').AsString:={formatdatetime('yyyy/mm/dd',Adate)+' '+}
+                  Fieldbyname('s_ask_h').AsString+':'+Fieldbyname('s_ask_t').AsString;    
+    Adate:=Fieldbyname('e_ask_d').AsDateTime;
+    fieldbyname('e_datetime').AsString:={formatdatetime('yyyy/mm/dd',Adate)+' '+}
+                  Fieldbyname('e_ask_h').AsString+':'+Fieldbyname('e_ask_t').AsString;
+  end;
+end;
+
+procedure TFormDut19.Btn_PrintClick(Sender: TObject);
+var
+  Title:widestring;
+begin
+  SetStatusText(GetLangName(LangStr,'while_printing'));
+  Title :=GetLangName(LangStr,'dut19_printitl');
+  Title:=Title+'<br><left>玻安:'+tntEdit1.text+''+tntEdit2.text+'ぱ   '+
+                'ㄆ安:'+tntEdit3.text+''+tntEdit4.text+'ぱ   '+
+                '盉安:'+tntEdit5.text+''+tntEdit6.text+'ぱ<br>';
+  Title:=Title+'<left>赤安:'+tntEdit7.text+''+tntEdit8.text+'ぱ '+
+              'そ端安:'+tntEdit9.text+''+tntEdit10.text+'ぱ   '+
+                '璸:'+tntEdit11.text+''+tntEdit12.text+'ぱ';
+//  ShowPrint(adoquery1,Title,'','emp_id,emp_chs,dept_code,abbr_titl,clas_code,s_datetime,e_datetime,addup');
+  ShowPrint(adoquery1,Title,'');
+  SetStatusText(GetLangName(LangStr,'print_finish'));
+end;
+
+function TFormDut19.GetAddUp(sDate,eDate:Tdate;sHour,eHour,sMinute,eMinute:double;AEmpId:string):double;
+var
+  i:integer;
+  tmpDate:Tdate;
+  HourCnt,DayRest:double;
+begin
+  HourCnt:=0.0;
+  {if sDate>eDate then
+  begin
+    result:=HourCnt;
+    exit;
+  end;
+  if sDate=eDate then
+  begin
+    {if dayofweek(sDate)=1 then
+    begin
+      result:=0.0;
+      exit;
+    end;
+    HourCnt:=(eHour-sHour)+(eMinute-sMinute)/60;
+    if HourCnt=9.0 then
+      HourCnt:=8.0;
+  end; 
+  if sDate<eDate then
+  begin
+    if dayofweek(sDate)=1 then
+    begin
+      sDate:=sDate+1;
+      sHour:=8.0;
+      sMinute:=0.0;
+    end;  
+    if dayofweek(eDate)=1 then
+    begin
+      eDate:=eDate-1;
+      eHour:=17;
+      eMinute:=0;
+    end;
+
+    for i:=0 to StrToInt(format('%3.0f',[int(eDate-sDate)])) do
+    begin
+      tmpDate:=sDate+i;
+      if dayofweek(tmpDate)=1 then
+        result:=result-8.0;
+    end;}
+  HourCnt:=(eDate-sDate)*8.0;
+  if ((eHour-sHour)+(eMinute-sMinute)/60)=9.0 then
+    HourCnt:=HourCnt+8.0
+  else
+    HourCnt:=HourCnt+(eHour-sHour)+(eMinute-sMinute)/60;
+  DayRest:=GetRestDayCount(SDate,EDate,AEmpId);
+  result:=max(HourCnt-DayRest*8.0,0);
+end;
+
+procedure TFormDut19.GetSum;
+begin
+  matNum:=0;affNum:=0;wedNum:=0;
+  funNum:=0;injNum:=0;allNum:=0;
+  matDays:=0.0;affDays:=0.0;wedDays:=0.0;
+  funDays:=0.0;injDays:=0.0;allDays:=0.0;
+  allNum:=adoquery1.recordcount;
+  with adoquery1 do
+  begin
+    first;
+    while not eof do
+    begin
+      if fieldbyname('clas_code').AsString='11' then
+      begin
+        matNum:=matNum+1;
+        matDays:=matDays+fieldbyname('addup').AsFloat;
+      end;
+      if fieldbyname('clas_code').AsString='12' then
+      begin
+        affNum:=affNum+1;
+        affDays:=affDays+fieldbyname('addup').AsFloat;
+      end;
+      if fieldbyname('clas_code').AsString='13' then
+      begin
+        wedNum:=wedNum+1;
+        wedDays:=wedDays+fieldbyname('addup').AsFloat;
+      end;
+      if fieldbyname('clas_code').AsString='14' then
+      begin
+        funNum:=funNum+1;
+        funDays:=funDays+fieldbyname('addup').AsFloat;
+      end;
+      if fieldbyname('clas_code').AsString='15' then
+      begin
+        injNum:=injNum+1;
+        injDays:=injDays+fieldbyname('addup').AsFloat;
+      end;
+      allDays:=allDays+fieldbyname('addup').AsFloat;
+      next;
+    end;
+  end;
+  matDays:=matDays/8;affDays:=affDays/8;wedDays:=wedDays/8;
+  funDays:=funDays/8;injDays:=injDays/8;allDays:=allDays/8;
+  tntedit1.Text:=inttostr(matNum);
+  tntedit3.Text:=inttostr(affNum);
+  tntedit5.Text:=inttostr(wedNum);
+  tntedit7.Text:=inttostr(funNum);
+  tntedit9.Text:=inttostr(injNum);
+  tntedit11.Text:=inttostr(allNum);
+  
+  tntedit2.Text:=format('%5.1f',[matDays]);
+  tntedit4.Text:=format('%5.1f',[affDays]);
+  tntedit6.Text:=format('%5.1f',[wedDays]);
+  tntedit8.Text:=format('%5.1f',[funDays]);
+  tntedit10.Text:=format('%5.1f',[injDays]);
+  tntedit12.Text:=format('%5.1f',[allDays]);
+end;
+
+procedure TFormDut19.FormDestroy(Sender: TObject);
+begin
+  SetStatustext('');
+  SetProcessBar;
+end;
+
+procedure TFormDut19.ADOQuery1AfterScroll(DataSet: TDataSet);
+begin
+  with adoquery1 do
+  begin
+    setstatustext(GetLangName(LangStr,'current_location')+inttostr(recno)+'/'+inttostr(recordcount));
+  end;
+end;
+
+end.

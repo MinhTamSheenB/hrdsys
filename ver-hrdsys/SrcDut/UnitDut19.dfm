@@ -1,0 +1,914 @@
+object FormDut19: TFormDut19
+  Left = 179
+  Top = 116
+  Width = 800
+  Height = 566
+  Caption = 'FormDut19'
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Scaled = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 792
+    Height = 532
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    object PanelTitle: TTntPanel
+      Left = 0
+      Top = 0
+      Width = 792
+      Height = 49
+      Align = alTop
+      BevelOuter = bvNone
+      Caption = 'dut19_titl'
+      Color = clCream
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -16
+      Font.Name = 'Palatino Linotype'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+    end
+    object PanelMain: TPanel
+      Left = 0
+      Top = 49
+      Width = 792
+      Height = 483
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
+      object TntGroupBox1: TTntGroupBox
+        Left = 0
+        Top = 0
+        Width = 792
+        Height = 73
+        Align = alTop
+        Caption = 'search_condition'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clRed
+        Font.Height = -11
+        Font.Name = 'Palatino Linotype'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        object TntLabel3: TTntLabel
+          Left = 219
+          Top = 22
+          Width = 86
+          Height = 16
+          Caption = 'dbl_clk_slct_emp'
+          Color = clYellow
+          ParentColor = False
+        end
+        object CobDeptBegin: TTntComboBox
+          Left = 107
+          Top = 45
+          Width = 120
+          Height = 24
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          ItemHeight = 16
+          ParentFont = False
+          TabOrder = 0
+          OnChange = CobDeptBeginChange
+        end
+        object CobDeptEnd: TTntComboBox
+          Left = 231
+          Top = 45
+          Width = 120
+          Height = 24
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          ItemHeight = 16
+          ParentFont = False
+          TabOrder = 1
+        end
+        object bb_reset: TTntBitBtn
+          Left = 710
+          Top = 13
+          Width = 77
+          Height = 25
+          BiDiMode = bdRightToLeftNoAlign
+          Caption = 'reset'
+          Default = True
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ModalResult = 4
+          ParentBiDiMode = False
+          ParentFont = False
+          TabOrder = 2
+          OnClick = bb_resetClick
+          Glyph.Data = {
+            DE010000424DDE01000000000000760000002800000024000000120000000100
+            0400000000006801000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333444444
+            33333333333F8888883F33330000324334222222443333388F3833333388F333
+            000032244222222222433338F8833FFFFF338F3300003222222AAAAA22243338
+            F333F88888F338F30000322222A33333A2224338F33F8333338F338F00003222
+            223333333A224338F33833333338F38F00003222222333333A444338FFFF8F33
+            3338888300003AAAAAAA33333333333888888833333333330000333333333333
+            333333333333333333FFFFFF000033333333333344444433FFFF333333888888
+            00003A444333333A22222438888F333338F3333800003A2243333333A2222438
+            F38F333333833338000033A224333334422224338338FFFFF8833338000033A2
+            22444442222224338F3388888333FF380000333A2222222222AA243338FF3333
+            33FF88F800003333AA222222AA33A3333388FFFFFF8833830000333333AAAAAA
+            3333333333338888883333330000333333333333333333333333333333333333
+            0000}
+          NumGlyphs = 2
+        end
+        object bb_ok: TTntBitBtn
+          Left = 631
+          Top = 14
+          Width = 77
+          Height = 25
+          Caption = 'ok'
+          Default = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ModalResult = 1
+          ParentFont = False
+          TabOrder = 3
+          OnClick = bb_okClick
+          Glyph.Data = {
+            DE010000424DDE01000000000000760000002800000024000000120000000100
+            0400000000006801000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+            3333333333333333333333330000333333333333333333333333F33333333333
+            00003333344333333333333333388F3333333333000033334224333333333333
+            338338F3333333330000333422224333333333333833338F3333333300003342
+            222224333333333383333338F3333333000034222A22224333333338F338F333
+            8F33333300003222A3A2224333333338F3838F338F33333300003A2A333A2224
+            33333338F83338F338F33333000033A33333A222433333338333338F338F3333
+            0000333333333A222433333333333338F338F33300003333333333A222433333
+            333333338F338F33000033333333333A222433333333333338F338F300003333
+            33333333A222433333333333338F338F00003333333333333A22433333333333
+            3338F38F000033333333333333A223333333333333338F830000333333333333
+            333A333333333333333338330000333333333333333333333333333333333333
+            0000}
+          NumGlyphs = 2
+        end
+        object Btn_Print: TTntBitBtn
+          Left = 631
+          Top = 42
+          Width = 77
+          Height = 25
+          Caption = '(&p)rint'
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 4
+          OnClick = Btn_PrintClick
+          Glyph.Data = {
+            76010000424D7601000000000000760000002800000020000000100000000100
+            04000000000000010000130B0000130B00001000000000000000000000000000
+            800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00300000000000
+            00033FFFFFFFFFFFFFFF0888888888888880777777777777777F088888888888
+            8880777777777777777F0000000000000000FFFFFFFFFFFFFFFF0F8F8F8F8F8F
+            8F80777777777777777F08F8F8F8F8F8F9F0777777777777777F0F8F8F8F8F8F
+            8F807777777777777F7F0000000000000000777777777777777F3330FFFFFFFF
+            03333337F3FFFF3F7F333330F0000F0F03333337F77773737F333330FFFFFFFF
+            03333337F3FF3FFF7F333330F00F000003333337F773777773333330FFFF0FF0
+            33333337F3FF7F3733333330F08F0F0333333337F7737F7333333330FFFF0033
+            33333337FFFF7733333333300000033333333337777773333333}
+          NumGlyphs = 2
+        end
+        object EditEmpBegin: TTntEdit
+          Left = 108
+          Top = 16
+          Width = 51
+          Height = 24
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          MaxLength = 6
+          ParentFont = False
+          TabOrder = 5
+          OnDblClick = EditEmpBeginDblClick
+        end
+        object EditEmpEnd: TTntEdit
+          Left = 161
+          Top = 16
+          Width = 52
+          Height = 24
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          MaxLength = 6
+          ParentFont = False
+          TabOrder = 6
+          OnDblClick = EditEmpBeginDblClick
+        end
+        object TntCheckBox1: TTntCheckBox
+          Left = 14
+          Top = 22
+          Width = 91
+          Height = 17
+          Caption = 'fld_emp_id'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 7
+          OnClick = TntCheckBox1Click
+        end
+        object TntCheckBox2: TTntCheckBox
+          Left = 14
+          Top = 48
+          Width = 91
+          Height = 17
+          Caption = 'dept_range'
+          Checked = True
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ParentFont = False
+          State = cbChecked
+          TabOrder = 8
+          OnClick = TntCheckBox1Click
+        end
+        object TntCheckBox3: TTntCheckBox
+          Left = 350
+          Top = 22
+          Width = 75
+          Height = 17
+          Caption = 'date'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 9
+          OnClick = TntCheckBox1Click
+        end
+        object dtpBegin: TTntDateTimePicker
+          Left = 448
+          Top = 17
+          Width = 84
+          Height = 24
+          Date = 38674.413328622690000000
+          Time = 38674.413328622690000000
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 10
+        end
+        object dtpEnd: TTntDateTimePicker
+          Left = 536
+          Top = 17
+          Width = 83
+          Height = 24
+          Date = 38674.413328622690000000
+          Time = 38674.413328622690000000
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 11
+        end
+        object TntCheckBox4: TTntCheckBox
+          Left = 350
+          Top = 48
+          Width = 97
+          Height = 17
+          Caption = 'fld_clas_code'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 12
+          OnClick = TntCheckBox1Click
+        end
+        object CobClasBegin: TTntComboBox
+          Left = 448
+          Top = 41
+          Width = 80
+          Height = 24
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Palatino Linotype'
+          Font.Style = []
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          ItemHeight = 16
+          ParentFont = False
+          TabOrder = 13
+          OnChange = CobDeptBeginChange
+        end
+      end
+      object TntDBGrid1: TTntDBGrid
+        Left = 0
+        Top = 73
+        Width = 792
+        Height = 339
+        Align = alClient
+        DataSource = DataSource1
+        FixedColor = clSkyBlue
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Palatino Linotype'
+        Font.Style = []
+        ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+        ParentFont = False
+        ReadOnly = True
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        TitleFont.Style = []
+        OnTitleClick = TntDBGrid1TitleClick
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'upd_user'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'emp_id'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'emp_chs'
+            Width = 49
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'dept_code'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'abbr_titl'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'clas_name'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 's_ask_d'
+            Width = 81
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 's_datetime'
+            Width = 73
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'e_ask_d'
+            Width = 72
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'e_datetime'
+            Width = 71
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'addup'
+            Width = 36
+            Visible = True
+          end>
+      end
+      object TntGroupBox2: TTntGroupBox
+        Left = 0
+        Top = 412
+        Width = 792
+        Height = 71
+        Align = alBottom
+        Caption = 'total'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clRed
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+        object TntLabel1: TTntLabel
+          Left = 32
+          Top = 16
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'maternityleave'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel2: TTntLabel
+          Left = 168
+          Top = 16
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel4: TTntLabel
+          Left = 237
+          Top = 16
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel5: TTntLabel
+          Left = 288
+          Top = 16
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'affairleave'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel6: TTntLabel
+          Left = 424
+          Top = 16
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel7: TTntLabel
+          Left = 493
+          Top = 16
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel8: TTntLabel
+          Left = 528
+          Top = 16
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'weddingleave'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel9: TTntLabel
+          Left = 665
+          Top = 16
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel10: TTntLabel
+          Left = 733
+          Top = 16
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel11: TTntLabel
+          Left = 32
+          Top = 41
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'funeralleave'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel12: TTntLabel
+          Left = 168
+          Top = 41
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel13: TTntLabel
+          Left = 237
+          Top = 41
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel14: TTntLabel
+          Left = 288
+          Top = 41
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'injureleave'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel15: TTntLabel
+          Left = 425
+          Top = 41
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel16: TTntLabel
+          Left = 494
+          Top = 41
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel17: TTntLabel
+          Left = 528
+          Top = 41
+          Width = 89
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'total'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel18: TTntLabel
+          Left = 665
+          Top = 41
+          Width = 20
+          Height = 13
+          AutoSize = False
+          Caption = 'men'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntLabel19: TTntLabel
+          Left = 732
+          Top = 41
+          Width = 22
+          Height = 13
+          AutoSize = False
+          Caption = 'days'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object TntEdit1: TTntEdit
+          Left = 123
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 0
+        end
+        object TntEdit2: TTntEdit
+          Left = 192
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 1
+        end
+        object TntEdit3: TTntEdit
+          Left = 379
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 2
+        end
+        object TntEdit4: TTntEdit
+          Left = 448
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 3
+        end
+        object TntEdit5: TTntEdit
+          Left = 619
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 4
+        end
+        object TntEdit6: TTntEdit
+          Left = 688
+          Top = 12
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 5
+        end
+        object TntEdit7: TTntEdit
+          Left = 123
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 6
+        end
+        object TntEdit8: TTntEdit
+          Left = 192
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 7
+        end
+        object TntEdit9: TTntEdit
+          Left = 379
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 8
+        end
+        object TntEdit10: TTntEdit
+          Left = 448
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 9
+        end
+        object TntEdit11: TTntEdit
+          Left = 619
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 10
+        end
+        object TntEdit12: TTntEdit
+          Left = 688
+          Top = 37
+          Width = 41
+          Height = 21
+          Enabled = False
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 11
+        end
+      end
+    end
+  end
+  object DataSource1: TDataSource
+    DataSet = ADOQuery1
+    Left = 288
+  end
+  object ADOQuery1: TADOQuery
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    LockType = ltBatchOptimistic
+    AfterScroll = ADOQuery1AfterScroll
+    OnCalcFields = ADOQuery1CalcFields
+    Parameters = <>
+    Prepared = True
+    SQL.Strings = (
+      'select a.*,b.emp_chs,b.dept_code,c.abbr_titl'
+      '      from hrd_dut_ask a,hrd_emp b,hrd_dept c '
+      '     where a.emp_id=b.emp_id and b.dept_code=c.dept_code ')
+    Left = 168
+    object ADOQuery1upd_user: TStringField
+      FieldName = 'upd_user'
+      Size = 10
+    end
+    object ADOQuery1emp_id: TStringField
+      FieldName = 'emp_id'
+      Size = 6
+    end
+    object ADOQuery1emp_chs: TWideStringField
+      FieldName = 'emp_chs'
+      Size = 10
+    end
+    object ADOQuery1dept_code: TStringField
+      FieldName = 'dept_code'
+      Size = 6
+    end
+    object ADOQuery1abbr_titl: TWideStringField
+      FieldName = 'abbr_titl'
+      Size = 14
+    end
+    object ADOQuery1clas_code: TStringField
+      FieldName = 'clas_code'
+      Visible = False
+      FixedChar = True
+      Size = 2
+    end
+    object ADOQuery1clas_name: TWideStringField
+      FieldKind = fkCalculated
+      FieldName = 'clas_name'
+      Calculated = True
+    end
+    object ADOQuery1s_ask_d: TDateTimeField
+      FieldName = 's_ask_d'
+    end
+    object ADOQuery1s_ask_h: TStringField
+      FieldName = 's_ask_h'
+      Size = 2
+    end
+    object ADOQuery1s_ask_t: TStringField
+      FieldName = 's_ask_t'
+      Size = 2
+    end
+    object ADOQuery1e_ask_d: TDateTimeField
+      FieldName = 'e_ask_d'
+    end
+    object ADOQuery1e_ask_h: TStringField
+      FieldName = 'e_ask_h'
+      Size = 2
+    end
+    object ADOQuery1e_ask_t: TStringField
+      FieldName = 'e_ask_t'
+      Size = 2
+    end
+    object ADOQuery1s_datetime: TStringField
+      FieldKind = fkCalculated
+      FieldName = 's_datetime'
+      Calculated = True
+    end
+    object ADOQuery1e_datetime: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'e_datetime'
+      Calculated = True
+    end
+    object ADOQuery1addup: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'addup'
+      Calculated = True
+    end
+  end
+  object PrintDialog1: TPrintDialog
+    Left = 665
+    Top = 9
+  end
+  object qry_pub: TADOQuery
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    LockType = ltBatchOptimistic
+    Parameters = <>
+    Prepared = True
+    Left = 400
+  end
+end

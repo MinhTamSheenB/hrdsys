@@ -1,0 +1,79 @@
+object DMHrdsys: TDMHrdsys
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Left = 905
+  Top = 279
+  Height = 341
+  Width = 461
+  object conn: TADOConnection
+    Connected = True
+    ConnectionString = 
+      'Provider=SQLOLEDB.1;Password=web;Persist Security Info=True;User' +
+      ' ID=web;Initial Catalog=flu-erp;Data Source=192.168.7.9'
+    LoginPrompt = False
+    Provider = 'SQLOLEDB.1'
+    Left = 48
+    Top = 24
+  end
+  object SQLQuery1: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 112
+    Top = 8
+  end
+  object SQLQuery2: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 152
+    Top = 8
+  end
+  object lang_Query: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 136
+    Top = 240
+  end
+  object SQLQuery3: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 192
+    Top = 8
+  end
+  object ADOCommand1: TADOCommand
+    Connection = conn
+    Parameters = <>
+    Left = 128
+    Top = 96
+  end
+  object ADOStoredProc1: TADOStoredProc
+    Connection = conn
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 216
+    Top = 96
+  end
+  object ADODataSet1: TADODataSet
+    Connection = conn
+    Parameters = <>
+    Left = 296
+    Top = 96
+  end
+  object SQLQuery4: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 232
+    Top = 8
+  end
+  object qry_pub: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 32
+    Top = 184
+  end
+  object QryPublic: TADOQuery
+    Connection = conn
+    Parameters = <>
+    Left = 280
+    Top = 8
+  end
+end

@@ -1,0 +1,514 @@
+{*************************************************************************
+Name：sal02(員工工種補貼作業)
+Author: anil
+Create date:2005-08-31
+Modify date:2005-09-01
+Commentate:員工工種補貼作業
+*************************************************************************}
+unit UnitSal03;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,
+  TntComCtrls,WSDLIntf, DB, ADODB,TntDialogs,strutils, TntDB;
+
+type
+  TFormSal03 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelPre: TPanel;
+    TntGroupBox1: TTntGroupBox;
+    Label_month: TTntLabel;
+    PanelGrid: TPanel;
+    DBGrid1: TTntDBGrid;
+    PanelMain: TPanel;
+    BtnQuery: TTntBitBtn;
+    BtnPrint: TTntBitBtn;
+    ADOQuery3: TADOQuery;
+    DataSource1: TDataSource;
+    Label_dept: TTntLabel;
+    Edit_Dept_code: TTntComboBox;
+    PanelAction: TTntPanel;
+    RbUpd: TTntRadioButton;
+    TntGroupBox3: TTntGroupBox;
+    PanelQuery: TTntPanel;
+    RbQuery: TTntRadioButton;
+    PanelTail: TTntPanel;
+    edit_month: TMaskEdit;
+    BtnCancel: TTntBitBtn;
+    BtnSubmit: TTntBitBtn;
+    ADOQuery1: TADOQuery;
+    ADOQuery1upd_user: TStringField;
+    ADOQuery1upd_date: TDateTimeField;
+    ADOQuery1emp_id: TStringField;
+    ADOQuery1wrk_mon: TStringField;
+    ADOQuery1part_code: TStringField;
+    ADOQuery1valid_date: TDateTimeField;
+    ADOQuery2: TADOQuery;
+    ADOQuery2emp_id: TStringField;
+    ADOQuery2emp_chs: TWideStringField;
+    ADOQuery2dept_code: TStringField;
+    ADOQuery2epindt: TDateTimeField;
+    ADOQuery2epledt: TDateTimeField;
+    ADOQuery2pst_code: TStringField;
+    ADOQuery1cate_name: TTntWideStringField;
+    ADOQuery1cate_money: TIntegerField;
+    ADOQuery3upd_user: TStringField;
+    ADOQuery3upd_date: TDateTimeField;
+    ADOQuery3part_code: TStringField;
+    ADOQuery3part_grad: TStringField;
+    ADOQuery3part_dept: TStringField;
+    ADOQuery3part_chs: TWideStringField;
+    ADOQuery3part_vim: TWideStringField;
+    ADOQuery3part_eng: TWideStringField;
+    ADOQuery3grad_code: TStringField;
+    ADOQuery3grad_money: TBCDField;
+    ADOQuery4: TADOQuery;
+    ADOQuery4upd_user: TStringField;
+    ADOQuery4upd_date: TDateTimeField;
+    ADOQuery4emp_id: TStringField;
+    ADOQuery4emp_chs: TWideStringField;
+    ADOQuery4epid_no: TStringField;
+    ADOQuery4epbirth: TDateTimeField;
+    ADOQuery4epsexd: TStringField;
+    ADOQuery4ifmarry: TStringField;
+    ADOQuery4epAddrchs: TWideStringField;
+    ADOQuery4tpAddrchs: TWideStringField;
+    ADOQuery4edu_code: TStringField;
+    ADOQuery4chs_status: TStringField;
+    ADOQuery4eng_status: TStringField;
+    ADOQuery4epid_date: TDateTimeField;
+    ADOQuery4epid_area: TWideStringField;
+    ADOQuery4factory: TStringField;
+    ADOQuery4dept_code: TStringField;
+    ADOQuery4epindt: TDateTimeField;
+    ADOQuery4epledt: TDateTimeField;
+    ADOQuery4pst_code: TStringField;
+    ADOQuery4info_code: TStringField;
+    ADOQuery4spc_id: TStringField;
+    ADOQuery4name_eng: TWideStringField;
+    ADOQuery4name_vim: TWideStringField;
+    ADOQuery4epAddrvim: TWideStringField;
+    ADOQuery4epAddreng: TWideStringField;
+    ADOQuery4tpAddrvim: TWideStringField;
+    ADOQuery4tpAddreng: TWideStringField;
+    ADOQuery4epid_vim: TWideStringField;
+    ADOQuery4epid_eng: TWideStringField;
+    ADOQuery1cate_grad: TStringField;
+    PanelFlow: TTntPanel;
+    ListCode: TTntListBox;
+    PanelFlowTitle: TTntPanel;
+    Label_choose_code: TTntLabel;
+    Button1: TButton;
+    Button2: TButton;
+    ImageClose: TImage;
+    ADOQuery1emp_chs: TTntWideStringField;
+    ADOQuery1name_vim: TTntWideStringField;
+    ADOQuery1epindt: TDateField;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure BtnQueryClick(Sender: TObject);
+    procedure DBGrid1TitleClick(Column: TColumn);
+    procedure BtnSubmitClick(Sender: TObject);
+    procedure BtnCancelClick(Sender: TObject);
+    procedure ADOQuery1BeforePost(DataSet: TDataSet);
+    procedure RbUpdClick(Sender: TObject);
+    procedure ADOQuery1AfterScroll(DataSet: TDataSet);
+    procedure RbQueryClick(Sender: TObject);
+    procedure DBGrid1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure DBGrid1EditButtonClick(Sender: TObject);
+    procedure ListCodeDblClick(Sender: TObject);
+    procedure PanelFlowMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure ImageCloseClick(Sender: TObject);
+    procedure BtnPrintClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormSal03: TFormSal03;
+
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys;
+var
+  Langstr:TWideStrings;//語言字符串
+  pri_arr:TPrvArr;//權限數組
+{$R *.dfm}
+
+procedure TFormSal03.InitLang;
+{*************************************************************************
+TO DO:初始化語言
+*************************************************************************}
+var
+  keys:String;
+  i:integer;
+  GetCpt:TComponent;
+begin
+  with ADOquery1 do
+    for i:=0 to Fieldcount-1 do                      
+      keys:=keys+'fld_'+Fields[i].FieldName+',';
+  keys:=keys+'sal03_titl,date,month,fld_department,not_find_data,'
+            +'query,print,save,cancel,total,current_location,choose_act,'
+            +'msg_confirm_cancel,msg_save_modify_data,sal03_choose_code,'
+            +'search_condition,query,add,delete,update,msg_confirm_save';
+  LangStr:=GetLangWideStrs(keys);
+  PanelTitle.Caption:=GetLangName(LangStr,'sal03_titl');
+  TntGroupbox1.Caption:=GetLangName(LangStr,'search_condition');
+  TntGroupbox3.Caption:=GetLangName(LangStr,'choose_act');
+  //rbAdd.Caption:=GetLangName(LangStr,'add');
+  Label_Dept.Caption:=GetLangName(LangStr,'fld_department');
+  Label_Month.Caption:=GetLangName(LangStr,'month');
+  Label_choose_code.Caption:=GetLangName(LangStr,'sal03_choose_code');
+  rbUpd.Caption:=GetLangName(LangStr,'update');
+  rbQuery.Caption:=GetLangName(LangStr,'query');
+  BtnQuery.Caption:=GetLangName(LangStr,'query');
+  BtnPrint.Caption:=GetLangName(LangStr,'print');
+  BtnSubmit.Caption:=GetLangName(LangStr,'save');
+  BtnCancel.Caption:=GetLangName(LangStr,'cancel');
+  //
+  with DBGrid1.Columns do// set Columns texts
+  for i:=0 to Count-1 do
+  begin
+    GetCpt:=self.FindComponent('Label_'+Items[i].FieldName);
+    if GetCpt<>nil then
+      Ttntlabel(GetCpt).Caption:=GetLangName(LangStr,'fld_'+Items[i].FieldName);
+    Items[i].Title.caption:=GetLangName(LangStr,'fld_'+Items[i].FieldName);
+  end;
+end;
+
+procedure TFormSal03.InitForm;
+{*************************************************************************
+TO DO:初始化Form
+*************************************************************************}
+var
+  sql_str,fld_name:string;
+begin
+  if not (pri_arr[UPD] or pri_arr[ADD]) then
+    RbUpd.Enabled:=false;
+  {if userLang='E' then
+    fld_name:='dept_code+'' ''+eng_abbr'
+  else if userLang='V' then
+    fld_name:='dept_code+'' ''+vim_abbr'
+  else
+    fld_name:='dept_code+'' ''+abbr_titl';
+  sql_str:='select '+fld_name+' as dept_name,dept_code from hrd_dept where dept_code>=''VA0000'' and dept_code<=''VZ0000''';
+  SetComboxList(sql_str,edit_Dept_code);}
+  GetDeptRange(Edit_Dept_code);
+  edit_month.Text:= formatdatetime('yyyymm',date);
+end;
+
+procedure TFormSal03.FormCreate(Sender: TObject);
+begin
+  pri_arr:=GetPrvArr(username,'sal03');
+  InitLang;// Init language
+  InitForm;// Init Form
+end;
+
+procedure TFormSal03.BtnQueryClick(Sender: TObject);
+var
+  sql_str,dept_list,factory, sDeptCode:string;
+  cate_seq:integer;
+  item:widestring;
+begin
+  //2012-12-13 hyt add
+  if upperCase(leftstr(edit_Dept_code.Text,1))<>G_sFactory then
+  begin
+    Showmessage('Department is Wrong ');
+    exit ;
+  end;
+{--chingluh
+if leftstr(edit_Dept_code.Text,2)='VD' then
+  dept_list:='''V0'',''VD'''
+else
+  dept_list:='''V0'',''V'+midstr(edit_Dept_code.Text,4,1)+'''';}
+  factory:=UpperCase(leftstr(edit_Dept_code.Text,1));
+  if factory='F' then//工作類別在部門中的位置
+    cate_seq:=3
+  else
+    cate_seq:=4;
+
+  //
+  sDeptCode := Copy(Edit_Dept_code.Text, 1, 6);
+  //
+  sDeptCode := UpperCase(sDeptCode);
+
+  if MidStr(edit_Dept_code.Text,2,1)='D' then
+    dept_list:=''''+factory+'0'','''+factory+'D'''
+  else if (sDeptCode= 'F09001') then
+    dept_list:=''''+factory+'0'','''+factory+'2'''
+  else if (sDeptCode= 'F09002') then
+    dept_list:=''''+factory+'0'','''+factory+'1'''
+  else if (sDeptCode= 'F09003') then
+    dept_list:=''''+factory+'0'','''+factory+'3'''
+  else
+    dept_list:=''''+factory+'0'','''+factory+midstr(edit_Dept_code.Text,cate_seq,1)+'''';
+  sql_str:='select * from hrd_wrkpart as B,hrd_wrkpay_grad as C where B.part_grad=C.grad_code';
+  sql_str:=sql_str+' AND B.part_dept in ('+dept_list+')';
+  with DMHrdsys.SQLQuery1 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add(sql_str);
+      open;
+      PanelFlow.Hide;
+      ListCode.Clear;
+      while not EOF do
+      begin
+        item :=format('%-5s%-5s%-10s%-5s%-30s',[fieldbyname('part_code').value,fieldbyname('part_grad').value,fieldbyname('grad_money').value,fieldbyname('part_dept').value,fieldbyname('part_chs').value]);
+        ListCode.AddItem(item,sender);
+        next;
+      end;
+    end;
+  sql_str:='select * from hrd_wrkpart as B,hrd_wrkpay_grad as C where B.part_grad=C.grad_code';
+  with ADOQuery3 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add(sql_str);
+      open;
+    end;
+  sql_str:='select * from hrd_emp where dept_code='''+leftstr(edit_Dept_code.Text,6)+'''';
+  with ADOQuery4 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add(sql_str);
+      open;
+    end;
+  sql_str:='select * from hrd_wrkpay where emp_id in (select emp_id from hrd_emp where'
+    +' dept_code='''+leftstr(edit_Dept_code.Text,6)+'''  and pst_code=''60'' and epledt is null) '
+    +' and wrk_mon='''+leftstr(edit_month.Text,6)+''''
+    +'';
+  with ADOQuery1 do
+    begin
+      Close;
+      sql.Clear;
+      sql.Add(sql_str);
+      open;
+    end;
+  sql_str:='select * from hrd_emp where emp_id not in (select emp_id from'
+    +' hrd_wrkpay where wrk_mon='''+leftstr(edit_month.Text,6)+''') and'
+    +' dept_code='''+leftstr(edit_Dept_code.Text,6)+''''
+    +' and pst_code=''60'' and epledt is null';
+  with ADOQuery2 do
+    begin
+        Close;
+        Sql.Clear;
+        Sql.Add(sql_str);
+        open;
+        First;
+        while not EOF do
+          begin
+            ADOQuery1.AppendRecord([username,'',FieldByName('emp_id').AsString,null,null,null,Edit_Month.Text,'',null,null]);
+            Next;
+          end;
+    end;
+  //
+  BtnPrint.Enabled := RbQuery.Checked;
+  //
+  DBGridSortByTitle(DBGrid1.Columns[0]);
+  ADOQuery1.First;
+end;
+
+procedure TFormSal03.BtnSubmitClick(Sender: TObject);
+begin
+  if wideMessageDlg(GetLangName(LangStr,'msg_confirm_save'),mtConfirmation,[mbyes,mbno],0)=mrno then
+    exit;
+  ADOQuery1.UpdateBatch;
+  BtnCancel.Enabled:=false;
+  BtnSubmit.Enabled:=false;
+end;
+
+procedure TFormSal03.BtnCancelClick(Sender: TObject);
+begin
+  if wideMessageDlg(GetLangName(LangStr,'msg_confirm_cancel'),mtConfirmation,[mbyes,mbno],0)=mrno then
+    exit;
+  ADOQuery1.close;
+  ADOQuery1.open;
+//  ADOQuery1.CancelBatch;
+  BtnCancel.Enabled:=false;
+  BtnSubmit.Enabled:=false;
+end;
+
+procedure TFormSal03.RbUpdClick(Sender: TObject);
+begin
+  PanelTail.Visible:=true;
+  DBGrid1.Columns[4].ReadOnly:=false;
+  BtnPrint.Enabled := False;
+end;
+
+procedure TFormSal03.RbQueryClick(Sender: TObject);
+begin
+  PanelTail.Visible:=false;
+  DBGrid1.Columns[4].ReadOnly:=true;
+end;
+
+procedure TFormSal03.DBGrid1TitleClick(Column: TColumn);
+{*************************************************************************
+TO DO:點擊表格標頭改變排序方式
+*************************************************************************}
+begin
+  DBGridSortByTitle(column);
+end;
+
+procedure TFormSal03.ADOQuery1BeforePost(DataSet: TDataSet);
+{*************************************************************************
+TO DO:移動前錯誤檢查,改變一些欄位值及狀態
+*************************************************************************}
+var
+  sSQL: string;
+  //
+  sPartCode: string;
+begin
+  with DataSet do
+  begin
+    if FieldByName('valid_date').AsDateTime<>0 then
+    begin
+      WideShowMessage('該資料已經確認,不能再修改');
+      DataSet.Cancel;
+      abort;
+      exit;
+    end;
+    //
+    sPartCode := FieldByName('PART_CODE').AsString;
+
+    //2014.12.10 檢查工種代號是否存在
+    sSQL := 'SELECT * FROM HRD_WRKPART WHERE PART_CODE = '+QuotedStr(sPartCode);
+    //
+    if (not DB_SeekRecord(sSQL)) and (sPartCode<> '') then
+    begin
+      WideShowMessage('該工種不存在，請確認後重新輸入');
+      DataSet.Cancel;
+      Abort;
+    end;
+
+    FieldByName('upd_user').Value:=username;
+    FieldByName('upd_date').Value:=GetServerDateTime;
+    BtnCancel.Enabled:=true;
+    BtnSubmit.Enabled:=true;
+  end;
+end;
+
+procedure TFormSal03.ADOQuery1AfterScroll(DataSet: TDataSet);
+{*************************************************************************
+TO DO:移動記錄時在狀態欄顯示提示信息
+*************************************************************************}
+begin
+  with ADOQuery1 do
+    setStatusText(GetLangName(LangStr,'current_location')+':'+inttostr(RecNo)+' '+GetLangName(LangStr,'total')+':'+inttostr(RecordCount));
+end;
+
+procedure TFormSal03.ListCodeDblClick(Sender: TObject);
+{*************************************************************************
+TO DO:雙擊代碼列表時填入選中值到DBGrid的part_code欄位中
+*************************************************************************}
+begin
+  ADOQuery1.Edit;
+  ADOQuery1.FieldByName('part_code').Value:=leftstr(ListCode.Items[ListCode.ItemIndex],3);
+  PanelFlow.hide;
+end;
+
+procedure TFormSal03.DBGrid1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+{*************************************************************************
+TO DO:快捷鍵設置
+*************************************************************************}
+begin
+{if Shift=[ssCtrl] then
+  begin
+    if key=KEY_S then
+      if BtnSubmit.Enabled then
+        BtnSubmit.Click;
+    if key=KEY_Z then
+      if BtnCancel.Enabled then
+        BtnCancel.Click;
+    if key=VK_F4 then
+      begin
+        self.Close;
+        self.Parent.Hide;
+      end;
+  end;
+if Shift=[] then
+  begin
+    if key=VK_F2 then
+      if BtnSubmit.Enabled then
+        BtnSubmit.Click;
+    if key=VK_F3 then
+      DBGrid1.OnEditButtonClick(nil);
+  end;  }
+end;
+
+procedure TFormSal03.PanelFlowMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+{*************************************************************************
+TO DO:移動浮動Panel
+*************************************************************************}
+begin
+  ReleaseCapture;
+  PanelFlow.Perform(WM_SysCommand,$F012,0);
+end;
+
+procedure TFormSal03.DBGrid1EditButtonClick(Sender: TObject);
+{*************************************************************************
+TO DO:顯示浮動Panel
+*************************************************************************}
+begin
+  if (rbUpd.Checked) and (listcode.Count>0) then
+    PanelFlow.Show;
+end;
+
+procedure TFormSal03.ImageCloseClick(Sender: TObject);
+{*************************************************************************
+TO DO:隱藏浮動Panel
+*************************************************************************}
+begin
+  PanelFlow.Hide;
+end;
+
+procedure TFormSal03.Button1Click(Sender: TObject);
+begin
+SetProcessBar(true,1,10000,0);
+end;
+
+procedure TFormSal03.Button2Click(Sender: TObject);
+var
+  i:integer;
+begin
+for i:=0 to 10000 do
+  begin
+    SetProcessBar(false,1);
+    setstatustext(inttostr(i));
+  end;
+setstatustext('ok');
+SetProcessBar(true,1,10000,0);
+end;
+
+procedure TFormSal03.BtnPrintClick(Sender: TObject);
+var
+  titl_str,fld_str,footer_str:string;
+begin
+  titl_str:=LeftStr(edit_month.text,4)+'年'+RightStr(edit_month.text,2)+'月員工工種補貼<br>'
+    +'<left>部門:  '+Edit_Dept_code.Text+'                                                      '
+    +'生效日期:';
+  fld_str:='emp_id,emp_chs,name_vim,epindt,part_code,cate_grad,cate_money,cate_name';
+  footer_str:='<br><left>補貼人數________           未補人數________           '
+    +'填表人簽名___________           部門主管批準___________'
+    +'<br><br>廠務經理批準___________        IE課批準___________        '
+    +'執行經理批準___________        協理批準___________<br><br><br>';
+  showPrint(ADOQuery1,titl_str,footer_str,fld_str);
+end;
+
+end.

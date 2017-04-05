@@ -1,0 +1,654 @@
+object FormEmp: TFormEmp
+  Left = 134
+  Top = 99
+  Width = 573
+  Height = 384
+  BorderIcons = []
+  Caption = #21729#24037#36984#25799
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  Scaled = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object TntGroupBox1: TTntGroupBox
+    Left = 0
+    Top = 0
+    Width = 565
+    Height = 74
+    Align = alTop
+    Caption = #26597#35426#31684#22285
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clRed
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    object TntLabel1: TTntLabel
+      Left = 246
+      Top = 44
+      Width = 12
+      Height = 13
+      Caption = #65374
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+    end
+    object TntLabel2: TTntLabel
+      Left = 140
+      Top = 20
+      Width = 12
+      Height = 13
+      Caption = #65374
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+    end
+    object EditEmpBegin: TTntEdit
+      Left = 77
+      Top = 16
+      Width = 52
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkFlat
+      BorderStyle = bsNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      MaxLength = 6
+      ParentFont = False
+      TabOrder = 0
+      Text = '000000'
+    end
+    object cb_Emp: TTntCheckBox
+      Left = 8
+      Top = 24
+      Width = 57
+      Height = 17
+      Caption = #24037#34399':'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+    end
+    object EditEmpEnd: TTntEdit
+      Left = 163
+      Top = 16
+      Width = 54
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkFlat
+      BorderStyle = bsNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      MaxLength = 6
+      ParentFont = False
+      TabOrder = 2
+      Text = '999999'
+    end
+    object cb_Dept: TTntCheckBox
+      Left = 8
+      Top = 48
+      Width = 73
+      Height = 17
+      Caption = #37096#38272':'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 3
+    end
+    object cob_DeptBeg: TTntComboBox
+      Left = 78
+      Top = 40
+      Width = 153
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkFlat
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ItemHeight = 13
+      ParentFont = False
+      TabOrder = 4
+      OnChange = cob_DeptBegChange
+    end
+    object cob_DeptEnd: TTntComboBox
+      Left = 272
+      Top = 40
+      Width = 153
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkFlat
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ItemHeight = 13
+      ParentFont = False
+      TabOrder = 5
+    end
+    object cb_Name: TTntCheckBox
+      Left = 272
+      Top = 16
+      Width = 65
+      Height = 17
+      Caption = #22995#21517':'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 6
+    end
+    object EditNameChs: TTntEdit
+      Left = 340
+      Top = 14
+      Width = 82
+      Height = 21
+      BevelInner = bvNone
+      BevelKind = bkFlat
+      BorderStyle = bsNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 7
+    end
+    object TntBitBtn1: TTntBitBtn
+      Left = 448
+      Top = 16
+      Width = 65
+      Height = 23
+      Caption = #30906#23450
+      Default = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 8
+      OnClick = TntBitBtn1Click
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000120B0000120B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00555555555555
+        555555555555555555555555555555555555555555FF55555555555559055555
+        55555555577FF5555555555599905555555555557777F5555555555599905555
+        555555557777FF5555555559999905555555555777777F555555559999990555
+        5555557777777FF5555557990599905555555777757777F55555790555599055
+        55557775555777FF5555555555599905555555555557777F5555555555559905
+        555555555555777FF5555555555559905555555555555777FF55555555555579
+        05555555555555777FF5555555555557905555555555555777FF555555555555
+        5990555555555555577755555555555555555555555555555555}
+      NumGlyphs = 2
+    end
+    object TntBitBtn2: TTntBitBtn
+      Left = 448
+      Top = 40
+      Width = 65
+      Height = 23
+      Caption = #38364#38281
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 9
+      OnClick = TntBitBtn2Click
+      Glyph.Data = {
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000120B0000120B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00330000000000
+        03333377777777777F333301111111110333337F333333337F33330111111111
+        0333337F333333337F333301111111110333337F333333337F33330111111111
+        0333337F333333337F333301111111110333337F333333337F33330111111111
+        0333337F3333333F7F333301111111B10333337F333333737F33330111111111
+        0333337F333333337F333301111111110333337F33FFFFF37F3333011EEEEE11
+        0333337F377777F37F3333011EEEEE110333337F37FFF7F37F3333011EEEEE11
+        0333337F377777337F333301111111110333337F333333337F33330111111111
+        0333337FFFFFFFFF7F3333000000000003333377777777777333}
+      NumGlyphs = 2
+    end
+  end
+  object TntGroupBox2: TTntGroupBox
+    Left = 0
+    Top = 74
+    Width = 565
+    Height = 228
+    Align = alClient
+    Caption = #21729#24037#26126#32048
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clRed
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    object TntDBGrid1: TTntDBGrid
+      Left = 2
+      Top = 15
+      Width = 561
+      Height = 211
+      Align = alClient
+      DataSource = ds_emp
+      FixedColor = clSkyBlue
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Palatino Linotype'
+      Font.Style = []
+      ParentFont = False
+      ReadOnly = True
+      TabOrder = 0
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clRed
+      TitleFont.Height = -11
+      TitleFont.Name = 'MS Sans Serif'
+      TitleFont.Style = []
+      OnDblClick = TntDBGrid1DblClick
+      OnKeyDown = TntDBGrid1KeyDown
+      OnTitleClick = TntDBGrid1TitleClick
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'emp_id'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'emp_chs'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'name_vim'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Width = 157
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'epsexd'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'dept_name'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Width = 152
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'pst_name'
+          Title.Font.Charset = DEFAULT_CHARSET
+          Title.Font.Color = clBlack
+          Title.Font.Height = -11
+          Title.Font.Name = 'MS Sans Serif'
+          Title.Font.Style = []
+          Visible = True
+        end>
+    end
+  end
+  object TntPanel1: TTntPanel
+    Left = 0
+    Top = 302
+    Width = 565
+    Height = 48
+    Align = alBottom
+    TabOrder = 2
+    object TntGroupBox3: TTntGroupBox
+      Left = 1
+      Top = 1
+      Width = 563
+      Height = 46
+      Align = alClient
+      Caption = #24555#36895#26597#25214
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      object TntLabel3: TTntLabel
+        Left = 21
+        Top = 22
+        Width = 27
+        Height = 13
+        Caption = #24037#34399':'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object TntLabel5: TTntLabel
+        Left = 152
+        Top = 24
+        Width = 36
+        Height = 13
+        Caption = #25552#31034#65306
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object EditEmp: TTntEdit
+        Left = 63
+        Top = 16
+        Width = 65
+        Height = 21
+        BevelKind = bkFlat
+        BorderStyle = bsNone
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        MaxLength = 6
+        ParentFont = False
+        TabOrder = 0
+        OnChange = EditEmpChange
+      end
+      object TntEdit1: TTntEdit
+        Left = 192
+        Top = 16
+        Width = 337
+        Height = 21
+        BevelInner = bvLowered
+        BevelKind = bkFlat
+        BorderStyle = bsNone
+        Color = clNone
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clYellow
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        Text = #35531#38617#25802#40736#27161#36984#25799#21729#24037
+      end
+    end
+  end
+  object sp_Emp: TADOStoredProc
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    ProcedureName = 'proc_emp;1'
+    Parameters = <
+      item
+        Name = '@RETURN_VALUE'
+        DataType = ftInteger
+        Direction = pdReturnValue
+        Precision = 10
+        Value = 0
+      end
+      item
+        Name = '@inwork_flag'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 1
+        Value = Null
+      end
+      item
+        Name = '@year_month'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 6
+        Value = Null
+      end
+      item
+        Name = '@emp_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 6
+        Value = Null
+      end
+      item
+        Name = '@emp_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 6
+        Value = Null
+      end
+      item
+        Name = '@dept_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 6
+        Value = Null
+      end
+      item
+        Name = '@dept_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 6
+        Value = Null
+      end
+      item
+        Name = '@pst_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 2
+        Value = Null
+      end
+      item
+        Name = '@pst_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 2
+        Value = Null
+      end
+      item
+        Name = '@edu_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 2
+        Value = Null
+      end
+      item
+        Name = '@edu_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 2
+        Value = Null
+      end
+      item
+        Name = '@birth_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@birth_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@indt_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@indt_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@ledt_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@ledt_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@idno_begin'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@idno_end'
+        Attributes = [paNullable]
+        DataType = ftString
+        Size = 10
+        Value = Null
+      end
+      item
+        Name = '@name_chs'
+        Attributes = [paNullable]
+        DataType = ftWideString
+        Size = 10
+        Value = Null
+      end>
+    Left = 24
+    Top = 146
+    object sp_Empemp_id: TStringField
+      FieldName = 'emp_id'
+      FixedChar = True
+      Size = 6
+    end
+    object sp_Empemp_chs: TWideStringField
+      FieldName = 'emp_chs'
+      Size = 10
+    end
+    object sp_Empname_vim: TWideStringField
+      FieldName = 'name_vim'
+      Size = 50
+    end
+    object sp_Empepsexd: TStringField
+      FieldName = 'epsexd'
+      OnGetText = sp_EmpepsexdGetText
+      Size = 1
+    end
+    object sp_Empdept_code: TStringField
+      FieldName = 'dept_code'
+      Size = 6
+    end
+    object sp_Emppst_code: TStringField
+      FieldName = 'pst_code'
+      Size = 2
+    end
+    object sp_Emppst_name: TStringField
+      FieldKind = fkLookup
+      FieldName = 'pst_name'
+      LookupDataSet = qry_pst
+      LookupKeyFields = 'pst_code'
+      LookupResultField = 'pst_name'
+      KeyFields = 'pst_code'
+      ReadOnly = True
+      Size = 10
+      Lookup = True
+    end
+    object sp_Empdept_name: TStringField
+      FieldKind = fkLookup
+      FieldName = 'dept_name'
+      LookupDataSet = qry_dept
+      LookupKeyFields = 'dept_code'
+      LookupResultField = 'dept_name'
+      KeyFields = 'dept_code'
+      ReadOnly = True
+      Lookup = True
+    end
+  end
+  object ds_emp: TDataSource
+    DataSet = sp_Emp
+    Left = 56
+    Top = 146
+  end
+  object qry_pst: TADOQuery
+    Active = True
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select pst_code+'#39'--'#39'+pst_chs as pst_name,* from hrd_prof')
+    Left = 24
+    Top = 184
+  end
+  object qry_dept: TADOQuery
+    Active = True
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'select dept_code+'#39'--'#39'+abbr_titl as dept_name,* from hrd_dept')
+    Left = 56
+    Top = 186
+  end
+end

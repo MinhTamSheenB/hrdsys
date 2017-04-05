@@ -1,0 +1,764 @@
+{*************************************************************************
+Name：dut02
+Author: anil
+Create date:2005-08-05
+Modify date:2005-08-08
+Commentate:員工請假資料維護
+*************************************************************************}
+unit uFhrd202;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,math,
+  TntComCtrls,WSDLIntf, DB, ADODB,TntDialogs,strutils, TntDB,DateUtils;
+
+type
+  TFormFhrd202 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    DataSource1: TDataSource;
+    PanelFlow: TTntPanel;
+    TntLabel3: TTntLabel;
+    PanelFlowTitle: TTntPanel;
+    ImageClose: TImage;
+    TntGroupBox5: TTntGroupBox;
+    Label_emp_id: TTntLabel;
+    sb_FindEmp: TTntSpeedButton;
+    Label_s_ask_d: TTntLabel;
+    DTPickSdate: TTntDateTimePicker;
+    Label_s_ask_h: TTntLabel;
+    DTPickEdate: TTntDateTimePicker;
+    Label_clas_code: TTntLabel;
+    CobClass: TTntComboBox;
+    EditEmpId: TTntDBEdit;
+    EditShour: TTntDBEdit;
+    EditEhour: TTntDBEdit;
+    TntLabel4: TTntLabel;
+    TntLabel1: TTntLabel;
+    PanelQuery: TPanel;
+    TntGroupBox1: TTntGroupBox;
+    TntLabel6: TTntLabel;
+    TntLabel7: TTntLabel;
+    TntLabel9: TTntLabel;
+    TntLabel2: TTntLabel;
+    EditEmpBegin: TTntEdit;
+    EditEmpEnd: TTntEdit;
+    rbEmp: TTntRadioButton;
+    rbDept: TTntRadioButton;
+    CobDeptBegin: TTntComboBox;
+    CobDeptEnd: TTntComboBox;
+    DTPickBegin: TTntDateTimePicker;
+    DTPickEnd: TTntDateTimePicker;
+    PanelGrid: TPanel;
+    DBGrid1: TTntDBGrid;
+    PanelAct: TTntPanel;
+    sb_Add: TTntSpeedButton;
+    sb_Recover: TTntSpeedButton;
+    sb_Save: TTntSpeedButton;
+    sb_edit: TTntSpeedButton;
+    sb_Del: TTntSpeedButton;
+    sb_Print: TTntSpeedButton;
+    edit_name: TTntDBEdit;
+    edit_dept: TTntDBEdit;
+    ADOQuery1: TADOQuery;
+    Btn_Search: TTntBitBtn;
+    Btn_Reset: TTntBitBtn;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    DBNavigator1: TDBNavigator;
+    bbtn_add: TTntBitBtn;
+    bbtn_ok: TTntBitBtn;
+    Panel4: TPanel;
+    Panel5: TPanel;
+    ADOQuery1tot_hour: TFloatField;
+    TntLabel10: TTntLabel;
+    TntLabel11: TTntLabel;
+    ADOQuery4: TADOQuery;
+    ADOQuery1emp_chs: TWideStringField;
+    ADOQuery1department: TWideStringField;
+    ADOQuery1clas_name: TWideStringField;
+    ADOQuery1upd_user: TWideStringField;
+    ADOQuery1upd_date: TDateTimeField;
+    ADOQuery1emp_id: TWideStringField;
+    ADOQuery1up_date: TDateTimeField;
+    ADOQuery1down_date: TDateTimeField;
+    ADOQuery1cls_id: TWideStringField;
+    ADOQuery1up_time: TWideStringField;
+    ADOQuery1down_time: TWideStringField;
+    ADOQuery1hol_reason: TWideStringField;
+    TntLabel5: TTntLabel;
+    TntDBEdit1: TTntDBEdit;
+    TntLabel8: TTntLabel;
+    TntDBEdit2: TTntDBEdit;
+    TntLabel12: TTntLabel;
+    TntDBEdit3: TTntDBEdit;
+    ADOQuery1hol_times: TIntegerField;
+    ADOQuery1hol_days: TFloatField;
+    ADOQuery1pst_code: TWideStringField;
+    TntDBEdit4: TTntDBEdit;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    function CheckInputValid():boolean;
+    procedure ChangeFlowFlds;
+    procedure SetActEnabled(modify_Flag:boolean=true);
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure DBGrid1TitleClick(Column: TColumn);
+    procedure ADOQuery1AfterScroll(DataSet: TDataSet);
+    procedure rbDeptClick(Sender: TObject);
+    procedure rbEmpClick(Sender: TObject);
+    procedure sb_FindEmpClick(Sender: TObject);
+    procedure EditEmpBeginDblClick(Sender: TObject);
+    procedure EditShourClick(Sender: TObject);
+    procedure sb_editClick(Sender: TObject);
+    procedure sb_AddClick(Sender: TObject);
+    procedure ImageCloseClick(Sender: TObject);
+    procedure PanelFlowTitleMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure sb_DelClick(Sender: TObject);
+    procedure sb_RecoverClick(Sender: TObject);
+    procedure sb_SaveClick(Sender: TObject);
+    procedure CobClassChange(Sender: TObject);
+    procedure DTPickSdateChange(Sender: TObject);
+    procedure DTPickEdateChange(Sender: TObject);
+    procedure sb_PrintClick(Sender: TObject);
+    procedure ADOQuery1AfterOpen(DataSet: TDataSet);
+    procedure ADOQuery1WillChangeRecord(DataSet: TCustomADODataSet;
+      const Reason: TEventReason; const RecordCount: Integer;
+      var EventStatus: TEventStatus);
+    procedure CobDeptBeginChange(Sender: TObject);
+    procedure ADOQuery1BeforePost(DataSet: TDataSet);
+    procedure ADOQuery1emp_idChange(Sender: TField);
+    procedure EditEmpIdKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure Btn_ResetClick(Sender: TObject);
+    procedure Btn_SearchClick(Sender: TObject);
+    procedure ADOQuery1AfterClose(DataSet: TDataSet);
+    procedure bbtn_okClick(Sender: TObject);
+    procedure bbtn_addClick(Sender: TObject);
+    procedure ADOQuery1CalcFields(DataSet: TDataSet);
+    procedure EditShourChange(Sender: TObject);
+    procedure EditEmpBeginChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormFhrd202: TFormFhrd202;
+
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys;
+var
+  Langstr:TWideStrings;//語言字符串
+  pri_arr:TPrvArr;//權限數組
+{$R *.dfm}
+
+procedure TFormFhrd202.InitLang;
+{*************************************************************************
+TO DO:初始化語言
+*************************************************************************}
+var
+  keys:String;             
+begin
+SetComponentLang(self);//set component language text
+keys:='dut02_titl,not_find_data,total,current_location,save_success,'
+  +'msg_confirm_save,msg_confirm_cancel,msg_del_alert,dut02_exist_excuse,'
+  +'error_date,error_empid,dut02_choose_clas,error_hour,error_input_hour,'
+  +'msg_ask_over_days,msg_ask_over_days_60,msg_post_record_on_close,'
+  +'save_success,save_fail';
+LangStr:=GetLangWideStrs(keys);
+//PanelTitle.Caption:=GetLangName(LangStr,'dut02_titl');
+end;
+
+procedure TFormFhrd202.InitForm;
+{*************************************************************************
+TO DO:初始化Form
+*************************************************************************}
+var
+  sql_str,fld_name:string;
+begin
+  GetDeptRange(CobDeptBegin);
+  GetDeptRange(CobDeptEnd);
+  CobDeptBegin.Enabled:=false;
+  CobDeptEnd.Enabled:=false;
+  CobDeptBegin.Color:=clBtnface;
+  CobDeptEnd.Color:=clBtnface;
+  if userLang='E' then
+    fld_name:='clas_code+'' ''+clas_eng'
+  else if userLang='V' then
+    fld_name:='clas_code+'' ''+clas_vim'
+  else
+    fld_name:='clas_code+'' ''+clas_chs';
+  sql_str:='select '+fld_name+' as clas_name,clas_code from hrd_dut_class where clas_code>=''06'' and clas_code<''30'' and clas_code<>''07'' ';
+  SetComboxList(sql_str,CobClass,'12');
+  DTPickBegin.Date:=dateOf(now)-7;
+  DTPickEnd.Date:=dateOf(now)+1;
+  DTPickSdate.Date:=dateOf(now);
+  DTPickEdate.Date:=dateOf(now);
+end;
+
+procedure TFormFhrd202.FormCreate(Sender: TObject);
+begin
+  InitLang;// Init language
+  pri_arr:=GetPrvArr(username,'fhrd202');//Get privilege
+  InitForm;// Init Form
+  SetActEnabled(false);//Set act button weather enabled
+end;
+
+procedure TFormFhrd202.Btn_SearchClick(Sender: TObject);
+var
+  sql_str:string;
+begin
+  sql_str:='select * from fhrd_hol where 2>1 ';
+    sql_str:=sql_str+' and down_date>=''' +formatdatetime('yyyy/mm/dd',DTPickBegin.date)+'''';
+    sql_str:=sql_str+' and up_date<=''' +formatdatetime('yyyy/mm/dd',DTPickEnd.date)+'''';
+    //2012-09-07 hyt add
+    sql_str:=sql_str+' and emp_id IN( select emp_id from fhrd_emp where '+G_sFactorySql+')';
+
+  if rbEmp.Checked then
+    begin
+      if trim(EditEmpBegin.Text)<>'' then
+        sql_str:=sql_str+' and emp_id>=''' +trim(EditEmpBegin.text)+'''';
+      if trim(EditEmpEnd.Text)<>'' then
+        sql_str:=sql_str+' and emp_id<=''' +trim(EditEmpEnd.text)+'''';
+      //sql_str:=sql_str+' and emp_id IN( select emp_id from fhrd_emp where '+UserDeptStr+')';
+    end;
+  if (rbDept.Checked) and ((trim(CobDeptBegin.Text)<>'') or (trim(CobDeptEnd.Text)<>'')) then
+    begin
+      sql_str:=sql_str+' and emp_id IN( select emp_id from fhrd_emp where 1=1';
+        if trim(CobDeptBegin.Text)<>'' then
+          sql_str:=sql_str+' and dept_code>=''' +leftstr(CobDeptBegin.Text,6)+'''';
+        if trim(CobDeptEnd.Text)<>'' then
+          sql_str:=sql_str+' and dept_code<=''' +leftstr(CobDeptEnd.Text,6)+'''';
+      sql_str:=sql_str+')';
+    end;
+  with Adoquery1 do
+    begin
+      close;
+      sql.Clear;
+      sql.Add(sql_str);
+      //SetOtherFields;//set other fields value
+      open;
+  if Adoquery1.Eof then
+  begin
+    SetStatusText(GetLangName(LangStr,'not_find_data'));
+    DBGrid1.Enabled:=false;
+  end
+  else
+    begin
+      DBGrid1.Enabled:=true;
+    end;
+    end;
+  Btn_Reset.OnClick(Sender);
+end;
+
+procedure TFormFhrd202.Btn_ResetClick(Sender: TObject);
+var
+  status:boolean;
+begin
+if TtntBitBtn(Sender).Name='Btn_Reset' then
+  status:=true
+else
+  status:=false;
+DTPickBegin.Enabled:=status;
+DTPickEnd.Enabled:=status;
+RBEmp.Enabled:=status;
+RBDept.Enabled:=status;
+EditEmpBegin.Enabled:=status;
+EditEmpEnd.Enabled:=status;
+CobDeptBegin.Enabled:=status;
+CobDeptEnd.Enabled:=status;
+Btn_search.Enabled:=status;
+Btn_Reset.Enabled:=not status;
+//if status=true then
+ADOQuery1.Active:= not status;
+end;
+
+procedure TFormFhrd202.ADOQuery1AfterOpen(DataSet: TDataSet);
+//打開數據集時設置功能按鈕是否可用
+begin
+  SetActEnabled(false);
+end;
+
+procedure TFormFhrd202.ADOQuery1AfterClose(DataSet: TDataSet);
+//關閉數據集時設置功能按鈕是否可用
+begin
+  SetActEnabled(false);
+end;
+
+procedure TFormFhrd202.ADOQuery1WillChangeRecord(DataSet: TCustomADODataSet;
+  const Reason: TEventReason; const RecordCount: Integer;
+  var EventStatus: TEventStatus);
+//改變數據集時設置功能按鈕是否可用
+begin
+  SetActEnabled(true);
+end;
+
+procedure TFormFhrd202.ADOQuery1AfterScroll(DataSet: TDataSet);
+//數據集移動時,改變狀態欄提示,及改變編輯區一些欄位
+begin
+ChangeFlowFlds;
+with ADOQuery1 do
+  setStatusText(GetLangName(LangStr,'current_location')+':'+inttostr(RecNo)+' '+GetLangName(LangStr,'total')+':'+inttostr(RecordCount));
+end;
+
+procedure TFormFhrd202.ADOQuery1BeforePost(DataSet: TDataSet);
+//數據集Post時,自動追加修改者,修改日期欄位
+var
+  sql_str,emp_id,clas_code,s_ask_d,s_ask_h,s_ask_t,e_ask_d,e_ask_h,e_ask_t,s_time,e_time,sqlSstr,sqlEstr:string;
+  TmpDataset:TADOQuery;
+begin
+  if not CheckInputValid then
+    abort;
+  with DataSet do
+  begin
+    emp_id:=FieldByName('emp_id').AsString;
+    clas_code:=FieldByName('cls_id').AsString;
+    s_ask_d:=FormatDateTime('yyyy/mm/dd',FieldByName('up_date').AsDateTime);
+    s_ask_h:=LeftStr(FieldByName('up_time').AsString,2);
+    s_ask_t:=RightStr(FieldByName('up_time').AsString,2);
+    e_ask_d:=FormatDateTime('yyyy/mm/dd',FieldByName('down_date').AsDateTime);
+    e_ask_h:=LeftStr(FieldByName('down_time').AsString,2);
+    e_ask_t:=RightStr(FieldByName('down_time').AsString,2);
+    s_time:=s_ask_d+' '+s_ask_h+':'+s_ask_t+':00';
+    e_time:=e_ask_d+' '+e_ask_h+':'+e_ask_t+':00';
+    sqlSstr:='up_date+(up_time/100.0)/24.0';
+    sqlEstr:='down_date+(down_time/100.0)/24.0';
+  end;
+  sql_str:='select * from fhrd_hol where emp_id='''+emp_id+''''
+    +' and (('''+s_ask_d+''' between up_date and down_date)'
+    +' or ('''+e_ask_d+''' between up_date and down_date)'
+    +' or (up_date between '''+s_ask_d+''' and '''+e_ask_d+''') '
+    +' or (down_date between '''+s_ask_d+''' and '''+e_ask_d+''')) ';
+  sql_str:='select up_date+up_time/24.0 as s_time,down_date+down_time/24.0 as e_time'
+    +' from fhrd_hol where emp_id='''+emp_id+''''
+    +' and (('''+s_time+''' between '+sqlSstr+' and '+sqlEstr+' )'
+    +' or ('''+e_time+''' between '+sqlSstr+' and '+sqlEstr+')'
+    +' or ('+sqlSstr+' between '''+s_time+''' and '''+e_time+''') '
+    +' or ('+sqlEstr+' between '''+s_time+''' and '''+e_time+''')) ';
+  if DataSet.State in [dsinsert] then
+  begin
+  ADOQuery4.Clone(ADOQuery1);
+  if ADOQuery4.Locate('emp_id;up_date;up_time',VarArrayOf([emp_id,s_ask_d,s_ask_h]),[loCaseInsensitive]) then
+  begin//新增時檢查dataset中是否存在
+    WideShowMessage(GetLangName(LangStr,'dut02_exist_excuse'));
+    abort;
+  end;
+  if CheckRecordExist(sql_str) then//新增時檢查是否存在
+  begin
+    WideShowMessage(GetLangName(LangStr,'dut02_exist_excuse'));
+    abort;
+  end;
+  end;
+  {with DMhrdsys.sqlquery2 do
+  begin
+    sql.clear;
+    sql.add('select * from hrd_emp where emp_id='''+emp_id+''' and '+UserDeptStr);
+    open;
+    if eof then
+    begin
+      wideshowmessage('你無權操作該工號！');
+      close;
+      abort;
+    end;
+    close;
+  end;}
+{  if not HasYearHoliday then//檢查年假是否已經請完
+//  if GetYearHol(emp_id,FormatDateTime('yyyy',DTPickSdate.Date)).Strings[3]
+  begin
+    abort;
+    exit;
+  end;
+}  with ADOQuery1 do
+    begin
+      FieldByName('upd_user').AsString:=UserName;
+      FieldByName('upd_date').AsDateTime:=GetServerDatetime;
+      FieldByName('up_date').AsDateTime:=DateOf(DTPickSdate.Date);
+      FieldByName('down_date').AsDateTime:=DateOf(DTPickEdate.Date);
+    end;
+end;
+
+procedure TFormFhrd202.DBGrid1TitleClick(Column: TColumn);
+begin
+  DBGridSortByTitle(column);//點擊表格標頭改變排序方式
+end;
+
+procedure TFormFhrd202.CobDeptBeginChange(Sender: TObject);
+begin
+  CobDeptEnd.Text:=CobDeptBegin.Text;
+end;
+
+function TFormFhrd202.CheckInputValid():boolean;
+{*************************************************************************
+TO DO:提交前檢查輸入的有效性
+*************************************************************************}
+begin
+  if length(EditEmpId.Text)<>6 then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'error_empid'),mterror,[mbOK],0);
+      EditEmpId.SetFocus;
+      result:=false;
+      exit;
+    end;
+  if Cobclass.ItemIndex=-1 then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'dut02_choose_clas'),mtConfirmation,[mbOK],0);
+      Cobclass.SetFocus;
+      result:=false;
+      exit;
+    end;
+  if (length(EditShour.Text)=0) or (length(EditEhour.Text)=0) then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'error_input_hour'),mterror,[mbOK],0);
+      result:=false;
+      exit;
+    end
+  else if (length(EditShour.Text)<>4) or (length(EditEhour.Text)<>4) then
+    begin
+      WideMessageDlg(GetLangName(LangStr,'error_hour'),mterror,[mbOK],0);
+      result:=false;
+      exit;
+    end;
+  result:=true;
+end;
+
+procedure TFormFhrd202.rbDeptClick(Sender: TObject);
+begin
+  EditEmpBegin.Enabled:=false;
+  EditEmpEnd.Enabled:=false;
+  EditEmpBegin.Color:=clBtnface;
+  EditEmpEnd.Color:=clBtnface;
+  CobDeptBegin.Enabled:=true;
+  CobDeptEnd.Enabled:=true;
+  CobDeptBegin.Color:=clwhite;
+  CobDeptEnd.Color:=clwhite;
+  CobDeptBegin.SetFocus;
+end;
+
+procedure TFormFhrd202.rbEmpClick(Sender: TObject);
+begin
+  CobDeptBegin.Enabled:=false;
+  CobDeptEnd.Enabled:=false;
+  CobDeptBegin.Color:=clBtnface;
+  CobDeptEnd.Color:=clBtnface;
+  EditEmpBegin.Enabled:=true;
+  EditEmpEnd.Enabled:=true;
+  EditEmpBegin.Color:=clwhite;
+  EditEmpEnd.Color:=clwhite;
+  EditEmpBegin.SetFocus;
+end;
+
+procedure TFormFhrd202.sb_FindEmpClick(Sender: TObject);
+begin
+  editempid.Text:=FindEmpId('emp_id');
+end;
+
+procedure TFormFhrd202.EditEmpBeginDblClick(Sender: TObject);
+begin
+  TtntEdit(Sender).Text:=FindEmpId('emp_id');
+end;
+
+procedure TFormFhrd202.EditShourClick(Sender: TObject);
+//進入時選中全部
+begin
+  TMaskEdit(Sender).SelStart:=0;
+  TMaskEdit(Sender).SelLength:=2;
+end;
+
+procedure TFormFhrd202.sb_PrintClick(Sender: TObject);
+//print dataset
+begin
+  showPrint(ADOQuery1,'員工請假情況列印');
+end;
+
+procedure TFormFhrd202.sb_AddClick(Sender: TObject);
+//add record
+begin
+  with ADOQuery1 do
+  begin
+    if Active=false then//如果沒有打開數據集， 則重新打開
+    begin
+      SQL.Clear;
+      SQL.Add('select * from fhrd_hol where 2=1 ');
+      Active:=true;
+    end;
+//    Last;
+    Append;
+  end;
+  ChangeFlowFlds;
+  DBNavigator1.Hide;
+  bbtn_add.Show;
+  PanelFlow.Visible:=true;
+  EditEmpId.SetFocus;
+  PanelMain.Enabled:=false;
+end;
+
+procedure TFormFhrd202.sb_editClick(Sender: TObject);
+//modify record
+begin
+  ChangeFlowFlds;
+  DBNavigator1.Show;
+  bbtn_add.Hide;
+  PanelFlow.Visible:=true;
+  EditEmpId.SetFocus;
+  PanelGrid.Enabled:=true;
+  PanelAct.Enabled:=false;
+  PanelQuery.Enabled:=false;
+end;
+
+procedure TFormFhrd202.sb_DelClick(Sender: TObject);
+//delete record
+begin
+with ADOQuery1 do
+if (RecordCount<>0) or ( not Eof) then
+  if wideMessageDlg(GetLangName(LangStr,'msg_del_alert'),mtConfirmation,[mbyes,mbno],0)=mryes then
+    Delete;
+end;
+
+procedure TFormFhrd202.sb_RecoverClick(Sender: TObject);
+//cancel all dataset modify
+begin
+if wideMessageDlg(GetLangName(LangStr,'msg_confirm_cancel'),mtConfirmation,[mbyes,mbno],0)=mrno then
+  exit;
+ADOQuery1.CancelBatch;
+SetActEnabled(false);
+end;
+
+procedure TFormFhrd202.sb_SaveClick(Sender: TObject);
+//save all dataset
+begin
+if wideMessageDlg(GetLangName(LangStr,'msg_confirm_save'),mtConfirmation,[mbyes,mbno],0)=mrno then
+  exit;
+try
+  ADOQuery1.UpdateBatch;
+  SetActEnabled(false);
+  WideShowMessage(GetLangName(LangStr,'save_success'));
+except
+  WideShowMessage(GetLangName(LangStr,'save_fail'));
+end;
+end;
+
+procedure TFormFhrd202.bbtn_addClick(Sender: TObject);
+//繼續新增
+begin
+  ADOQuery1.Append;
+  ChangeFlowFlds;
+  EditEmpId.SetFocus;
+end;
+
+procedure TFormFhrd202.bbtn_okClick(Sender: TObject);
+//單筆資料修改后post，並關閉編輯區
+begin
+  if ADOQuery1.State in [dsedit,dsinsert] then
+    ADOQuery1.post;
+  ImageClose.OnClick(Sender);
+end;
+
+procedure TFormFhrd202.ImageCloseClick(Sender: TObject);
+//關閉浮動窗口,其他panel可用
+begin
+  if ADOQuery1.State in [dsedit,dsinsert] then
+  begin
+    if wideMessageDlg(GetLangName(LangStr,'msg_post_record_on_close'),mtConfirmation,[mbyes,mbno],0)=mryes then
+      ADOQuery1.Post
+    else
+      ADOQuery1.Cancel;
+  end;
+  PanelFlow.Visible:=false;
+  PanelMain.Enabled:=true;
+  PanelQuery.Enabled:=true;
+  PanelGrid.Enabled:=true;
+  PanelAct.Enabled:=true;
+end;
+
+procedure TFormFhrd202.PanelFlowTitleMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+//拖動浮動窗口
+begin
+  ReleaseCapture;
+  PanelFlow.Perform(WM_SysCommand,$F012,0);
+end;
+
+procedure TFormFhrd202.CobClassChange(Sender: TObject);
+begin
+  ADOQuery1.Edit;
+  ADOQuery1.FieldByName('cls_id').AsString:=leftstr(CobClass.Text,2);
+end;
+
+procedure TFormFhrd202.DTPickSdateChange(Sender: TObject);
+begin
+  ADOQuery1.Edit;
+  ADOQuery1.FieldByName('up_date').AsDateTime:=DateOf(DTPickSdate.Date);
+end;
+
+procedure TFormFhrd202.DTPickEdateChange(Sender: TObject);
+begin
+  ADOQuery1.Edit;
+  ADOQuery1.FieldByName('down_date').AsDateTime:=DateOf(DTPickEdate.Date);
+end;
+
+procedure TFormFhrd202.ADOQuery1emp_idChange(Sender: TField);
+//當輸入工號時,給日期,班別賦默認值
+begin
+  with ADOQuery1 do
+    begin
+      Edit;
+      FieldByName('cls_id').AsString:=leftstr(CobClass.Text,2);
+      FieldByName('up_date').AsDateTime:=DateOf(DTPickSdate.Date);
+      FieldByName('down_date').AsDateTime:=DateOf(DTPickEdate.Date);
+    end;
+end;
+
+procedure TFormFhrd202.ChangeFlowFlds;
+//給浮動窗口中某些欄位賦默認值
+var
+  DefDate,CurDate:Tdatetime;
+begin
+  with ADOQuery1 do
+    begin
+      if State=dsInsert then//工號是否可編輯
+        begin
+          EditEmpId.ReadOnly:=false;
+          EditEmpId.Color:=clwhite;
+          sb_FindEmp.Enabled:=true;
+        end
+      else
+        begin
+          EditEmpId.ReadOnly:=true;
+          EditEmpId.Color:=clBtnface;
+          sb_FindEmp.Enabled:=false;
+        end;
+      //默認起止日期
+      CurDate:=GetServerDatetime;
+      if FieldByName('up_date').AsString<>'' then
+        DefDate:=FieldByName('up_date').AsDateTime
+      else
+        DefDate:=CurDate;
+      DTPickSdate.Date:=DefDate;
+      if FieldByName('down_date').AsString<>'' then
+        DefDate:=FieldByName('down_date').AsDateTime
+      else
+        DefDate:=CurDate;
+      DTPickEdate.Date:=DefDate;
+      //默認班別代號
+      if FieldByName('cls_id').AsString<>'' then
+        SetComboxIndex(CobClass,FieldByName('cls_id').AsString)
+      else
+        SetComboxIndex(CobClass,'12');
+    end;
+end;
+
+procedure TFormFhrd202.SetActEnabled(Modify_Flag:boolean=true);
+//設置功能按鈕是否可用
+var
+  status:boolean;
+begin
+  status:=AdoQuery1.Active;
+  sb_print.Enabled:=status and Pri_Arr[PRT];
+  sb_Add.Enabled:=Pri_Arr[ADD];
+  sb_Del.Enabled:=status and Pri_Arr[DEL];
+  sb_edit.Enabled:=status and Pri_Arr[UPD];
+  sb_Recover.Enabled:=status and modify_flag;
+  sb_Save.Enabled:=status and modify_flag;
+end;
+
+procedure TFormFhrd202.EditEmpIdKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+//浮動Panel的輸入框中快捷移動設置
+begin
+  if (key=13) then// key_enter
+    self.FindNextControl(TwinControl(Sender),true,true,false).SetFocus;
+  if (Sender.ClassType = TtntcomboBox) or (Sender.ClassType =TTntDatetimePicker) then
+    exit;//while key up and down on comboBox or DatetimePicker,not continue;
+  if (key=40) then//key_down
+    self.FindNextControl(TwinControl(Sender),true,true,false).SetFocus;
+  if (key=38) and (TwinControl(Sender).TabOrder>0) then//key_up
+    self.FindNextControl(TwinControl(Sender),false,true,false).SetFocus;
+end;
+
+procedure TFormFhrd202.EditShourChange(Sender: TObject);
+//浮動Panel的輸入框中快捷移動設置(到最大長度時移動)
+begin
+  if panelflow.Visible and (length(TtntDBEdit(Sender).Text)=4) then
+    self.FindNextControl(TwinControl(Sender),true,true,false).SetFocus;
+end;
+
+procedure TFormFhrd202.ADOQuery1CalcFields(DataSet: TDataSet);
+var
+  s_ask_d,e_ask_d,s_time,e_time,t_time,CurDays,t_date:Tdatetime;
+  i:integer;
+  emp_id,clas_code,sql_str,sPst_code:string;
+  emp_chs,department,clas_name:WideString;
+  flds:TFields;
+  DayRest:double;
+//計算本次請假時長
+begin
+  with Dataset do
+  begin
+    emp_id:=FieldByName('emp_id').AsString;
+    clas_code:=FieldByName('cls_id').AsString;
+    s_ask_d:=FieldByName('up_date').AsDateTime;
+    e_ask_d:=FieldByName('down_date').AsDateTime;
+    s_time:=ShortstrToTime(FieldByName('up_time').AsString);
+    e_time:=ShortstrToTime(FieldByName('down_time').AsString);
+  end;
+    t_time:=e_time-s_time;
+    if (s_time<=12/24) and (e_time>=13/24) then
+      t_time:=t_time-1/24;
+    CurDays:=t_time*3;
+    CurDays:=CurDays+e_ask_d-s_ask_d;
+    t_date:=s_ask_d;
+ // DayRest:=GetRestDayCount(s_ask_d,e_ask_d);
+  CurDays:=CurDays;  //-DayRest;
+  CurDays:=ceil(CurDays*4)/4;
+  if GetSunDayCount(DayOf(s_ask_d),DayOf(e_ask_d),formatdatetime('yyyymm',DTPickBegin.date) ) > 0 then
+         CurDays := CurDays - GetSunDayCount(DayOf(s_ask_d),DayOf(e_ask_d),formatdatetime('yyyymm',DTPickBegin.date) ) ;
+  if CurDays > 26 then   CurDays := 26 ;
+  //flds:=GetEmpInfo(emp_id);
+  sPst_code:='';
+  sql_str:='select *,(SELECT pst_code+'' ''+pst_chs FROM  hrd_prof where pst_code=A.pst_code) as pst_code_name '
+    +'from fhrd_emp A left join hrd_dept B '
+    +'on A.dept_code=B.dept_code where emp_id='''+emp_id+'''';
+  with DMHrdsys.SQLQuery1 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add(sql_str);
+    open;
+    emp_chs:=FieldByName('emp_name').AsString;
+    department:=FieldByName('dept_code').AsString+' '+FieldByName('abbr_titl').AsString;
+    sPst_code:=FieldByName('pst_code_name').AsString;
+  end;
+  with DMHrdsys.SQLQuery1 do
+  begin
+    close;
+    sql.Clear;
+    sql.Add('select * from hrd_dut_class where clas_code='''+clas_code+'''');
+    open;
+    clas_name:=FieldByName('clas_chs').AsString;
+  end;
+  with Dataset do
+  begin
+    FieldByName('clas_name').Value:=clas_name;
+    FieldByName('emp_chs').AsString:=emp_chs;
+    FieldByName('department').AsString:=department;
+    FieldByName('tot_days').AsFloat:=CurDays;
+    FieldByName('pst_code').Value:=sPst_code;//clas_name;
+
+  end;
+end;
+
+procedure TFormFhrd202.EditEmpBeginChange(Sender: TObject);
+begin
+  EditEmpEnd.Text :=EditEmpBegin.Text;
+end;
+
+end.

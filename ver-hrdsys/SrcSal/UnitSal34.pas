@@ -1,0 +1,184 @@
+{*************************************************************************
+Name：Sal33
+Author: anil
+Create date:2005-08-05
+Modify date:2005-08-08
+Commentate:員工請假資料維護
+*************************************************************************}
+unit UnitSal34;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Mask, DBCtrls, TntDbCtrls, ExtCtrls, Grids, DBGrids, TntDBGrids,
+  StdCtrls, Buttons, TntButtons, TntStdCtrls, TntExtCtrls, ComCtrls,math,
+  TntComCtrls,WSDLIntf, DB, ADODB,TntDialogs,strutils, TntDB,DateUtils;
+
+type
+  TFormSal34 = class(TForm)
+    Panel1: TPanel;
+    PanelTitle: TTntPanel;
+    PanelMain: TPanel;
+    DataSource1: TDataSource;
+    PanelQuery: TPanel;
+    PanelGrid: TPanel;
+    DBGrid1: TTntDBGrid;
+    TntPanel1: TTntPanel;
+    btn1: TTntButton;
+    qryBank: TADOQuery;
+    qryBankupd_user: TStringField;
+    dtmfldBankupd_date: TDateTimeField;
+    qryBankemp_id: TStringField;
+    qryBankepid_no: TStringField;
+    qryBankbank_name: TWideStringField;
+    qryBankcard_no: TStringField;
+    qryEmp: TADOQuery;
+    qryEmpemp_name: TWideStringField;
+    qryEmpdept_titl: TWideStringField;
+    qryEmpemp_id: TStringField;
+    qryBankemp_name: TWideStringField;
+    qryBankdept_titl: TWideStringField;
+    conCos: TADOConnection;
+    qryCosBank: TADOQuery;
+    qryCosBankupd_user: TStringField;
+    dtmfldCosBankupd_date: TDateTimeField;
+    qryCosBankemp_id: TStringField;
+    qryCosBankepid_no: TStringField;
+    qryCosBankbank_name: TWideStringField;
+    qryCosBankcard_no: TStringField;
+    //my define
+    procedure InitLang;
+    procedure InitForm;
+    //auto general
+    procedure FormCreate(Sender: TObject);
+    procedure btn1Click(Sender: TObject);
+  private
+    { Private declarations }
+    curAction: string;
+  public
+    { Public declarations }
+  end;
+
+var
+  FormSal34: TFormSal34;
+
+implementation
+uses
+  UnitHrdUtils,unitDMHrdsys;
+var
+  Langstr:TWideStrings;//語言字符串
+  pri_arr:TPrvArr;//權限數組
+{$R *.dfm}
+
+procedure TFormSal34.InitLang;
+{*************************************************************************
+TO DO:初始化語言
+*************************************************************************}
+var
+  keys:String;             
+begin
+SetComponentLang(self);//set component language text
+keys:='sal34_titl,not_find_data,total,current_location,save_success,'
+  +'msg_confirm_save,msg_confirm_cancel,msg_del_alert,dut02_exist_excuse,'
+  +'error_date,error_empid,dut02_choose_clas,error_hour,error_input_hour,'
+  +'msg_ask_over_days,msg_ask_over_days_60,msg_post_record_on_close,'
+  +'save_success,save_fail,msg_month_data_locked,';
+LangStr:=GetLangWideStrs(keys);
+//PanelTitle.Caption:=GetLangName(LangStr,'dut02_titl');
+end;
+
+procedure TFormSal34.InitForm;
+{*************************************************************************
+TO DO:初始化Form
+*************************************************************************}
+var
+  sql_str:string;
+begin
+  sql_str := 'select e.emp_id,e.emp_chs+''-''+e.name_vim emp_name,e.dept_code+''-''+d.abbr_titl+''-''+d.vim_titl dept_titl from hrd_emp e,hrd_dept d where e.emp_id not like ''2%'' and e.dept_code=d.dept_code';
+
+  with qryEmp do
+  begin
+    sql.Clear;
+    SQL.Add(sql_str);
+    Open;
+  end;
+  sql_str:='select * from hrd_sal_bankcard where emp_id not like ''2%'' order by emp_id';
+  with qryBank do
+  begin
+    SQL.Clear;
+    SQL.Add(sql_str);
+    Open;
+  end;
+end;
+
+procedure TFormSal34.FormCreate(Sender: TObject);
+begin
+  InitLang;// Init language
+  pri_arr:=GetPrvArr(username,'sal34');//Get privilege
+  InitForm;// Init Form
+end;
+
+procedure TFormSal34.btn1Click(Sender: TObject);
+var
+  sql_str,sEmp:string;
+  i,delCount,newCount,updCount:Integer;
+begin
+  sql_str := 'select * from hrd_sal_bankcard where emp_id not like ''2%'' order by emp_id';
+  with qryCosBank do
+  begin
+    SQL.Clear;
+    SQL.Add(sql_str);
+    Open;
+  end;
+  // 刪除多的員工
+  qryBank.First;
+  while not qryBank.Eof do
+  begin
+    sEmp := qryBank.FieldByName('emp_id').AsString;
+    if not qryCosBank.Locate('emp_id',sEmp,[loCaseInsensitive]) then
+    begin
+      qryBank.Delete;
+      delCount := delCount+1;
+    end else begin
+      qryBank.Next;
+    end;
+  end;
+  // 新增新的銀行卡資料
+  qryCosBank.First;
+  while not qryCosBank.Eof do
+  begin
+    try
+      sEmp := qryCosBank.FieldByName('emp_id').AsString;
+      if not qryBank.Locate('emp_id',sEmp,[loCaseInsensitive]) then
+      begin
+        qryBank.Append;
+        //qryBank.FieldByName('upd_user').Value := UserName;
+        //qryBank.FieldByName('upd_date').Value := GetServerDateTime;
+        qryBank.FieldByName('emp_id').Value := qryCosBank.FieldByName('emp_id').Value;
+        qryBank.FieldByName('epid_no').Value := qryCosBank.FieldByName('epid_no').Value;
+        qryBank.FieldByName('bank_name').Value := qryCosBank.FieldByName('bank_name').Value;
+        qryBank.FieldByName('card_no').Value := qryCosBank.FieldByName('card_no').Value;
+        qryBank.Post;
+        newCount := newCount+1;
+      end else begin
+        if qryCosBank.FieldByName('card_no').AsString<> qryBank.FieldByName('card_no').AsString then
+        begin
+          qryBank.Edit;
+          qryBank.FieldByName('card_no').AsString := qryCosBank.FieldByName('card_no').AsString;
+          qryBank.Post;
+          updCount := updCount+1;
+        end;
+      end;
+    except
+      ShowMessage(IntToStr(qryCosBank.RecNo));
+    end;
+
+    qryCosBank.Next;
+  end;
+  WideMessageDlg('Append '+IntToStr(newCount)+' records,'
+             +'Update '+IntToStr(updCount)+' records,'
+             +'Delete '+IntToStr(delCount)+' records!',mtInformation,[mbOK],0);
+end;
+
+end.

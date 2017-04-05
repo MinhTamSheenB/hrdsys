@@ -1,0 +1,583 @@
+object FormSal19: TFormSal19
+  Left = 198
+  Top = 156
+  Width = 1062
+  Height = 503
+  Caption = #34218#36039#21934'/'#34218#36039#34920#21015#21360
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Scaled = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 1054
+    Height = 469
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    object PanelTitle: TTntPanel
+      Left = 0
+      Top = 0
+      Width = 1054
+      Height = 36
+      Align = alTop
+      BevelOuter = bvNone
+      Caption = 'sal19_titl'
+      Color = clCream
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -16
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+    end
+    object PanelMain: TPanel
+      Left = 0
+      Top = 36
+      Width = 1054
+      Height = 433
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 1054
+        Height = 113
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        object TntGroupBox1: TTntGroupBox
+          Left = 0
+          Top = 0
+          Width = 1054
+          Height = 113
+          Align = alClient
+          Caption = 'query_condition'
+          TabOrder = 0
+          object Label_month: TTntLabel
+            Left = 10
+            Top = 17
+            Width = 78
+            Height = 13
+            Alignment = taRightJustify
+            AutoSize = False
+            Caption = 'month'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clBlue
+            Font.Height = -13
+            Font.Name = 'MS PGothic'
+            Font.Style = []
+            ParentFont = False
+          end
+          object edit_month: TMaskEdit
+            Left = 107
+            Top = 12
+            Width = 47
+            Height = 21
+            Hint = 'yyyy/mm'
+            EditMask = '9999/99;0;_'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlack
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+            MaxLength = 7
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            OnChange = EditEmpBeginChange
+          end
+          object RbEmp: TTntRadioButton
+            Left = 24
+            Top = 43
+            Width = 80
+            Height = 17
+            Caption = 'by_empid'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            OnClick = TntRadioButton_faceClick
+          end
+          object EditEmpBegin: TTntEdit
+            Left = 107
+            Top = 40
+            Width = 57
+            Height = 21
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlack
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+            ParentFont = False
+            TabOrder = 2
+            OnChange = EditEmpBeginChange
+          end
+          object EditEmpEnd: TTntEdit
+            Left = 171
+            Top = 40
+            Width = 57
+            Height = 21
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlack
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+            ParentFont = False
+            TabOrder = 3
+            OnChange = EditEmpBeginChange
+          end
+          object RbDept: TTntRadioButton
+            Left = 24
+            Top = 75
+            Width = 80
+            Height = 17
+            Caption = 'by_deptcode'
+            Checked = True
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 4
+            TabStop = True
+            OnClick = TntRadioButton_faceClick
+          end
+          object CobDeptBegin: TTntComboBox
+            Left = 107
+            Top = 76
+            Width = 150
+            Height = 21
+            Color = clWhite
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlack
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+            ItemHeight = 13
+            ParentFont = False
+            TabOrder = 5
+            OnChange = EditEmpBeginChange
+          end
+          object CobDeptEnd: TTntComboBox
+            Left = 259
+            Top = 76
+            Width = 150
+            Height = 21
+            Color = clWhite
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlack
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+            ItemHeight = 13
+            ParentFont = False
+            TabOrder = 6
+            OnChange = EditEmpBeginChange
+          end
+          object Panel7: TPanel
+            Left = 247
+            Top = 42
+            Width = 188
+            Height = 16
+            BevelOuter = bvNone
+            TabOrder = 7
+          end
+          object Panel2: TPanel
+            Left = 438
+            Top = 35
+            Width = 338
+            Height = 68
+            BevelOuter = bvNone
+            TabOrder = 8
+            object BtnQuery: TTntButton
+              Left = 59
+              Top = 39
+              Width = 75
+              Height = 25
+              Caption = 'query'
+              TabOrder = 0
+              OnClick = BtnQueryClick
+            end
+            object BtnPreview: TTntButton
+              Left = 163
+              Top = 39
+              Width = 75
+              Height = 25
+              Caption = 'preview'
+              Enabled = False
+              TabOrder = 1
+              OnClick = BtnPrintClick
+            end
+            object BtnPrint: TTntBitBtn
+              Left = 259
+              Top = 39
+              Width = 75
+              Height = 25
+              Caption = 'print'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Height = -11
+              Font.Name = 'MS Sans Serif'
+              Font.Style = []
+              ParentFont = False
+              TabOrder = 2
+              OnClick = BtnPrintClick
+            end
+          end
+        end
+      end
+      object PanelGrid: TPanel
+        Left = 0
+        Top = 113
+        Width = 1054
+        Height = 320
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 1
+        object TntDBGrid1: TTntDBGrid
+          Left = 0
+          Top = 0
+          Width = 1054
+          Height = 320
+          Align = alClient
+          DataSource = DataSource1
+          FixedColor = clSkyBlue
+          ImeName = 'Chinese (Simplified) - Microsoft Pinyin IME 3.0'
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          TitleFont.Style = []
+          OnTitleClick = TntDBGrid1TitleClick
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'emp_id'
+              Title.Alignment = taCenter
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'name_vim'
+              Title.Alignment = taCenter
+              Width = 175
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'dept_code'
+              Title.Alignment = taCenter
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'abbr_titl'
+              Title.Alignment = taCenter
+              Width = 130
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'epid_no'
+              Title.Alignment = taCenter
+              Width = 65
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'epindt'
+              Title.Alignment = taCenter
+              Width = 65
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'epledt'
+              Title.Alignment = taCenter
+              Width = 65
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'lv_supp_amt'
+              Title.Alignment = taCenter
+              Width = 76
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'six_amt'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'six_amt_new'
+              Visible = True
+            end>
+        end
+      end
+    end
+  end
+  object DataSource1: TDataSource
+    DataSet = ADOQuery1
+    Left = 200
+  end
+  object ADOQuery1: TADOQuery
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    LockType = ltBatchOptimistic
+    AfterScroll = ADOQuery1AfterScroll
+    OnCalcFields = ADOQuery1CalcFields
+    Parameters = <>
+    SQL.Strings = (
+      
+        'SELECT         *, DATEDIFF(Month, epindt - 9, epledt - 9) AS fac' +
+        '_months, DATEDIFF(Day, epindt,'
+      '                           epledt) AS rub_days,'
+      
+        '                    (select pst_vim from hrd_prof where pst_code' +
+        '=a.pst_code) as pst_vim,'
+      
+        '(select vim_titl from hrd_dept where dept_code=a.dept_code)  as ' +
+        'dept_vim  '
+      'FROM             dbo.hrd_emp as a'
+      
+        'WHERE         (epledt BETWEEN '#39'2006/08/01'#39' AND '#39'2006/08/31'#39') AND' +
+        ' (info_code = '#39'2'#39') AND '
+      
+        '                          (LEFT(dept_code, 1) = '#39'V'#39') AND ((YEAR(' +
+        'epledt - 9) - YEAR(epindt - 9)) '
+      
+        '                          * 12 + MONTH(epledt - 9) - MONTH(epind' +
+        't - 9) >= 12)'
+      'ORDER BY  emp_id')
+    Left = 168
+    object ADOQuery1sort: TIntegerField
+      FieldKind = fkCalculated
+      FieldName = 'sort'
+      Calculated = True
+    end
+    object ADOQuery1emp_id: TStringField
+      FieldName = 'emp_id'
+      Size = 6
+    end
+    object ADOQuery1name_vim: TWideStringField
+      FieldName = 'name_vim'
+      Size = 50
+    end
+    object ADOQuery1dept_code: TStringField
+      FieldName = 'dept_code'
+      Size = 6
+    end
+    object ADOQuery1abbr_titl: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'abbr_titl'
+      Calculated = True
+    end
+    object ADOQuery1epid_no: TStringField
+      FieldName = 'epid_no'
+      Size = 10
+    end
+    object ADOQuery1epindt: TDateTimeField
+      FieldName = 'epindt'
+      OnGetText = ADOQuery1epindtGetText
+    end
+    object ADOQuery1epledt: TDateTimeField
+      FieldName = 'epledt'
+      OnGetText = ADOQuery1epindtGetText
+    end
+    object ADOQuery1supp_amt: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'lv_supp_amt'
+      OnGetText = ADOQuery1supp_amtGetText
+      Calculated = True
+    end
+    object ADOQuery1pst_code: TStringField
+      FieldName = 'pst_code'
+      Size = 2
+    end
+    object ADOQuery1edu_code: TStringField
+      FieldName = 'edu_code'
+      Size = 2
+    end
+    object ADOQuery1tr_month: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'tr_month'
+      Calculated = True
+    end
+    object ADOQuery1fac_months: TIntegerField
+      FieldName = 'fac_months'
+      ReadOnly = True
+    end
+    object ADOQuery1rub_days: TIntegerField
+      FieldName = 'rub_days'
+      ReadOnly = True
+    end
+    object ADOQuery1years: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'years'
+      Calculated = True
+    end
+    object ADOQuery1six_amt: TFloatField
+      DisplayLabel = #20845#20491#26376#24179#22343#24037#36039'(2009'#24180#20197#21069')'
+      FieldKind = fkCalculated
+      FieldName = 'six_amt'
+      Calculated = True
+    end
+    object ADOQuery1factory_name: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'factory_name'
+      Calculated = True
+    end
+    object ADOQuery1basic_pay: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'basic_pay'
+      Calculated = True
+    end
+    object ADOQuery1other_pay: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'other_pay'
+      Calculated = True
+    end
+    object ADOQuery1in_months: TIntegerField
+      FieldKind = fkCalculated
+      FieldName = 'in_months'
+      Calculated = True
+    end
+    object ADOQuery1sal_pay: TFloatField
+      FieldKind = fkCalculated
+      FieldName = 'sal_pay'
+      Calculated = True
+    end
+    object ADOQuery1epbirth: TDateTimeField
+      FieldName = 'epbirth'
+    end
+    object ADOQuery1pst_vim: TWideStringField
+      FieldName = 'pst_vim'
+      ReadOnly = True
+    end
+    object ADOQuery1dept_vim: TWideStringField
+      FieldName = 'dept_vim'
+      ReadOnly = True
+      Size = 40
+    end
+    object ADOQuery1six_amt_new2: TFloatField
+      DisplayLabel = #20845#20491#26376#24179#22343#24037#36039'(2009'#24180#20197#21518')'
+      FieldKind = fkCalculated
+      FieldName = 'six_amt_new'
+      Calculated = True
+    end
+  end
+  object PrintDialog1: TPrintDialog
+    Left = 640
+    Top = 4
+  end
+  object ADOQuery_prt: TADOQuery
+    Connection = DMHrdsys.conn
+    Parameters = <>
+    Left = 232
+  end
+  object ADOQuery_cur: TADOQuery
+    Connection = DMHrdsys.conn
+    CursorType = ctStatic
+    LockType = ltBatchOptimistic
+    AfterScroll = ADOQuery1AfterScroll
+    Parameters = <>
+    SQL.Strings = (
+      'select * from hrd_sal_cur_leave ')
+    Left = 592
+    Top = 8
+    object ADOQuery_curupd_user: TStringField
+      FieldName = 'upd_user'
+      Size = 16
+    end
+    object ADOQuery_curupd_date: TDateTimeField
+      FieldName = 'upd_date'
+    end
+    object ADOQuery_curpay_mon: TStringField
+      FieldName = 'pay_mon'
+      Size = 6
+    end
+    object ADOQuery_curemp_id: TStringField
+      FieldName = 'emp_id'
+      Size = 6
+    end
+    object ADOQuery_curdept_code: TStringField
+      FieldName = 'dept_code'
+      Size = 6
+    end
+    object ADOQuery_curinfo_code: TStringField
+      FieldName = 'info_code'
+      FixedChar = True
+      Size = 1
+    end
+    object ADOQuery_cursalary: TBCDField
+      FieldName = 'salary'
+      Precision = 19
+    end
+    object ADOQuery_curfull_sal: TBCDField
+      FieldName = 'full_sal'
+      Precision = 19
+    end
+    object ADOQuery_curif_full: TStringField
+      FieldName = 'if_full'
+      Size = 1
+    end
+    object ADOQuery_curcurr_qty: TIntegerField
+      FieldName = 'curr_qty'
+    end
+    object ADOQuery_cursal50w: TIntegerField
+      FieldName = 'sal50w'
+    end
+    object ADOQuery_cursal10w: TIntegerField
+      FieldName = 'sal10w'
+    end
+    object ADOQuery_cursal5w: TIntegerField
+      FieldName = 'sal5w'
+    end
+    object ADOQuery_cursal2w: TIntegerField
+      FieldName = 'sal2w'
+    end
+    object ADOQuery_cursal1w: TIntegerField
+      FieldName = 'sal1w'
+    end
+    object ADOQuery_cursal5s: TIntegerField
+      FieldName = 'sal5s'
+    end
+    object ADOQuery_cursal2s: TIntegerField
+      FieldName = 'sal2s'
+    end
+    object ADOQuery_cursal1s: TIntegerField
+      FieldName = 'sal1s'
+    end
+    object ADOQuery_cursal5h: TIntegerField
+      FieldName = 'sal5h'
+    end
+    object ADOQuery_cursal2h: TIntegerField
+      FieldName = 'sal2h'
+    end
+  end
+end
