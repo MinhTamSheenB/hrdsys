@@ -1,0 +1,26 @@
+
+----test /每工作天伙食費
+
+SELECT * FROM cos_vouc_mst WHERE vouc_id='NH17030072'
+SELECT * FROM cos_vouc_mst WHERE vouc_id='NH10010001'
+
+SELECT  * FROM cos_vouc_detail WHERE vouc_id='NH17030072'
+SELECT cashier_confirm, * FROM cos_vouc_detail WHERE vouc_id='NH10010001'
+
+
+
+SELECT * FROM cos_vouc_mst WHERE vouc_id='NH17030072'
+SELECT  * FROM cos_vouc_detail WHERE vouc_id='NH17030072'
+
+select * from cos_icbc_pay where   --- icbc_date='2017/03/24'
+tran_vouc like 'NH17030072%'
+
+--select * into tempdbf.dbo.cos_icbc_pay_tam
+--from cos_icbc_pay where   --- icbc_date='2017/03/24'
+--tran_vouc like 'NH17030072%'
+
+SELECT * FROM tempdbf.dbo.cos_icbc_pay_tam
+ WHERE tran_vouc like 'NH17030072%'
+
+
+select * from cos_supp where supp_no IN ('K0102','C0059')
