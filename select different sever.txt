@@ -1,8 +1,0 @@
-SELECT         *,(select  b.name_vim  from OpenDataSource('sqloledb','data source=192.168.7.9;user id=web;password=web').[flu-erp].[dbo].[hrd_emp] b where b.emp_id=right(left(a.logonuser,7),6) collate Chinese_PRC_CI_AS)
-,  (select bb.vim_titl from OpenDataSource('sqloledb','data source=192.168.7.9;user id=web;password=web').[flu-erp].[dbo].[hrd_dept] bb where bb.dept_code=
- (select  aa.dept_code from  OpenDataSource('sqloledb','data source=192.168.7.9;user id=web;password=web').[flu-erp].[dbo].[hrd_emp] aa 
-where aa.emp_id=right(left(a.logonuser,7),6) collate Chinese_PRC_CI_AS )  )
-
-FROM             dbo.LogonInfoLog a
-WHERE         (logonForm LIKE 'bar7%') AND (LogonUser <> 'itfuluh')
-ORDER BY  id DESC
