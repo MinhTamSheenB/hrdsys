@@ -1,0 +1,113 @@
+---------------- compare check wrong update ?
+SELECT tt2.on_hand as truocdo,bisai.on_hand as bisai,tt2.up_date as datetruocdo,bisai.up_date as datebisai,tt2.* 
+FROM  vhprodlog.dbo.x_inv_mast tt2
+INNER JOIN
+
+    (SELECT item_no, MAX(up_date) AS MaxDateTime
+    FROM vhprodlog.dbo.x_inv_mast b where b.up_date<'2014-07-10 15:25:03.000' 
+    GROUP BY b.item_no) groupedtt 
+
+ON tt2.item_no = groupedtt.item_no 
+AND tt2.up_date = groupedtt.MaxDateTime   and fact_code='f'
+--and tt2.on_hand>0
+
+inner join 
+(
+
+SELECT tt.*
+FROM  vhprodlog.dbo.x_inv_mast tt
+INNER JOIN
+
+    (SELECT item_no, MAX(up_date) AS MaxDateTime
+    FROM vhprodlog.dbo.x_inv_mast b where b.up_date<'2014-07-10 15:26:05.000'
+    GROUP BY b.item_no) groupedtt 
+
+ON tt.item_no = groupedtt.item_no 
+AND tt.up_date = groupedtt.MaxDateTime     and fact_code='f'
+--and on_hand>0
+
+)bisai
+on bisai.item_no=tt2.item_no  and tt2.on_hand<>bisai.on_hand
+and tt2.on_hand>0 
+
+order by datetruocdo desc 
+
+
+-------------------------------- select maxdate of item_no
+
+SELECT groupedtt.MaxDateTime,tt.*
+FROM  vhprodlog.dbo.X_INV_MAST_MON_BACKUP tt
+right JOIN
+
+    (SELECT item_no, MAX(up_date) AS MaxDateTime
+    FROM vhprodlog.dbo.x_inv_mast b where b.up_date<'2014-07-10 15:25:03.000'
+    GROUP BY b.item_no) groupedtt 
+
+ON  -- tt.item_no = groupedtt.item_no  AND tt.up_date = groupedtt.MaxDateTime     and
+ fact_code='f' and  tt.item_no = groupedtt.item_no and 
+  lbak_month='201407' and up_date <='2014-07-10 15:25:05.000'  
+
+
+-------------update up_date of x_inv_mast
+
+----UPDATE  date time
+
+--update  vhitem.dbo.x_inv_mast  --  
+set  vhitem.dbo.x_inv_mast.up_date=d.MaxDateTime 
+from  vhitem.dbo.x_inv_mast    c inner join 
+( 
+  
+
+SELECT groupedtt.MaxDateTime,tt.item_no,tt.location,tt.fact_code
+FROM   vhitem.dbo.x_inv_mast  TT
+inner JOIN
+
+    (  SELECT item_no, MAX(up_date) AS MaxDateTime
+    FROM vhprodlog.dbo.x_inv_mast b where b.up_date<'2014-07-10 15:25:03.000' and b.fact_code='f'    --  and b.item_no='XF020100G50407'
+    GROUP BY b.item_no) groupedtt 
+
+ON  
+ fact_code='f' and  tt.item_no = groupedtt.item_no  
+  and up_date <='2014-07-10 15:25:05.000'   
+
+
+) d  ON 
+c.item_no=d.item_no and c.location=d.location and 
+   c.up_date <='2014-07-10 15:25:05.000'  and
+c.fact_code=d.fact_code
+
+
+---------------- select detail info of item_no 
+
+
+
+select 
+on_hand,* 
+ from vhprodlog.dbo.x_inv_mast  m where      fact_code='f'  and  --and lup_user='B600004' 
+ item_no='XJ200M103000TQ'
+order by lup_date desc 
+
+select  on_hand, * from x_inv_mast 
+where  -- fact_code='f'  and 
+ item_no='XJ200M103000TQ'
+
+
+select * from X_INV_TRG_ITEM_UPD 
+where fact_code='f'
+and  item_no='XJ200M103000TQ' order by up_date desc 
+
+select * from vhprodlog.dbo.X_INV_MAST_MON_BACKUP
+where   item_no='XJ200M103000TQ' 
+and fact_code ='f' order by lbak_month desc 
+
+
+------------------------- select make sure for test and update little item_no before update all of wrong item_no
+
+
+
+select * from vhprodlog.dbo.x_inv_mast
+where lup_date>='2014-08-02 09:38:29.830'
+and lup_date<='2014-08-02 09:41:22.550'
+and fact_code='f'
+order by lup_date desc 
+
