@@ -1,0 +1,43 @@
+SELECT         *
+FROM             dbo.prd_day_prod_mst
+WHERE         (ind_no = 'MV40145')
+ORDER BY  up_date DESC
+
+ SELECT         *
+FROM             dbo.prd_day_prod_in
+WHERE         (ind_no = 'MV40145')
+ORDER BY  up_date DESC
+
+
+
+SELECT         *
+FROM             dbo.prd_inv_pro_iod
+WHERE         (batch_no = 'I114020798')
+
+
+SELECT         *
+FROM             dbo.prd_day_prod_dtl
+WHERE         (batch_no = 'V140530563')
+
+
+
+
+
+
+
+SELECT         *
+FROM             dbo.prd_day_prod_mst
+WHERE         (ind_no = 'MV40145')
+ORDER BY  up_date DESC
+
+
+
+select b.batch_no,sum(prod_qty) from  prd_day_prod_dtl  b  where   --batch_no='V140530575' and 
+   batch_no in (
+
+SELECT         batch_no
+FROM             dbo.prd_day_prod_mst
+WHERE         (ind_no = 'MV40145') and part_pos='a'
+)
+
+group by b.batch_no  --,b.prod_qty
