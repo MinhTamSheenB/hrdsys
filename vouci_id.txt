@@ -1,0 +1,46 @@
+
+----tre13
+--NH17030033
+
+SELECT b.vouc_date
+	,b.currency
+	,a.cashier_confirm AS tran_bill
+	,a.cashier_confirm AS fetch_bill
+	,a.cashier_confirm AS other_bill
+	,a.*
+FROM cos_vouc_detail AS a
+	,cos_vouc_mst AS b
+WHERE a.vouc_id = b.vouc_id
+	AND b.vouc_sts = 'C'
+	AND a.accitem_id LIKE '112%'
+ORDER BY b.vouc_date
+
+
+
+----bas15
+
+
+select * from cos_icbc_pay where icbc_date='2017/03/24'
+
+
+select *,memo as supp_name from cos_icbc_pay where 1<0
+
+
+select * from cos_supp where supp_no='K0103'
+
+
+
+---- bas18
+
+select * from cos_icbc_pay where icbc_date='2017/03/24'
+select *,memo as supp_name from cos_icbc_pay where 1<0
+
+select icbc_batch, icbc_bankno, icbc_date,icbc_curr,icbc_pay1, icbc_supp,  ICBC_DETL, if_huikuan  from cos_icbc_pay where  icbc_date='2017/03/24'
+
+
+select *,memo as supp_name,'0' as choose  from cos_icbc_pay where 1<0
+
+select bank_name + bank_addr as bank_name , bank_cst, bank_id  from cos_supp where supp_no='K0103'
+
+
+select * from cos_icbc_pay where icbc_date='2017/03/24'

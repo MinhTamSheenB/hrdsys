@@ -1,0 +1,21 @@
+
+
+
+select * from ord_idm_idmter
+where ind_no='MVS70218'
+and part_code='L03'
+
+select * from vhprod_0206.dbo.ord_idm_idmter
+where ind_no='MVS70218'
+and part_code='L03'
+
+
+select * from vhprodlog2.dbo.vhp_847_ord_idm_idmter
+where ind_no='MVS70218'
+and part_code='L03'
+order by lup_date desc
+
+SELECT * FROM VHPRODLOG2.DBO.vhp_847_ord_idm_idmstc
+where ind_no='MVS70218'
+ORDER BY lup_date DESC 
+

@@ -1,0 +1,8 @@
+
+select   *  from prd_inv_pro_mon
+where  inv_month in ('201702','201703')
+and ind_no in (
+select   distinct ind_no  from prd_inv_pro_mon
+where inv_month='201702'
+and in_qty like '%.5'
+)
